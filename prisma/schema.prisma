@@ -1,0 +1,238 @@
+// 本番はSupabase(Postgres)。npx prisma migrate dev で反映
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum League {
+  CENTRAL
+  PACIFIC
+}
+
+enum Level {
+  ICHIGUN
+  NIGUN
+}
+
+enum TitleCategory {
+  BATTING_AVERAGE
+  HOME_RUNS
+  RBI
+  STOLEN_BASES
+  WINS
+  ERA
+  STRIKEOUTS
+  SAVES
+  HOLDS
+}
+
+model Team {
+  id     String @id @default(cuid())
+  slug   String @unique
+  name   String
+  league League
+
+  homeGames             Game[]                  @relation("HomeTeam")
+  awayGames             Game[]                  @relation("AwayTeam")
+  standings             StandingsSnapshot[]
+  battingStats          PlayerBattingStat[]
+  pitchingStats         PlayerPitchingStat[]
+  championshipProbs     ChampionshipProbability[]
+  titleRaceProbs        TitleRaceProbability[]
+  titleLeaderSnapshots  TitleLeaderSnapshot[]
+  insights              TeamInsight[]
+  prospectRatings       ProspectRating[]
+}
+
+model Game {
+  id         String   @id @default(cuid())
+  date       DateTime
+  homeTeamId String
+  awayTeamId String
+  homeScore  Int?
+  awayScore  Int?
+  isFinished Boolean  @default(false)
+
+  homeTeam Team @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam Team @relation("AwayTeam", fields: [awayTeamId], references: [id])
+
+  @@unique([date, homeTeamId, awayTeamId])
+  @@index([date])
+}
+
+// 順位表の日次スナップショット。シミュレーションの入力かつ推移グラフの元データ
+model StandingsSnapshot {
+  id         String   @id @default(cuid())
+  teamId     String
+  date       DateTime
+  wins       Int
+  losses     Int
+  draws      Int
+  winPct     Float
+  gamesBehind Float
+
+  team Team @relation(fields: [teamId], references: [id])
+
+  @@unique([teamId, date])
+}
+
+// npb.jpの「個人打撃成績」ページ（1軍: idb1_*、2軍: idb2_*）から取得するフル成績。
+// playerIdは公式IDがないため teamSlug-選手名 の簡易スラッグ（同姓同名は考慮していない）
+model PlayerBattingStat {
+  id               String   @id @default(cuid())
+  playerId         String
+  playerName       String
+  teamId           String
+  level            Level
+  season           Int
+  date             DateTime
+  games            Int
+  plateAppearances Int
+  atBats           Int
+  runs             Int
+  hits             Int
+  doubles          Int
+  triples          Int
+  homeRuns         Int
+  totalBases       Int
+  rbi              Int
+  stolenBases      Int
+  caughtStealing   Int
+  walks            Int
+  hitByPitch       Int
+  strikeouts       Int
+  avg              Float
+  slg              Float
+  obp              Float
+
+  team Team @relation(fields: [teamId], references: [id])
+
+  @@unique([playerId, level, date])
+}
+
+model PlayerPitchingStat {
+  id             String   @id @default(cuid())
+  playerId       String
+  playerName     String
+  teamId         String
+  level          Level
+  season         Int
+  date           DateTime
+  appearances    Int
+  wins           Int
+  losses         Int
+  saves          Int
+  holds          Int
+  inningsPitched Float
+  hits           Int
+  homeRuns       Int
+  walks          Int
+  hitByPitch     Int
+  strikeouts     Int
+  runs           Int
+  earnedRuns     Int
+  era            Float
+
+  team Team @relation(fields: [teamId], references: [id])
+
+  @@unique([playerId, level, date])
+}
+
+// モンテカルロシミュレーションの結果（日次）
+model ChampionshipProbability {
+  id              String   @id @default(cuid())
+  teamId          String
+  date            DateTime
+  probability     Float
+  projectedWins   Float
+  projectedLosses Float
+  simulationRuns  Int
+
+  team Team @relation(fields: [teamId], references: [id])
+
+  @@unique([teamId, date])
+}
+
+// npb.jpのリーダーズページから取得した生の現在値。playerIdは公式IDがないため
+// 選手名+球団から生成した簡易スラッグ（同姓同名は考慮していないので要改善）
+model TitleLeaderSnapshot {
+  id         String        @id @default(cuid())
+  playerId   String
+  playerName String
+  teamId     String
+  category   TitleCategory
+  date       DateTime
+  rank       Int
+  value      Float
+
+  team Team @relation(fields: [teamId], references: [id])
+
+  @@unique([playerId, category, date])
+}
+
+// 得失点・試合結果から算出する分析系指標（シミュレーションではなく実績ベースの分析）
+model TeamInsight {
+  id                String   @id @default(cuid())
+  teamId            String
+  date              DateTime
+  pythagoreanWinPct Float // 得失点から算出する期待勝率（Bill James式、指数2）
+  actualWinPct      Float
+  eloRating         Float // 対戦相手の強さを加味したパワーランキング（初期値1500）
+  last10Wins        Int
+  last10Losses      Int
+  last10Draws       Int
+  offenseRank       Int // リーグ内の得点数順位（1が最多）
+  defenseRank       Int // リーグ内の失点数順位（1が最少＝最も良い）
+  summary           String // ルールベースで生成した特徴の要約文
+  runsScored        Int @default(0) // 消化試合の総得点（補強What-Ifシミュレーションの入力）
+  runsAllowed       Int @default(0) // 消化試合の総失点
+  gamesPlayed       Int @default(0)
+
+  team Team @relation(fields: [teamId], references: [id])
+
+  @@unique([teamId, date])
+}
+
+model TitleRaceProbability {
+  id             String        @id @default(cuid())
+  playerId       String
+  playerName     String
+  teamId         String
+  category       TitleCategory
+  date           DateTime
+  probability    Float
+  currentValue   Float
+  projectedValue Float
+
+  team Team @relation(fields: [teamId], references: [id])
+
+  @@unique([playerId, category, date])
+}
+
+enum ProspectCategory {
+  BATTING
+  PITCHING
+}
+
+// 2軍成績を、同一シーズンの1軍/2軍のリーグ平均差から算出した換算係数で「1軍換算」した粗い推計。
+// 特定選手の詳細な貢献度評価ではなく、球場補正・対戦相手調整も行っていないことを明記して使う
+model ProspectRating {
+  id              String           @id @default(cuid())
+  playerId        String
+  playerName      String
+  teamId          String
+  date            DateTime
+  category        ProspectCategory
+  nigunValue      Float // 打者はOPS(出塁率+長打率)、投手はERA
+  translatedValue Float // リーグ平均差から換算した1軍相当の推定値
+  sampleSize      Int // 打者は打数、投手は投球回（切り捨て）
+  rank            Int // カテゴリ内の順位（換算値ベース）
+
+  team Team @relation(fields: [teamId], references: [id])
+
+  @@unique([playerId, category, date])
+}
