@@ -2,7 +2,6 @@ name: Daily data pipeline
 
 on:
   schedule:
-    # 21:00 UTC = 6:00 JST（試合終了・npb.jp更新後を想定）
     - cron: "0 21 * * *"
   workflow_dispatch: {}
 
@@ -22,8 +21,6 @@ jobs:
 
       - run: npm ci
 
-      # tsxの--env-fileはファイルが無いとエラーになるため、CIでは空ファイルを用意する
-      # （実際の値はこのジョブのenv:からprocess.envに渡る）
       - run: touch .env.local
 
       - name: Scrape npb.jp
