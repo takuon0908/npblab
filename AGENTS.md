@@ -34,10 +34,17 @@ NPB(プロ野球)のデータを独自分析するアフィリエイトブログ
 - **npb.jpのDOM構造**: 1軍/2軍でカラム構成が違う（2軍投手にホールド列が無い等）。ヘッダーラベル文字列から列位置を引く方式で吸収（`scripts/scraper/parse.ts`の`buildHeaderIndex`）
 - **投球回表記**: 「6.1」は6回1/3（実数の小数ではない、野球独自表記）。降板時0アウトは"+"という特殊表記
 
+## チーム体制
+
+- **CEO（ユーザー）**: 方針決定・最終承認。デザイン/優先順位の好みなど「人にしか判断できないこと」の担当
+- **Claude Code（自分）**: 技術実装全般（データ基盤・UI・QA・デプロイ）
+- **`content-writer`サブエージェント**（`.claude/agents/content-writer.md`）: コラム記事の執筆。下書きを`content-drafts/`に保存するのみで、microCMSへの公開は行わない（CEOの承認が必要）
+- **`seo-strategist`サブエージェント**（`.claude/agents/seo-strategist.md`）: SEO・コンテンツ戦略の提案。実行はせず選択肢を提示するのみ
+
 ## 未着手（次のステップ）
 
-1. GitHub Actionsで日次パイプライン自動化（scrape→simulate→analyze→prospects）— 元々のゴールだが未着手
-2. `NEXT_PUBLIC_SITE_URL`をVercel環境変数に追加（デプロイ後ドメイン確定後の設定）
+1. GitHub Actionsで日次パイプライン自動化（scrape→simulate→analyze→prospects）— Secrets設定・動作確認まで完了、定期実行の様子見中
+2. `NEXT_PUBLIC_SITE_URL`をVercel環境変数に追加（デプロイ後ドメイン確定後の設定、`https://npblab.vercel.app`）
 3. OGP画像生成、Search Console登録
 4. 打率・防御率のタイトルレース対応
 
