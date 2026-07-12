@@ -1,0 +1,39 @@
+name: Daily data pipeline
+
+on:
+  schedule:
+    # 21:00 UTC = 6:00 JST（試合終了・npb.jp更新後を想定）
+    - cron: "0 21 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - run: npm ci
+
+      # tsxの--env-fileはファイルが無いとエラーになるため、CIでは空ファイルを用意する
+      # （実際の値はこのジョブのenv:からprocess.envに渡る）
+      - run: touch .env.local
+
+      - name: Scrape npb.jp
+        run: npm run scrape
+
+      - name: Run championship/title simulations
+        run: npm run simulate
+
+      - name: Compute team analytics
+        run: npm run analyze
+
+      - name: Compute prospect rankings
+        run: npm run prospects
