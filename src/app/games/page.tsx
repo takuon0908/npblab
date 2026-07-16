@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatDateJa } from "@/lib/date";
-import { teamAbbr } from "@/lib/teamAbbr";
+import { GameScore } from "@/components/GameScore";
 
 export const dynamic = "force-dynamic";
 
@@ -69,41 +68,15 @@ export default async function GamesPage() {
                 {formatDateJa(new Date(dateKey)).replace(/^\d+年/, "")}
               </h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 flex-1 min-w-0">
-                {games.map((g) => {
-                  const homeWin = (g.homeScore ?? 0) > (g.awayScore ?? 0);
-                  const awayWin = (g.awayScore ?? 0) > (g.homeScore ?? 0);
-                  return (
-                    <div
-                      key={g.id}
-                      className="flex items-center justify-center gap-1.5 rounded px-2 py-1.5 text-sm tabular-nums"
-                      style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
-                    >
-                      <Link
-                        href={`/teams/${g.awayTeam.slug}`}
-                        className="hover:underline"
-                        style={{
-                          color: awayWin ? "var(--ink)" : "var(--ink-muted)",
-                          fontWeight: awayWin ? 700 : 400,
-                        }}
-                      >
-                        {teamAbbr(g.awayTeam.slug)}
-                      </Link>
-                      <span className="font-semibold whitespace-nowrap">
-                        {g.awayScore}-{g.homeScore}
-                      </span>
-                      <Link
-                        href={`/teams/${g.homeTeam.slug}`}
-                        className="hover:underline"
-                        style={{
-                          color: homeWin ? "var(--ink)" : "var(--ink-muted)",
-                          fontWeight: homeWin ? 700 : 400,
-                        }}
-                      >
-                        {teamAbbr(g.homeTeam.slug)}
-                      </Link>
-                    </div>
-                  );
-                })}
+                {games.map((g) => (
+                  <GameScore
+                    key={g.id}
+                    homeTeam={g.homeTeam}
+                    awayTeam={g.awayTeam}
+                    homeScore={g.homeScore}
+                    awayScore={g.awayScore}
+                  />
+                ))}
               </div>
             </section>
           ))}

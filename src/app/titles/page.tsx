@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { TitleCategory } from "@prisma/client";
-import { Meter } from "@/components/Meter";
 import { Table, Th, Td } from "@/components/Table";
 
 export const dynamic = "force-dynamic";
@@ -52,10 +51,11 @@ async function getTitleRaces() {
   const latest = await prisma.titleRaceProbability.aggregate({ _max: { date: true } });
   if (!latest._max.date) return null;
 
+  // 確率はあくまで当サイト独自のシミュレーション値なので、並び順は実際の成績(currentValue)を主役にする
   const rows = await prisma.titleRaceProbability.findMany({
     where: { date: latest._max.date },
     include: { team: true },
-    orderBy: { probability: "desc" },
+    orderBy: { currentValue: "desc" },
   });
 
   const byCategory = new Map<TitleCategory, typeof rows>();
@@ -96,7 +96,7 @@ export default async function TitlesPage() {
                       <tr>
                         <Th>選手</Th>
                         <Th align="right">現在</Th>
-                        <Th align="right">確率</Th>
+                        <Th align="right">獲得確率</Th>
                       </tr>
                     </thead>
                     <tbody>
@@ -125,10 +125,8 @@ export default async function TitlesPage() {
                               {unit}
                             </div>
                           </Td>
-                          <Td align="right">
-                            <div className="inline-block w-32 align-middle">
-                              <Meter value={row.probability} />
-                            </div>
+                          <Td align="right" muted>
+                            {(row.probability * 100).toFixed(1)}%
                           </Td>
                         </tr>
                       ))}
