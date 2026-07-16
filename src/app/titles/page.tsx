@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { TitleCategory } from "@prisma/client";
 import { Meter } from "@/components/Meter";
@@ -106,9 +107,13 @@ export default async function TitlesPage() {
                               {i + 1}
                             </span>
                             {row.playerName}
-                            <span className="text-xs ml-1" style={{ color: "var(--ink-secondary)" }}>
+                            <Link
+                              href={`/teams/${row.team.slug}`}
+                              className="text-xs ml-1 hover:underline"
+                              style={{ color: "var(--ink-secondary)" }}
+                            >
                               ({row.team.name})
-                            </span>
+                            </Link>
                           </Td>
                           <Td align="right">
                             <div className="font-semibold text-base">

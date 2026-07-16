@@ -20,7 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/teams`, changeFrequency: "daily", priority: 0.9 },
     { url: `${siteUrl}/titles`, changeFrequency: "daily", priority: 0.9 },
     { url: `${siteUrl}/prospects`, changeFrequency: "daily", priority: 0.8 },
-    { url: `${siteUrl}/analysis`, changeFrequency: "weekly", priority: 0.6 },
+    // /analysisは中身が「準備中」のプレースホルダーのため、実装するまでサイトマップ・ナビから外す
     { url: `${siteUrl}/columns`, changeFrequency: "daily", priority: 0.7 },
     { url: `${siteUrl}/about/methodology`, changeFrequency: "monthly", priority: 0.4 },
   ];

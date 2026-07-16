@@ -1,8 +1,17 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
 function formatDate(date: Date): string {
   return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
 }
+
+const FOOTER_LINKS = [
+  { href: "/teams", label: "球団" },
+  { href: "/titles", label: "タイトルレース" },
+  { href: "/prospects", label: "2軍注目選手" },
+  { href: "/columns", label: "コラム" },
+  { href: "/about/methodology", label: "算出方法について" },
+];
 
 export async function SiteFooter() {
   const latest = await prisma.standingsSnapshot.aggregate({ _max: { date: true } });
@@ -10,14 +19,23 @@ export async function SiteFooter() {
 
   return (
     <footer className="mt-auto" style={{ borderTop: "1px solid var(--border)" }}>
-      <div
-        className="mx-auto max-w-4xl px-4 py-6 text-xs"
-        style={{ color: "var(--ink-muted)" }}
-      >
-        {updatedAt && <p className="mb-1">データ最終更新: {updatedAt}</p>}
-        <p>
-          掲載の確率・指標は公開情報をもとにした独自の分析・試算であり、NPB公式の見解や予測ではありません。
-        </p>
+      <div className="mx-auto max-w-4xl px-4 py-6">
+        <nav
+          className="flex flex-wrap gap-x-4 gap-y-2 text-xs mb-4"
+          style={{ color: "var(--ink-secondary)" }}
+        >
+          {FOOTER_LINKS.map((item) => (
+            <Link key={item.href} href={item.href} className="hover:underline">
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+        <div className="text-xs" style={{ color: "var(--ink-muted)" }}>
+          {updatedAt && <p className="mb-1">データ最終更新: {updatedAt}</p>}
+          <p>
+            掲載の確率・指標は公開情報をもとにした独自の分析・試算であり、NPB公式の見解や予測ではありません。
+          </p>
+        </div>
       </div>
     </footer>
   );

@@ -4,7 +4,6 @@ const NAV = [
   { href: "/teams", label: "球団" },
   { href: "/titles", label: "タイトルレース" },
   { href: "/prospects", label: "2軍注目選手" },
-  { href: "/analysis", label: "独自指標" },
   { href: "/columns", label: "コラム" },
 ];
 

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ProspectCategory } from "@prisma/client";
 import { Table, Th, Td } from "@/components/Table";
@@ -66,9 +67,13 @@ export default async function ProspectsPage() {
                         {p.rank}
                       </span>
                       {p.playerName}
-                      <span className="text-xs ml-1" style={{ color: "var(--ink-secondary)" }}>
+                      <Link
+                        href={`/teams/${p.team.slug}`}
+                        className="text-xs ml-1 hover:underline"
+                        style={{ color: "var(--ink-secondary)" }}
+                      >
                         ({p.team.name})
-                      </span>
+                      </Link>
                     </Td>
                     <Td align="right" muted>
                       {p.nigunValue.toFixed(3)}
@@ -103,9 +108,13 @@ export default async function ProspectsPage() {
                         {p.rank}
                       </span>
                       {p.playerName}
-                      <span className="text-xs ml-1" style={{ color: "var(--ink-secondary)" }}>
+                      <Link
+                        href={`/teams/${p.team.slug}`}
+                        className="text-xs ml-1 hover:underline"
+                        style={{ color: "var(--ink-secondary)" }}
+                      >
                         ({p.team.name})
-                      </span>
+                      </Link>
                     </Td>
                     <Td align="right" muted>
                       {p.nigunValue.toFixed(2)}
