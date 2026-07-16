@@ -17,10 +17,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: siteUrl, changeFrequency: "daily", priority: 1 },
+    { url: `${siteUrl}/games`, changeFrequency: "daily", priority: 0.9 },
     { url: `${siteUrl}/teams`, changeFrequency: "daily", priority: 0.9 },
     { url: `${siteUrl}/titles`, changeFrequency: "daily", priority: 0.9 },
     { url: `${siteUrl}/prospects`, changeFrequency: "daily", priority: 0.8 },
-    // /analysisは中身が「準備中」のプレースホルダーのため、実装するまでサイトマップ・ナビから外す
+    { url: `${siteUrl}/analysis`, changeFrequency: "daily", priority: 0.8 },
     { url: `${siteUrl}/columns`, changeFrequency: "daily", priority: 0.7 },
     { url: `${siteUrl}/about/methodology`, changeFrequency: "monthly", priority: 0.4 },
   ];

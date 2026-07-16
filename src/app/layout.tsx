@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Shippori_Mincho } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -13,6 +13,13 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+// コラム記事の見出し用。データページの機械的な数字表と、読み物であるコラムを書体で区別する
+const shipporiMincho = Shippori_Mincho({
+  variable: "--font-shippori-mincho",
+  weight: ["500", "700"],
   subsets: ["latin"],
 });
 
@@ -51,7 +58,7 @@ export default function RootLayout({
   return (
     <html
       lang="ja"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${shipporiMincho.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {/* eslint-disable-next-line react/no-danger */}

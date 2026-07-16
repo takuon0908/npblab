@@ -4,6 +4,7 @@
 import { PrismaClient, Level, ProspectCategory } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { computeBattingTranslation, computePitchingTranslation } from "./compute";
+import { latestPerPlayer } from "../shared/latestPerPlayer";
 
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URLが設定されていません");
@@ -17,20 +18,6 @@ function todayIso(): string {
 
 const MIN_AT_BATS = 30;
 const MIN_INNINGS = 10;
-
-// PlayerBattingStat/PlayerPitchingStatは日次スナップショット（@@unique([playerId, level, date])）なので、
-// season/levelだけで絞ると同一選手の過去分まで全部拾ってしまい、換算・ランキングが選手ごとに重複計算されてしまう。
-// 選手ごとに最新dateの1件だけを残す。
-function latestPerPlayer<T extends { playerId: string; date: Date }>(rows: T[]): T[] {
-  const latest = new Map<string, T>();
-  for (const row of rows) {
-    const current = latest.get(row.playerId);
-    if (!current || row.date > current.date) {
-      latest.set(row.playerId, row);
-    }
-  }
-  return [...latest.values()];
-}
 
 async function main() {
   const date = new Date(todayIso());

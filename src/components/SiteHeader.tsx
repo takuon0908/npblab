@@ -1,9 +1,11 @@
 import Link from "next/link";
 
 const NAV = [
+  { href: "/games", label: "試合結果" },
   { href: "/teams", label: "球団" },
   { href: "/titles", label: "タイトルレース" },
   { href: "/prospects", label: "2軍注目選手" },
+  { href: "/analysis", label: "独自指標" },
   { href: "/columns", label: "コラム" },
 ];
 

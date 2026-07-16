@@ -11,7 +11,8 @@
     "scrape": "tsx --env-file=.env.local scripts/scraper/index.ts",
     "simulate": "tsx --env-file=.env.local scripts/simulation/index.ts",
     "analyze": "tsx --env-file=.env.local scripts/analytics/index.ts",
-    "prospects": "tsx --env-file=.env.local scripts/prospects/index.ts"
+    "prospects": "tsx --env-file=.env.local scripts/prospects/index.ts",
+    "mvp": "tsx --env-file=.env.local scripts/mvp/index.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",

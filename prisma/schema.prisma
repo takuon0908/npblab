@@ -46,6 +46,7 @@ model Team {
   titleLeaderSnapshots  TitleLeaderSnapshot[]
   insights              TeamInsight[]
   prospectRatings       ProspectRating[]
+  valueRatings          PlayerValueRating[]
 }
 
 model Game {
@@ -216,6 +217,26 @@ model TitleRaceProbability {
 enum ProspectCategory {
   BATTING
   PITCHING
+}
+
+// 1軍選手の「LABバリュー」独自指標。打者・投手を同じ物差し（リーグ平均からの標準得点）で比較できるようにした
+// 貢献度指数。正式なWARではなく、公開データのみで算出できる簡易な近似値であることを前提とする
+model PlayerValueRating {
+  id         String           @id @default(cuid())
+  playerId   String
+  playerName String
+  teamId     String
+  category   ProspectCategory
+  season     Int
+  date       DateTime
+  rawStat    Float // 打者はOPS(出塁率+長打率)、投手は防御率
+  sampleSize Int // 打者は打席数、投手は投球回（切り捨て）
+  value      Float // LABバリュー（カテゴリ内で標準化したz-score。打者・投手はこの値で横並び比較する）
+  rank       Int // 打者・投手を合算した全体ランキングでの順位
+
+  team Team @relation(fields: [teamId], references: [id])
+
+  @@unique([playerId, category, date])
 }
 
 // 2軍成績を、同一シーズンの1軍/2軍のリーグ平均差から算出した換算係数で「1軍換算」した粗い推計。

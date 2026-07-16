@@ -1,21 +1,20 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-
-function formatDate(date: Date): string {
-  return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
-}
+import { formatDateJa } from "@/lib/date";
 
 const FOOTER_LINKS = [
+  { href: "/games", label: "試合結果" },
   { href: "/teams", label: "球団" },
   { href: "/titles", label: "タイトルレース" },
   { href: "/prospects", label: "2軍注目選手" },
+  { href: "/analysis", label: "独自指標" },
   { href: "/columns", label: "コラム" },
   { href: "/about/methodology", label: "算出方法について" },
 ];
 
 export async function SiteFooter() {
   const latest = await prisma.standingsSnapshot.aggregate({ _max: { date: true } });
-  const updatedAt = latest._max.date ? formatDate(latest._max.date) : null;
+  const updatedAt = latest._max.date ? formatDateJa(latest._max.date) : null;
 
   return (
     <footer className="mt-auto" style={{ borderTop: "1px solid var(--border)" }}>

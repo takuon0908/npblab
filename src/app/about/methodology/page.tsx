@@ -6,15 +6,71 @@ export const metadata: Metadata = {
   alternates: { canonical: "/about/methodology" },
 };
 
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="mb-10">
+      <h2 className="font-semibold text-lg mb-2">{title}</h2>
+      <div className="text-sm space-y-2" style={{ color: "var(--ink-secondary)" }}>
+        {children}
+      </div>
+    </section>
+  );
+}
+
 export default function MethodologyPage() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
-      <h1 className="text-2xl font-bold mb-4">算出方法について</h1>
-      <p style={{ color: "var(--ink-secondary)" }}>
-        優勝確率・タイトル獲得確率は、公開されている試合結果・成績データをもとに独自にシミュレーションした結果であり、
+      <h1 className="text-2xl font-bold mb-2">算出方法について</h1>
+      <p className="text-sm mb-10" style={{ color: "var(--ink-secondary)" }}>
+        当サイトの確率・指標はすべて、公開されている試合結果・成績データをもとにした独自の分析・試算です。
         NPB公式の見解や予測ではありません。
       </p>
-      {/* TODO: シミュレーション手法（モンテカルロ法の試行回数、チーム強さの推定方法など）を具体的に記載 */}
+
+      <Section title="優勝確率シミュレーション">
+        <p>
+          残り試合すべてを、両チームの勝率から算出した「log5法」の勝利確率でモンテカルロ・シミュレーションし、
+          1万回試行のうち何回優勝したかを確率として算出しています。実際の対戦カードの偏りも考慮しています。
+        </p>
+      </Section>
+
+      <Section title="タイトルレース獲得確率">
+        <p>
+          本塁打・打点・盗塁・勝利・奪三振・セーブ・ホールドの各部門について、残り試合数と選手ごとの1試合あたりの
+          平均ペースからポアソン分布で伸びしろを試算し、シミュレーション上でタイトルを獲得した割合を確率としています。
+          打率・防御率のような比率成績は規定打席・投球回の判定が別途必要なため、現時点では未対応です。
+        </p>
+      </Section>
+
+      <Section title="ピタゴラス勝率・パワーランキング(Elo)">
+        <p>
+          ピタゴラス勝率は、実際の勝敗ではなく総得点・総失点から算出する「実力なりの期待勝率」（Bill James式）です。
+          実際の勝率との差が大きいほど、「実力以上に勝てている／実力ほど勝てていない」ことを示します。
+        </p>
+        <p>
+          Eloレーティングは、対戦相手の強さを加味して算出するパワーランキングです。弱いチームに勝っても上がり幅は小さく、
+          強いチームに勝つと大きく上がります。
+        </p>
+      </Section>
+
+      <Section title="LABバリュー（1軍打者・投手の独自貢献度指数）">
+        <p>
+          打者と投手は成績の単位が違うため単純比較できません。そこで、打者は「OPS(出塁率+長打率)がリーグ平均を
+          どれだけ上回ったか」、投手は「防御率がリーグ平均をどれだけ下回ったか」を、それぞれ出場量（打席数・投球回）で
+          重みづけした上で、カテゴリ内で標準化（z-score）し、同じ物差しに乗せています。
+        </p>
+        <p>
+          正式なWAR(Wins Above Replacement)のような厳密な貢献度算出ではなく、公開データのみで作れる簡易な近似値です。
+          守備・走塁の貢献、対戦相手の強さ、球場補正などは考慮していません。打席数100・投球回30未満の選手は
+          サンプルサイズが小さいため対象外としています。
+        </p>
+      </Section>
+
+      <Section title="2軍→1軍換算（注目選手ランキング）">
+        <p>
+          2軍成績を、同一シーズンの1軍・2軍それぞれのリーグ平均の比率で換算した参考値です。球場補正や対戦相手の
+          強さは考慮していない粗い推計であり、特定選手の昇格後の成績を保証するものではありません。
+        </p>
+      </Section>
     </main>
   );
 }
