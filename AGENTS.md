@@ -39,6 +39,7 @@ NPB(プロ野球)のデータを独自分析するアフィリエイトブログ
 - **CEO（ユーザー）**: 方針決定・最終承認。デザイン/優先順位の好みなど「人にしか判断できないこと」の担当
 - **Claude Code（自分＝ボス）**: 技術実装全般（データ基盤・UI・QA・デプロイ）＋サブエージェント陣の指揮・成果物の取りまとめ
 - **`seo-strategist`**（`.claude/agents/seo-strategist.md`）: 何を書くか＝ネタ出し・SEO戦略の提案。実行はせず選択肢を提示するのみ
+- **`growth-strategist`**（`.claude/agents/growth-strategist.md`）: 集めたアクセスをどう収益化・回遊させるか＝広告/アフィリエイト戦略・内部導線・計測状況の提案。実行（アカウント開設・契約）はしない
 - **`researcher`**（`.claude/agents/researcher.md`）: 記事の元になる事実・数字の裏取り、背景調査。記事は書かない
 - **ライター陣**（それぞれ得意分野・キャラクターが違う。案件に応じてボスが使い分ける）
   - `content-writer`（`.claude/agents/content-writer.md`）: 汎用ライター。特定のキャラが不要な記事全般
@@ -59,13 +60,16 @@ NPB(プロ野球)のデータを独自分析するアフィリエイトブログ
 4. `editor`が下書きをレビュー（事実確認・文体チェック）
 5. CEOが最終確認 → OKならmicroCMS管理画面に手動で入稿（自動公開はしない）
 6. コード修正・小機能追加が必要な場合は`developer`に依頼、ボスが最終レビュー
+7. `growth-strategist`が定期的にPV・収益化状況を棚卸しし、改善案をCEOに提示（実行は伴わない）
 
 ## 未着手（次のステップ）
 
-1. GitHub Actionsで日次パイプライン自動化（scrape→simulate→analyze→prospects）— Secrets設定・動作確認まで完了、定期実行の様子見中
-2. `NEXT_PUBLIC_SITE_URL`をVercel環境変数に追加（デプロイ後ドメイン確定後の設定、`https://npblab.vercel.app`）
-3. OGP画像生成、Search Console登録
-4. 打率・防御率のタイトルレース対応
+1. **アクセス解析(GA4等)が未導入 — 最優先**: `src/app/layout.tsx`にトラッキングコードが一切無く、現状PVを計測できていない。CEOにGA4プロパティ作成を依頼し、測定IDを受け取り次第、実装側で組み込む
+2. 収益化手段が未導入（広告・アフィリエイトの契約ゼロ）: `growth-strategist`が選択肢を整理予定。ASP登録・AdSense審査申請等はCEOの作業が必要
+3. GitHub Actionsで日次パイプライン自動化（scrape→simulate→analyze→prospects）— Secrets設定・動作確認まで完了。以前スクレイパーが20分タイムアウトでキャンセルされる不具合があったが、fetchタイムアウト追加+並列化で解消（実測2分程度）
+4. `NEXT_PUBLIC_SITE_URL`をVercel環境変数に追加（デプロイ後ドメイン確定後の設定、`https://npblab.vercel.app`）
+5. OGP画像生成、Search Console登録
+6. 打率・防御率のタイトルレース対応
 
 ## 詳しい経緯
 
