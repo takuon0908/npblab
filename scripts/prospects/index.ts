@@ -18,6 +18,20 @@ function todayIso(): string {
 const MIN_AT_BATS = 30;
 const MIN_INNINGS = 10;
 
+// PlayerBattingStat/PlayerPitchingStatは日次スナップショット（@@unique([playerId, level, date])）なので、
+// season/levelだけで絞ると同一選手の過去分まで全部拾ってしまい、換算・ランキングが選手ごとに重複計算されてしまう。
+// 選手ごとに最新dateの1件だけを残す。
+function latestPerPlayer<T extends { playerId: string; date: Date }>(rows: T[]): T[] {
+  const latest = new Map<string, T>();
+  for (const row of rows) {
+    const current = latest.get(row.playerId);
+    if (!current || row.date > current.date) {
+      latest.set(row.playerId, row);
+    }
+  }
+  return [...latest.values()];
+}
+
 async function main() {
   const date = new Date(todayIso());
   const season = new Date().getFullYear();
@@ -29,8 +43,16 @@ async function main() {
     prisma.playerPitchingStat.findMany({ where: { level: Level.ICHIGUN, season } }),
   ]);
 
-  const battingRatings = computeBattingTranslation(nigunBatting, ichigunBatting, MIN_AT_BATS);
-  const pitchingRatings = computePitchingTranslation(nigunPitching, ichigunPitching, MIN_INNINGS);
+  const battingRatings = computeBattingTranslation(
+    latestPerPlayer(nigunBatting),
+    latestPerPlayer(ichigunBatting),
+    MIN_AT_BATS,
+  );
+  const pitchingRatings = computePitchingTranslation(
+    latestPerPlayer(nigunPitching),
+    latestPerPlayer(ichigunPitching),
+    MIN_INNINGS,
+  );
 
   let count = 0;
   for (const r of battingRatings) {
