@@ -17,14 +17,19 @@ NPB(プロ野球)のデータを独自分析するアフィリエイトブログ
 
 ## アーキテクチャ
 
-- `src/app/`: Next.js App Router のページ（`/teams`, `/titles`, `/prospects`, `/columns`, `/analysis`, `/about/methodology`）。全て`export const dynamic = "force-dynamic"`でDBを都度読む
+- `src/app/`: Next.js App Router のページ（`/games`, `/teams`, `/titles`, `/prospects`, `/analysis`, `/columns`, `/about/methodology`）。全て`export const dynamic = "force-dynamic"`でDBを都度読む
 - `src/lib/prisma.ts`: Prismaクライアントのシングルトン（`@prisma/adapter-pg`使用）
 - `src/lib/whatif.ts`: 補強What-Ifシミュレーション（既存の`simulateLeagueChampionship`を再利用）
+- `src/lib/date.ts`: 日付表示の共通フォーマッタ（`formatDateJa`）
+- `src/lib/microcms.ts`: コラムの読み取り専用クライアント（`microcms-js-sdk`）
 - `src/components/`: `Table`/`Th`/`Td`（ランキング表の共通部品）、`Meter`（確率バー）、`StatTile`、`GamesAboveBelow500`（貯金/借金の色分け表示）
 - `scripts/scraper/`: npb.jpから順位表・試合日程・タイトルリーダーズ・1軍/2軍個人成績をスクレイピングしDBにupsert（`npm run scrape`）
 - `scripts/simulation/`: log5法によるモンテカルロで優勝確率・タイトル獲得確率を算出（`npm run simulate`）
 - `scripts/analytics/`: ピタゴラス勝率・Eloパワーランキング・直近成績・スカウティングレポート文章を自動生成（`npm run analyze`）
 - `scripts/prospects/`: 2軍成績を1軍換算する独自ランキング（`npm run prospects`）
+- `scripts/mvp/`: 1軍打者・投手をリーグ平均からの標準得点(z-score)で横並び比較する独自指標「LABバリュー」を算出（`npm run mvp`）。`/analysis`ページのMVPランキング
+- `scripts/shared/latestPerPlayer.ts`: `PlayerBattingStat`/`PlayerPitchingStat`は日次スナップショットなので、season/levelだけで絞ると同一選手の過去分まで拾ってしまう。選手ごとに最新date分だけ残す共通ヘルパー（prospects/mvp両方で使用。過去に未適用でrankが飛ぶバグがあったため必ず経由すること）
+- `scripts/publish/publish-drafts.ts`: `content-drafts/`の下書きをmicroCMSに投稿するスクリプト（`npx tsx --env-file=.env.local scripts/publish/publish-drafts.ts [ファイル名...]`）。現在のMICROCMS_API_KEYは読み取り専用でPOSTが403になるため、書き込み権限のあるキーが必要（未着手リスト参照）
 
 ## 重要な注意点
 
@@ -64,12 +69,13 @@ NPB(プロ野球)のデータを独自分析するアフィリエイトブログ
 
 ## 未着手（次のステップ）
 
-1. **アクセス解析(GA4等)が未導入 — 最優先**: `src/app/layout.tsx`にトラッキングコードが一切無く、現状PVを計測できていない。CEOにGA4プロパティ作成を依頼し、測定IDを受け取り次第、実装側で組み込む
-2. 収益化手段が未導入（広告・アフィリエイトの契約ゼロ）: `growth-strategist`が選択肢を整理予定。ASP登録・AdSense審査申請等はCEOの作業が必要
-3. GitHub Actionsで日次パイプライン自動化（scrape→simulate→analyze→prospects）— Secrets設定・動作確認まで完了。以前スクレイパーが20分タイムアウトでキャンセルされる不具合があったが、fetchタイムアウト追加+並列化で解消（実測2分程度）
-4. `NEXT_PUBLIC_SITE_URL`をVercel環境変数に追加（デプロイ後ドメイン確定後の設定、`https://npblab.vercel.app`）
-5. OGP画像生成、Search Console登録
-6. 打率・防御率のタイトルレース対応
+1. **アクセス解析(GA4等)が未導入 — 最優先**: Vercel Analytics/Speed Insightsは導入済みだが、より詳細な行動分析にはGA4が必要。CEOにGA4プロパティ作成を依頼し、測定IDを受け取り次第、実装側で組み込む
+2. **microCMS APIキーが読み取り専用**: `scripts/publish/publish-drafts.ts`でPOSTすると403。CEOがmicroCMS管理画面でcolumnsエンドポイントへの書き込み権限(POST/PUT/PATCH/DELETE)があるAPIキーを発行し、`.env.local`の`MICROCMS_API_KEY`を更新する必要がある
+3. 収益化手段が未導入（広告・アフィリエイトの契約ゼロ）: `growth-strategist`が選択肢を整理済み（`strategy/`配下、gitignore対象の内部メモ）。ASP登録・AdSense審査申請等はCEOの作業が必要
+4. GitHub Actionsで日次パイプライン自動化（scrape→simulate→analyze→prospects→mvp）— Secrets設定・動作確認まで完了。mvpステップは`.github/workflows/daily-pipeline.yml`にまだ追加していない（workflowファイルの変更はPATのworkflow scope制限でpushできないため、GitHub Web UIでの手動追加が必要）
+5. `NEXT_PUBLIC_SITE_URL`をVercel環境変数に追加（デプロイ後ドメイン確定後の設定、`https://npblab.vercel.app`）
+6. OGP画像生成、Search Console登録
+7. 打率・防御率のタイトルレース対応
 
 ## 詳しい経緯
 
