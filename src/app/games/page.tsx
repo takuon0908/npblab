@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatDateJa } from "@/lib/date";
+import { teamAbbr } from "@/lib/teamAbbr";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/games" },
 };
 
-const DAYS_TO_SHOW = 10;
+const DAYS_TO_SHOW = 14;
 
 async function getRecentGames() {
   const today = new Date();
@@ -47,9 +48,9 @@ export default async function GamesPage() {
   const gamesByDate = await getRecentGames();
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-16">
+    <main className="mx-auto max-w-4xl px-4 py-16">
       <h1 className="text-2xl font-bold mb-2">試合結果</h1>
-      <p className="text-sm mb-10" style={{ color: "var(--ink-secondary)" }}>
+      <p className="text-sm mb-8" style={{ color: "var(--ink-secondary)" }}>
         直近{DAYS_TO_SHOW}試合日分の結果です。
       </p>
 
@@ -58,44 +59,47 @@ export default async function GamesPage() {
           データがありません。<code>npm run scrape</code> を実行してください。
         </p>
       ) : (
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-5">
           {gamesByDate.map(([dateKey, games]) => (
-            <section key={dateKey}>
-              <h2 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-muted)" }}>
-                {formatDateJa(new Date(dateKey))}
+            <section key={dateKey} className="flex items-baseline gap-4">
+              <h2
+                className="text-xs whitespace-nowrap w-16 shrink-0 pt-2"
+                style={{ color: "var(--ink-muted)" }}
+              >
+                {formatDateJa(new Date(dateKey)).replace(/^\d+年/, "")}
               </h2>
-              <div className="flex flex-col" style={{ border: "1px solid var(--border)", borderRadius: 8 }}>
-                {games.map((g, i) => {
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 flex-1 min-w-0">
+                {games.map((g) => {
                   const homeWin = (g.homeScore ?? 0) > (g.awayScore ?? 0);
                   const awayWin = (g.awayScore ?? 0) > (g.homeScore ?? 0);
                   return (
                     <div
                       key={g.id}
-                      className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 py-3 text-sm"
-                      style={i > 0 ? { borderTop: "1px solid var(--border)" } : undefined}
+                      className="flex items-center justify-center gap-1.5 rounded px-2 py-1.5 text-sm tabular-nums"
+                      style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
                     >
                       <Link
                         href={`/teams/${g.awayTeam.slug}`}
-                        className="text-right hover:underline"
+                        className="hover:underline"
                         style={{
-                          color: awayWin ? "var(--ink)" : "var(--ink-secondary)",
-                          fontWeight: awayWin ? 600 : 400,
+                          color: awayWin ? "var(--ink)" : "var(--ink-muted)",
+                          fontWeight: awayWin ? 700 : 400,
                         }}
                       >
-                        {g.awayTeam.name}
+                        {teamAbbr(g.awayTeam.slug)}
                       </Link>
-                      <span className="tabular-nums font-semibold whitespace-nowrap px-2">
-                        {g.awayScore} - {g.homeScore}
+                      <span className="font-semibold whitespace-nowrap">
+                        {g.awayScore}-{g.homeScore}
                       </span>
                       <Link
                         href={`/teams/${g.homeTeam.slug}`}
                         className="hover:underline"
                         style={{
-                          color: homeWin ? "var(--ink)" : "var(--ink-secondary)",
-                          fontWeight: homeWin ? 600 : 400,
+                          color: homeWin ? "var(--ink)" : "var(--ink-muted)",
+                          fontWeight: homeWin ? 700 : 400,
                         }}
                       >
-                        {g.homeTeam.name}
+                        {teamAbbr(g.homeTeam.slug)}
                       </Link>
                     </div>
                   );
