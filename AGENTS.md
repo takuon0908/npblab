@@ -34,12 +34,31 @@ NPB(プロ野球)のデータを独自分析するアフィリエイトブログ
 - **npb.jpのDOM構造**: 1軍/2軍でカラム構成が違う（2軍投手にホールド列が無い等）。ヘッダーラベル文字列から列位置を引く方式で吸収（`scripts/scraper/parse.ts`の`buildHeaderIndex`）
 - **投球回表記**: 「6.1」は6回1/3（実数の小数ではない、野球独自表記）。降板時0アウトは"+"という特殊表記
 
-## チーム体制
+## チーム体制（コンテンツ運用会社）
 
 - **CEO（ユーザー）**: 方針決定・最終承認。デザイン/優先順位の好みなど「人にしか判断できないこと」の担当
-- **Claude Code（自分）**: 技術実装全般（データ基盤・UI・QA・デプロイ）
-- **`content-writer`サブエージェント**（`.claude/agents/content-writer.md`）: コラム記事の執筆。下書きを`content-drafts/`に保存するのみで、microCMSへの公開は行わない（CEOの承認が必要）
-- **`seo-strategist`サブエージェント**（`.claude/agents/seo-strategist.md`）: SEO・コンテンツ戦略の提案。実行はせず選択肢を提示するのみ
+- **Claude Code（自分＝ボス）**: 技術実装全般（データ基盤・UI・QA・デプロイ）＋サブエージェント陣の指揮・成果物の取りまとめ
+- **`seo-strategist`**（`.claude/agents/seo-strategist.md`）: 何を書くか＝ネタ出し・SEO戦略の提案。実行はせず選択肢を提示するのみ
+- **`researcher`**（`.claude/agents/researcher.md`）: 記事の元になる事実・数字の裏取り、背景調査。記事は書かない
+- **ライター陣**（それぞれ得意分野・キャラクターが違う。案件に応じてボスが使い分ける）
+  - `content-writer`（`.claude/agents/content-writer.md`）: 汎用ライター。特定のキャラが不要な記事全般
+  - `writer-stats`（`.claude/agents/writer-stats.md`）: データ・数字重視。確率の変動やセイバーメトリクス系の記事
+  - `writer-passion`（`.claude/agents/writer-passion.md`）: 熱血・応援目線。逆転劇やドラマ性のある記事
+  - `writer-goods`（`.claude/agents/writer-goods.md`）: グッズ・観戦アイテム・商品紹介系（アフィリエイト導線を意識）
+  - `writer-baseball-otaku`（`.claude/agents/writer-baseball-otaku.md`）: 戦術・技術論・球史比較など「野球の中身」に踏み込む記事
+  - `writer-sports-science`（`.claude/agents/writer-sports-science.md`）: バイオメカニクス・スポーツ科学視点、独自指標の科学的な解説
+  - `writer-caster`（`.claude/agents/writer-caster.md`）: 実況風のライブ感・速報性重視の記事
+- **`editor`**（`.claude/agents/editor.md`）: ライター陣の下書きをCEOに見せる前に品質チェック（事実確認・転記チェック・文体チェック）。自分では書かない・公開しない
+- **`developer`**（`.claude/agents/developer.md`）: ボスから渡されたスコープ明確な実装タスクを担当。設計判断・デプロイ・pushはしない
+
+### ワークフロー
+
+1. `seo-strategist`がネタ案を複数提示 → CEOが選ぶ（または自由に指示）
+2. `researcher`が事実・数字を裏取りして調査メモを作る
+3. ボスが記事のキャラに合うライターを選んで執筆依頼（`content-drafts/`に下書き保存）
+4. `editor`が下書きをレビュー（事実確認・文体チェック）
+5. CEOが最終確認 → OKならmicroCMS管理画面に手動で入稿（自動公開はしない）
+6. コード修正・小機能追加が必要な場合は`developer`に依頼、ボスが最終レビュー
 
 ## 未着手（次のステップ）
 
