@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { prisma } from "@/lib/prisma";
+import { FavoriteTeamPicker } from "@/components/FavoriteTeamPicker";
 
 const NAV = [
   { href: "/games", label: "試合結果" },
@@ -9,7 +11,9 @@ const NAV = [
   { href: "/columns", label: "コラム" },
 ];
 
-export function SiteHeader() {
+export async function SiteHeader() {
+  const teams = await prisma.team.findMany({ select: { slug: true, name: true }, orderBy: { name: "asc" } });
+
   return (
     <header style={{ borderBottom: "1px solid var(--border)" }}>
       <div className="mx-auto max-w-4xl px-4 py-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 sm:py-4">
@@ -17,7 +21,7 @@ export function SiteHeader() {
           プロ野球LAB
         </Link>
         <nav
-          className="flex gap-3 text-xs overflow-x-auto sm:gap-5 sm:text-sm"
+          className="flex items-center gap-3 text-xs overflow-x-auto sm:gap-5 sm:text-sm"
           style={{ color: "var(--ink-secondary)" }}
         >
           {NAV.map((item) => (
@@ -29,6 +33,7 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
+          <FavoriteTeamPicker teams={teams} />
         </nav>
       </div>
     </header>

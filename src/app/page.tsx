@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { formatDateJa } from "@/lib/date";
 import { getLatestDayGames } from "@/lib/games";
-import { GameScore } from "@/components/GameScore";
+import { FavoriteAwareGameGrid } from "@/components/FavoriteAwareGameGrid";
 
 export const dynamic = "force-dynamic";
 
@@ -38,19 +38,7 @@ export default async function Home() {
               もっと見る →
             </Link>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
-            {latestGames.games.map((g) => (
-              <GameScore
-                key={g.id}
-                homeTeam={g.homeTeam}
-                awayTeam={g.awayTeam}
-                homeScore={g.homeScore}
-                awayScore={g.awayScore}
-                winningPitcher={g.winningPitcher}
-                savePitcher={g.savePitcher}
-              />
-            ))}
-          </div>
+          <FavoriteAwareGameGrid games={latestGames.games} />
         </section>
       )}
 

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatDateJa } from "@/lib/date";
-import { GameScore } from "@/components/GameScore";
+import { FavoriteAwareGameGrid } from "@/components/FavoriteAwareGameGrid";
 import { teamAbbr } from "@/lib/teamAbbr";
 
 export const dynamic = "force-dynamic";
@@ -108,19 +108,10 @@ export default async function GamesPage() {
               >
                 {formatDateJa(new Date(dateKey)).replace(/^\d+年/, "")}
               </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 flex-1 min-w-0">
-                {games.map((g) => (
-                  <GameScore
-                    key={g.id}
-                    homeTeam={g.homeTeam}
-                    awayTeam={g.awayTeam}
-                    homeScore={g.homeScore}
-                    awayScore={g.awayScore}
-                    winningPitcher={g.winningPitcher}
-                    savePitcher={g.savePitcher}
-                  />
-                ))}
-              </div>
+              <FavoriteAwareGameGrid
+                games={games}
+                className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 flex-1 min-w-0"
+              />
             </section>
           ))}
         </div>
