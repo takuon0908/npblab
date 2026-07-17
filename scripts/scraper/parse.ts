@@ -228,9 +228,12 @@ export interface ParsedGame {
   homeScore: number | null;
   awayScore: number | null;
   isFinished: boolean;
+  boxScoreUrl: string | null;
 }
 
-// npb.jp/games/{year}/schedule_{month}.html の月間日程。1日ごとに複数カードがネストしたテーブル
+// npb.jp/games/{year}/schedule_{month}.html の月間日程。1日ごとに複数カードがネストしたテーブル。
+// 各カードのtableは<a href="/scores/{year}/{MMDD}/{away}-{home}-{seriesNo}/">で囲まれており、
+// 勝敗投手を取得するボックススコアページへのリンクとして使える
 export function parseSchedule(html: string, year: number, month: number): ParsedGame[] {
   const $ = cheerio.load(html);
   const result: ParsedGame[] = [];
@@ -259,6 +262,9 @@ export function parseSchedule(html: string, year: number, month: number): Parsed
       const awayScoreText = $(scores[1]).text().trim();
       const isFinished = /^\d+$/.test(homeScoreText) && /^\d+$/.test(awayScoreText);
 
+      const href = $(gameTable).closest("a").attr("href");
+      const boxScoreUrl = href ? new URL(href, "https://npb.jp").toString() : null;
+
       result.push({
         date: `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
         homeTeamSlug: homeTeam.slug,
@@ -266,9 +272,34 @@ export function parseSchedule(html: string, year: number, month: number): Parsed
         homeScore: isFinished ? Number(homeScoreText) : null,
         awayScore: isFinished ? Number(awayScoreText) : null,
         isFinished,
+        boxScoreUrl,
       });
     });
   });
 
   return result;
+}
+
+export interface ParsedDecision {
+  winningPitcher: string | null;
+  losingPitcher: string | null;
+  savePitcher: string | null;
+}
+
+// npb.jp/scores/{year}/{MMDD}/{away}-{home}-{seriesNo}/ のボックススコアページから
+// 【勝投手】【敗投手】【セーブ】（例: 「【勝投手】 才木 （7勝4敗）」）を抜き出す。
+// どちらのチームの投手かの情報は無いため、呼び出し側でスコアの勝敗と突き合わせて判定する
+export function parseBoxScoreDecision(html: string): ParsedDecision {
+  const text = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+
+  const extract = (label: string) => {
+    const match = text.match(new RegExp(`【${label}】\\s*([^\\s（]+)`));
+    return match ? match[1] : null;
+  };
+
+  return {
+    winningPitcher: extract("勝投手"),
+    losingPitcher: extract("敗投手"),
+    savePitcher: extract("セーブ"),
+  };
 }

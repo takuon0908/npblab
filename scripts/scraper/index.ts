@@ -10,6 +10,7 @@ import {
   parseSchedule,
   parseIndividualBatting,
   parseIndividualPitching,
+  parseBoxScoreDecision,
 } from "./parse";
 import { fetchHtml } from "../shared/fetchHtml";
 import { slugifyPlayer } from "../shared/slugifyPlayer";
@@ -85,7 +86,7 @@ async function scrapeSchedule(year: number, month: number) {
       where: {
         date_homeTeamId_awayTeamId: { date, homeTeamId: homeTeam.id, awayTeamId: awayTeam.id },
       },
-      update: { homeScore: g.homeScore, awayScore: g.awayScore, isFinished: g.isFinished },
+      update: { homeScore: g.homeScore, awayScore: g.awayScore, isFinished: g.isFinished, boxScoreUrl: g.boxScoreUrl },
       create: {
         date,
         homeTeamId: homeTeam.id,
@@ -93,6 +94,7 @@ async function scrapeSchedule(year: number, month: number) {
         homeScore: g.homeScore,
         awayScore: g.awayScore,
         isFinished: g.isFinished,
+        boxScoreUrl: g.boxScoreUrl,
       },
     });
     count++;
@@ -169,6 +171,38 @@ async function scrapePlayerStats(year: number) {
   return { battingCount, pitchingCount };
 }
 
+// boxScoreUrlは日程ページに埋め込まれているリンクをscrapeSchedule側で保存済み
+async function fetchGameDecision(game: { id: string; boxScoreUrl: string | null }) {
+  if (!game.boxScoreUrl) return false;
+  try {
+    const html = await fetchHtml(game.boxScoreUrl);
+    const decision = parseBoxScoreDecision(html);
+    if (decision.winningPitcher) {
+      await prisma.game.update({ where: { id: game.id }, data: decision });
+      return true;
+    }
+  } catch (err) {
+    console.warn(`勝敗投手 ${game.boxScoreUrl} の取得に失敗:`, err);
+  }
+  return false;
+}
+
+const DECISION_FETCH_CONCURRENCY = 6;
+
+async function scrapeDecisions() {
+  const games = await prisma.game.findMany({
+    where: { isFinished: true, winningPitcher: null, boxScoreUrl: { not: null } },
+  });
+
+  let count = 0;
+  for (let i = 0; i < games.length; i += DECISION_FETCH_CONCURRENCY) {
+    const batch = games.slice(i, i + DECISION_FETCH_CONCURRENCY);
+    const results = await Promise.all(batch.map((g) => fetchGameDecision(g)));
+    count += results.filter(Boolean).length;
+  }
+  return count;
+}
+
 const TITLE_CATEGORY_URL: Record<TitleCategory, string> = {
   [TitleCategory.BATTING_AVERAGE]: "lb_avg",
   [TitleCategory.HOME_RUNS]: "lb_hr",
@@ -237,8 +271,9 @@ async function main() {
 
   const leadersCount = await scrapeTitleLeaders(year);
   const { battingCount, pitchingCount } = await scrapePlayerStats(year);
+  const decisionsCount = await scrapeDecisions();
 
-  console.log({ standingsCount, gamesCount, leadersCount, battingCount, pitchingCount });
+  console.log({ standingsCount, gamesCount, leadersCount, battingCount, pitchingCount, decisionsCount });
 }
 
 if (require.main === module) {

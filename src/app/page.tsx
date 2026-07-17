@@ -46,6 +46,8 @@ export default async function Home() {
                 awayTeam={g.awayTeam}
                 homeScore={g.homeScore}
                 awayScore={g.awayScore}
+                winningPitcher={g.winningPitcher}
+                savePitcher={g.savePitcher}
               />
             ))}
           </div>

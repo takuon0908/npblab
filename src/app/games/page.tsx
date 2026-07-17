@@ -75,6 +75,8 @@ export default async function GamesPage() {
                     awayTeam={g.awayTeam}
                     homeScore={g.homeScore}
                     awayScore={g.awayScore}
+                    winningPitcher={g.winningPitcher}
+                    savePitcher={g.savePitcher}
                   />
                 ))}
               </div>

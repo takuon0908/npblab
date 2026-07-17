@@ -58,6 +58,13 @@ model Game {
   awayScore  Int?
   isFinished Boolean  @default(false)
 
+  // 日程ページに埋め込まれているボックススコアページへのリンク（勝敗投手取得に使う）
+  boxScoreUrl String?
+  // ボックススコアページから取得する勝敗投手・セーブ投手
+  winningPitcher String?
+  losingPitcher  String?
+  savePitcher    String?
+
   homeTeam Team @relation("HomeTeam", fields: [homeTeamId], references: [id])
   awayTeam Team @relation("AwayTeam", fields: [awayTeamId], references: [id])
 
