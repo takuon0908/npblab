@@ -1,15 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { TitleCategory } from "@prisma/client";
+import { TitleCategory, Level } from "@prisma/client";
 import { Table, Th, Td } from "@/components/Table";
+import { latestPerPlayer } from "@/lib/latestPerPlayer";
+
+// NPBの規定打席・規定投球回の定義（チーム試合数を基準にした変動値）
+const QUALIFYING_PA_PER_GAME = 3.1;
+const QUALIFYING_IP_PER_GAME = 1;
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "プロ野球タイトルレース 獲得確率ランキング",
   description:
-    "本塁打王・打点王・盗塁王・最多勝・最多奪三振・最多セーブ・最多ホールドなど、NPBタイトル争いの獲得確率を日次シミュレーションで算出。現在値から最終予測値まで一目で分かります。",
+    "本塁打王・打点王・盗塁王・最多勝・最多奪三振・最多セーブ・最多ホールドの獲得確率を日次シミュレーションで算出。首位打者・防御率は規定到達者の現在値も掲載。",
   alternates: { canonical: "/titles" },
 };
 
@@ -67,8 +72,37 @@ async function getTitleRaces() {
   return byCategory;
 }
 
+// 打率・防御率は比率成績のため、規定打席/投球回に到達した選手の「現在値」のみを集計する。
+// カウント成績のような残り試合シミュレーションは行っていない（確率を出せない理由は/columns参照）
+async function getRateStatLeaders() {
+  const standingsLatest = await prisma.standingsSnapshot.aggregate({ _max: { date: true } });
+  if (!standingsLatest._max.date) return null;
+
+  const standings = await prisma.standingsSnapshot.findMany({ where: { date: standingsLatest._max.date } });
+  const teamGames = new Map(standings.map((s) => [s.teamId, s.wins + s.losses + s.draws]));
+
+  const season = new Date().getFullYear();
+  const [battingRows, pitchingRows] = await Promise.all([
+    prisma.playerBattingStat.findMany({ where: { level: Level.ICHIGUN, season }, include: { team: true } }),
+    prisma.playerPitchingStat.findMany({ where: { level: Level.ICHIGUN, season }, include: { team: true } }),
+  ]);
+
+  const qualifiedBatters = latestPerPlayer(battingRows)
+    .filter((b) => b.plateAppearances >= (teamGames.get(b.teamId) ?? 0) * QUALIFYING_PA_PER_GAME)
+    .sort((a, b) => b.avg - a.avg)
+    .slice(0, 5);
+
+  const qualifiedPitchers = latestPerPlayer(pitchingRows)
+    .filter((p) => p.inningsPitched >= (teamGames.get(p.teamId) ?? 0) * QUALIFYING_IP_PER_GAME)
+    .sort((a, b) => a.era - b.era)
+    .slice(0, 5);
+
+  return { qualifiedBatters, qualifiedPitchers };
+}
+
 export default async function TitlesPage() {
   const byCategory = await getTitleRaces();
+  const rateStats = await getRateStatLeaders();
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
@@ -136,6 +170,101 @@ export default async function TitlesPage() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {rateStats && (
+        <div className="mt-12">
+          <h2 className="font-semibold mb-1">首位打者・防御率（規定到達者）</h2>
+          <p className="text-xs mb-4" style={{ color: "var(--ink-muted)" }}>
+            規定打席（チーム試合数×3.1）・規定投球回（チーム試合数×1）に到達した選手の現在値です。
+            比率成績のため、当サイトの残り試合シミュレーションによる獲得確率は算出していません。
+          </p>
+          <div className="grid gap-8 sm:grid-cols-2 min-w-0">
+            <div>
+              <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
+                首位打者
+              </h3>
+              {rateStats.qualifiedBatters.length === 0 ? (
+                <p className="text-sm" style={{ color: "var(--ink-secondary)" }}>
+                  規定打席到達者なし
+                </p>
+              ) : (
+                <Table>
+                  <thead>
+                    <tr>
+                      <Th>選手</Th>
+                      <Th align="right">打率</Th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rateStats.qualifiedBatters.map((b, i) => (
+                      <tr key={b.playerId} className="hover:bg-black/[0.03]">
+                        <Td>
+                          <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
+                            {i + 1}
+                          </span>
+                          {b.playerName}
+                          <Link
+                            href={`/teams/${b.team.slug}`}
+                            className="text-xs ml-1 hover:underline"
+                            style={{ color: "var(--ink-secondary)" }}
+                          >
+                            ({b.team.name})
+                          </Link>
+                        </Td>
+                        <Td align="right">
+                          <span className="font-semibold text-base">{b.avg.toFixed(3)}</span>
+                        </Td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              )}
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
+                防御率
+              </h3>
+              {rateStats.qualifiedPitchers.length === 0 ? (
+                <p className="text-sm" style={{ color: "var(--ink-secondary)" }}>
+                  規定投球回到達者なし
+                </p>
+              ) : (
+                <Table>
+                  <thead>
+                    <tr>
+                      <Th>選手</Th>
+                      <Th align="right">防御率</Th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rateStats.qualifiedPitchers.map((p, i) => (
+                      <tr key={p.playerId} className="hover:bg-black/[0.03]">
+                        <Td>
+                          <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
+                            {i + 1}
+                          </span>
+                          {p.playerName}
+                          <Link
+                            href={`/teams/${p.team.slug}`}
+                            className="text-xs ml-1 hover:underline"
+                            style={{ color: "var(--ink-secondary)" }}
+                          >
+                            ({p.team.name})
+                          </Link>
+                        </Td>
+                        <Td align="right">
+                          <span className="font-semibold text-base">{p.era.toFixed(2)}</span>
+                        </Td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </main>
