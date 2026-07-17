@@ -33,8 +33,10 @@ NPB(プロ野球)のデータを独自分析するアフィリエイトブログ
 - `scripts/mvp/`: 1軍打者・投手をリーグ平均からの標準得点(z-score)で横並び比較する独自指標「LABバリュー」を算出（`npm run mvp`）。`/analysis`ページのMVPランキング
 - `scripts/historical/`: 過去シーズンをバックフィルする（`npm run historical`）。season-end代表日付(11/30)でStandingsSnapshot/PlayerBattingStat/PlayerPitchingStatに投入。**npb.jpは2025年にサイト構造を刷新しており、既存パーサーは2025年以降にのみ対応**（2024年以前は旧サイトの多重ネストテーブル構造のため別パーサーが必要、未着手）
 - `scripts/shared/latestPerPlayer.ts` / `fetchHtml.ts` / `slugifyPlayer.ts`: `PlayerBattingStat`/`PlayerPitchingStat`は日次スナップショットなので、season/levelだけで絞ると同一選手の過去分まで拾ってしまう。選手ごとに最新date分だけ残す共通ヘルパーと、タイムアウト付きfetch・選手スラッグ生成の共通処理（scraper/historical/prospects/mvpで共用。過去に未適用でrankが飛ぶバグがあったため必ず経由すること）
-- `scripts/publish/publish-drafts.ts`: `content-drafts/`の下書きをmicroCMSに投稿するスクリプト（`npx tsx --env-file=.env.local scripts/publish/publish-drafts.ts [ファイル名...]`）。書き込み権限のあるAPIキーに切り替え済みで稼働確認済み（5本投稿済み）
 - `src/lib/sabermetrics.ts`: FIP(投手)・wOBA(打者)の簡易試算（一般的な線形加重係数、NPB固有の較正は行っていない）。`/analysis`ページに表示
+- `src/lib/favoriteTeam.ts`: お気に入り球団をlocalStorageに保存（アカウント基盤が無いためブラウザ内のみ）。`favoriteTeamChange`カスタムイベントで`FavoriteTeamPicker`(ヘッダー)と`FavoriteAwareGameGrid`(/games・TOP)が連動する。プッシュ通知は現状の日次バッチ構成では実現不可のため未対応
+- `Game`モデル: `boxScoreUrl`(日程ページに埋め込まれたボックススコアURL)、`winningPitcher`/`losingPitcher`/`savePitcher`（ボックススコアの【勝投手】等から取得）、`venue`（球場名）、`probableHomePitcher`/`probableAwayPitcher`（npb.jp/announcement/starter/の翌日分予告先発）を保持
+- `scripts/publish/publish-drafts.ts`: `content-drafts/`の下書きをmicroCMSに投稿するスクリプト（`npx tsx --env-file=.env.local scripts/publish/publish-drafts.ts [ファイル名...]`）。書き込み権限のあるAPIキーに切り替え済みで稼働確認済み（5本投稿済み）
 
 ## 重要な注意点
 
@@ -87,11 +89,16 @@ NPB(プロ野球)のデータを独自分析するアフィリエイトブログ
 - コラム記事にArticleCoverイラスト(言及球団のチームカラー反映)を追加
 - 過去シーズン(2025)のバックフィル、球団ページに歴代成績を表示
 - FIP・wOBAのセイバーメトリクス指標を`/analysis`に追加
+- 球団ページに「チーム内成績トップ」を追加
+- 試合結果に勝敗投手・セーブ投手を表示（ボックススコアページの埋め込みリンクを利用）
+- 予告先発投手を`/games`に表示
+- お気に入り球団機能（localStorage、通知なし）を追加
 
 ## バックログ（次に手を付けるとしたら）
 
 - **2024年以前のnpb.jp旧サイト構造への対応**: 別パーサーの実装が必要（規模の見積もりが必要、着手前にCEOに相談）
 - タイトルリーダーズ・2軍成績の過去シーズン分バックフィル（現状は順位表・1軍個人成績のみ）
+- お気に入り球団のプッシュ通知（現状の日次バッチ構成では不可。リアルタイム性のあるパイプラインへの変更が前提）
 
 ## 詳しい経緯
 
