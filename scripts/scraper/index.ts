@@ -11,6 +11,8 @@ import {
   parseIndividualBatting,
   parseIndividualPitching,
 } from "./parse";
+import { fetchHtml } from "../shared/fetchHtml";
+import { slugifyPlayer } from "../shared/slugifyPlayer";
 
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URLが設定されていません");
@@ -18,23 +20,8 @@ if (!process.env.DATABASE_URL) {
 const adapter = new PrismaPg(process.env.DATABASE_URL);
 const prisma = new PrismaClient({ adapter });
 
-const USER_AGENT = "Mozilla/5.0";
-
-async function fetchHtml(url: string): Promise<string> {
-  const res = await fetch(url, {
-    headers: { "User-Agent": USER_AGENT },
-    signal: AbortSignal.timeout(15_000),
-  });
-  if (!res.ok) throw new Error(`fetch failed: ${url} (${res.status})`);
-  return res.text();
-}
-
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
-}
-
-function slugifyPlayer(playerName: string, teamSlug: string): string {
-  return `${teamSlug}-${playerName.replace(/\s|　/g, "")}`;
 }
 
 async function seedTeams() {
