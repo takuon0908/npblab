@@ -11,6 +11,7 @@ import {
   parseIndividualBatting,
   parseIndividualPitching,
   parseBoxScoreDecision,
+  parseProbableStarters,
 } from "./parse";
 import { fetchHtml } from "../shared/fetchHtml";
 import { slugifyPlayer } from "../shared/slugifyPlayer";
@@ -86,7 +87,13 @@ async function scrapeSchedule(year: number, month: number) {
       where: {
         date_homeTeamId_awayTeamId: { date, homeTeamId: homeTeam.id, awayTeamId: awayTeam.id },
       },
-      update: { homeScore: g.homeScore, awayScore: g.awayScore, isFinished: g.isFinished, boxScoreUrl: g.boxScoreUrl },
+      update: {
+        homeScore: g.homeScore,
+        awayScore: g.awayScore,
+        isFinished: g.isFinished,
+        boxScoreUrl: g.boxScoreUrl,
+        venue: g.venue,
+      },
       create: {
         date,
         homeTeamId: homeTeam.id,
@@ -95,6 +102,7 @@ async function scrapeSchedule(year: number, month: number) {
         awayScore: g.awayScore,
         isFinished: g.isFinished,
         boxScoreUrl: g.boxScoreUrl,
+        venue: g.venue,
       },
     });
     count++;
@@ -248,6 +256,35 @@ async function scrapeTitleLeaders(year: number) {
   return count;
 }
 
+// npb.jp/announcement/starter/ は「翌日分」の予告先発のみを掲載する（前日夕方頃に公示）
+async function scrapeProbableStarters(year: number) {
+  let entries;
+  try {
+    const html = await fetchHtml("https://npb.jp/announcement/starter/");
+    entries = parseProbableStarters(html, year);
+  } catch (err) {
+    console.warn("予告先発の取得に失敗（未公示の可能性）:", err);
+    return 0;
+  }
+
+  let count = 0;
+  for (const e of entries) {
+    const homeTeam = await prisma.team.findUniqueOrThrow({ where: { slug: e.homeTeamSlug } });
+    const awayTeam = await prisma.team.findUniqueOrThrow({ where: { slug: e.awayTeamSlug } });
+    const date = new Date(e.date);
+    try {
+      await prisma.game.update({
+        where: { date_homeTeamId_awayTeamId: { date, homeTeamId: homeTeam.id, awayTeamId: awayTeam.id } },
+        data: { probableHomePitcher: e.homePitcher, probableAwayPitcher: e.awayPitcher },
+      });
+      count++;
+    } catch (err) {
+      console.warn(`予告先発 ${e.date} ${e.homeTeamSlug}-${e.awayTeamSlug} に対応する試合が見つかりません:`, err);
+    }
+  }
+  return count;
+}
+
 // NPBのレギュラーシーズンは3月開幕なので、開幕月〜当月までを毎回まとめて取り込む。
 // 過去分は結果が変わらないのでupsertで冪等、当月分だけが実質更新される
 const SEASON_START_MONTH = 3;
@@ -272,8 +309,17 @@ async function main() {
   const leadersCount = await scrapeTitleLeaders(year);
   const { battingCount, pitchingCount } = await scrapePlayerStats(year);
   const decisionsCount = await scrapeDecisions();
+  const probableStartersCount = await scrapeProbableStarters(year);
 
-  console.log({ standingsCount, gamesCount, leadersCount, battingCount, pitchingCount, decisionsCount });
+  console.log({
+    standingsCount,
+    gamesCount,
+    leadersCount,
+    battingCount,
+    pitchingCount,
+    decisionsCount,
+    probableStartersCount,
+  });
 }
 
 if (require.main === module) {

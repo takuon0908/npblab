@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatDateJa } from "@/lib/date";
 import { GameScore } from "@/components/GameScore";
+import { teamAbbr } from "@/lib/teamAbbr";
 
 export const dynamic = "force-dynamic";
 
@@ -43,8 +45,19 @@ async function getRecentGames() {
   return [...byDate.entries()].sort(([a], [b]) => (a < b ? 1 : -1));
 }
 
+async function getProbableStarters() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return prisma.game.findMany({
+    where: { date: { gte: today }, isFinished: false, probableHomePitcher: { not: null } },
+    include: { homeTeam: true, awayTeam: true },
+    orderBy: { date: "asc" },
+  });
+}
+
 export default async function GamesPage() {
-  const gamesByDate = await getRecentGames();
+  const [gamesByDate, probableStarters] = await Promise.all([getRecentGames(), getProbableStarters()]);
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
@@ -52,6 +65,34 @@ export default async function GamesPage() {
       <p className="text-sm mb-8" style={{ color: "var(--ink-secondary)" }}>
         直近{DAYS_TO_SHOW}試合日分の結果です。
       </p>
+
+      {probableStarters.length > 0 && (
+        <section className="mb-10">
+          <h2 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-muted)" }}>
+            予告先発
+          </h2>
+          <div className="grid gap-1.5 sm:grid-cols-2">
+            {probableStarters.map((g) => (
+              <div
+                key={g.id}
+                className="flex items-center justify-between gap-2 rounded px-3 py-2 text-sm"
+                style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
+              >
+                <span style={{ color: "var(--ink-muted)" }} className="text-xs whitespace-nowrap">
+                  {formatDateJa(g.date).replace(/^\d+年/, "")}
+                </span>
+                <Link href={`/teams/${g.awayTeam.slug}`} className="hover:underline whitespace-nowrap">
+                  {teamAbbr(g.awayTeam.slug)} {g.probableAwayPitcher}
+                </Link>
+                <span style={{ color: "var(--ink-muted)" }}>vs</span>
+                <Link href={`/teams/${g.homeTeam.slug}`} className="hover:underline whitespace-nowrap">
+                  {teamAbbr(g.homeTeam.slug)} {g.probableHomePitcher}
+                </Link>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {gamesByDate.length === 0 ? (
         <p className="text-sm" style={{ color: "var(--ink-secondary)" }}>

@@ -229,6 +229,7 @@ export interface ParsedGame {
   awayScore: number | null;
   isFinished: boolean;
   boxScoreUrl: string | null;
+  venue: string | null;
 }
 
 // npb.jp/games/{year}/schedule_{month}.html の月間日程。1日ごとに複数カードがネストしたテーブル。
@@ -262,8 +263,12 @@ export function parseSchedule(html: string, year: number, month: number): Parsed
       const awayScoreText = $(scores[1]).text().trim();
       const isFinished = /^\d+$/.test(homeScoreText) && /^\d+$/.test(awayScoreText);
 
+      // 試合前カードは球団チケットサイトへのリンクで囲まれているため、
+      // ボックススコアURL(/scores/...)の形をしている場合のみ採用する
       const href = $(gameTable).closest("a").attr("href");
-      const boxScoreUrl = href ? new URL(href, "https://npb.jp").toString() : null;
+      const boxScoreUrl = href && href.startsWith("/scores/") ? new URL(href, "https://npb.jp").toString() : null;
+      // 試合前カードは開始時刻もtd.stateなので、球場名(colspan=5)だけを狙って拾う
+      const venue = $(gameTable).find('td.state[colspan="5"]').first().text().trim() || null;
 
       result.push({
         date: `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
@@ -273,6 +278,7 @@ export function parseSchedule(html: string, year: number, month: number): Parsed
         awayScore: isFinished ? Number(awayScoreText) : null,
         isFinished,
         boxScoreUrl,
+        venue,
       });
     });
   });
@@ -302,4 +308,38 @@ export function parseBoxScoreDecision(html: string): ParsedDecision {
     losingPitcher: extract("敗投手"),
     savePitcher: extract("セーブ"),
   };
+}
+
+export interface ParsedProbableStarter {
+  date: string; // ISO
+  homeTeamSlug: string;
+  awayTeamSlug: string;
+  homePitcher: string;
+  awayPitcher: string;
+}
+
+// npb.jp/announcement/starter/ の予告先発投手ページ。翌日分のみ掲載される。
+// <div class="unit">1つが1カードで、team_left=先(home)発表側、team_right=away側という並び
+export function parseProbableStarters(html: string, year: number): ParsedProbableStarter[] {
+  const $ = cheerio.load(html);
+  const heading = $("h4").first().text().trim();
+  const dateMatch = heading.match(/(\d+)月(\d+)日/);
+  if (!dateMatch) return [];
+  const date = `${year}-${dateMatch[1].padStart(2, "0")}-${dateMatch[2].padStart(2, "0")}`;
+
+  const result: ParsedProbableStarter[] = [];
+  $(".unit").each((_, unitEl) => {
+    const unit = $(unitEl);
+    const homeName = unit.find(".team_left img").attr("alt")?.trim();
+    const awayName = unit.find(".team_right img").attr("alt")?.trim();
+    const homePitcher = unit.find(".team_left span").first().text().trim();
+    const awayPitcher = unit.find(".team_right span").first().text().trim();
+    const homeTeam = homeName ? findTeamByName(homeName) : undefined;
+    const awayTeam = awayName ? findTeamByName(awayName) : undefined;
+    if (!homeTeam || !awayTeam || !homePitcher || !awayPitcher) return;
+
+    result.push({ date, homeTeamSlug: homeTeam.slug, awayTeamSlug: awayTeam.slug, homePitcher, awayPitcher });
+  });
+
+  return result;
 }

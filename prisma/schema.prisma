@@ -64,6 +64,11 @@ model Game {
   winningPitcher String?
   losingPitcher  String?
   savePitcher    String?
+  // 試合開催球場（日程ページのtd.state。予告先発の突き合わせにも使う）
+  venue String?
+  // npb.jp/announcement/starter/ から取得する予告先発投手（前日に翌日分のみ公示される）
+  probableHomePitcher String?
+  probableAwayPitcher String?
 
   homeTeam Team @relation("HomeTeam", fields: [homeTeamId], references: [id])
   awayTeam Team @relation("AwayTeam", fields: [awayTeamId], references: [id])
