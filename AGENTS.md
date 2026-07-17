@@ -31,8 +31,10 @@ NPB(プロ野球)のデータを独自分析するアフィリエイトブログ
 - `scripts/analytics/`: ピタゴラス勝率・Eloパワーランキング・直近成績・スカウティングレポート文章を自動生成（`npm run analyze`）
 - `scripts/prospects/`: 2軍成績を1軍換算する独自ランキング（`npm run prospects`）
 - `scripts/mvp/`: 1軍打者・投手をリーグ平均からの標準得点(z-score)で横並び比較する独自指標「LABバリュー」を算出（`npm run mvp`）。`/analysis`ページのMVPランキング
-- `scripts/shared/latestPerPlayer.ts`: `PlayerBattingStat`/`PlayerPitchingStat`は日次スナップショットなので、season/levelだけで絞ると同一選手の過去分まで拾ってしまう。選手ごとに最新date分だけ残す共通ヘルパー（prospects/mvp両方で使用。過去に未適用でrankが飛ぶバグがあったため必ず経由すること）
+- `scripts/historical/`: 過去シーズンをバックフィルする（`npm run historical`）。season-end代表日付(11/30)でStandingsSnapshot/PlayerBattingStat/PlayerPitchingStatに投入。**npb.jpは2025年にサイト構造を刷新しており、既存パーサーは2025年以降にのみ対応**（2024年以前は旧サイトの多重ネストテーブル構造のため別パーサーが必要、未着手）
+- `scripts/shared/latestPerPlayer.ts` / `fetchHtml.ts` / `slugifyPlayer.ts`: `PlayerBattingStat`/`PlayerPitchingStat`は日次スナップショットなので、season/levelだけで絞ると同一選手の過去分まで拾ってしまう。選手ごとに最新date分だけ残す共通ヘルパーと、タイムアウト付きfetch・選手スラッグ生成の共通処理（scraper/historical/prospects/mvpで共用。過去に未適用でrankが飛ぶバグがあったため必ず経由すること）
 - `scripts/publish/publish-drafts.ts`: `content-drafts/`の下書きをmicroCMSに投稿するスクリプト（`npx tsx --env-file=.env.local scripts/publish/publish-drafts.ts [ファイル名...]`）。書き込み権限のあるAPIキーに切り替え済みで稼働確認済み（5本投稿済み）
+- `src/lib/sabermetrics.ts`: FIP(投手)・wOBA(打者)の簡易試算（一般的な線形加重係数、NPB固有の較正は行っていない）。`/analysis`ページに表示
 
 ## 重要な注意点
 
@@ -83,6 +85,13 @@ NPB(プロ野球)のデータを独自分析するアフィリエイトブログ
 - microCMS APIキーの書き込み権限をCEOが有効化 → `publish-drafts.ts`で記事5本を投稿済み
 - 打率・防御率のタイトルレース対応（規定到達者の現在値ランキングとして実装）
 - コラム記事にArticleCoverイラスト(言及球団のチームカラー反映)を追加
+- 過去シーズン(2025)のバックフィル、球団ページに歴代成績を表示
+- FIP・wOBAのセイバーメトリクス指標を`/analysis`に追加
+
+## バックログ（次に手を付けるとしたら）
+
+- **2024年以前のnpb.jp旧サイト構造への対応**: 別パーサーの実装が必要（規模の見積もりが必要、着手前にCEOに相談）
+- タイトルリーダーズ・2軍成績の過去シーズン分バックフィル（現状は順位表・1軍個人成績のみ）
 
 ## 詳しい経緯
 
