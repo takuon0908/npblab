@@ -1,12 +1,51 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { Level } from "@prisma/client";
 import { StatTile } from "@/components/StatTile";
 import { Meter } from "@/components/Meter";
 import { GamesAboveBelow500 } from "@/components/GamesAboveBelow500";
 import { Table, Th, Td } from "@/components/Table";
 import { computeWhatIf } from "@/lib/whatif";
 import { calcMagicNumber } from "@/lib/baseball";
+import { latestPerPlayer } from "@/lib/latestPerPlayer";
+
+const MIN_AT_BATS_FOR_AVG_LEADER = 10;
+const MIN_INNINGS_FOR_ERA_LEADER = 10;
+
+function topBy<T>(rows: T[], key: (row: T) => number, filter?: (row: T) => boolean) {
+  const pool = filter ? rows.filter(filter) : rows;
+  if (pool.length === 0) return null;
+  return pool.reduce((best, row) => (key(row) > key(best) ? row : best));
+}
+
+function bottomBy<T>(rows: T[], key: (row: T) => number, filter?: (row: T) => boolean) {
+  const pool = filter ? rows.filter(filter) : rows;
+  if (pool.length === 0) return null;
+  return pool.reduce((best, row) => (key(row) < key(best) ? row : best));
+}
+
+async function getTeamLeaders(teamId: string) {
+  const season = new Date().getFullYear();
+  const [battingRows, pitchingRows] = await Promise.all([
+    prisma.playerBattingStat.findMany({ where: { teamId, level: Level.ICHIGUN, season } }),
+    prisma.playerPitchingStat.findMany({ where: { teamId, level: Level.ICHIGUN, season } }),
+  ]);
+
+  const batters = latestPerPlayer(battingRows);
+  const pitchers = latestPerPlayer(pitchingRows);
+
+  return {
+    avg: topBy(batters, (b) => b.avg, (b) => b.atBats >= MIN_AT_BATS_FOR_AVG_LEADER),
+    homeRuns: topBy(batters, (b) => b.homeRuns),
+    rbi: topBy(batters, (b) => b.rbi),
+    stolenBases: topBy(batters, (b) => b.stolenBases),
+    era: bottomBy(pitchers, (p) => p.era, (p) => p.inningsPitched >= MIN_INNINGS_FOR_ERA_LEADER),
+    wins: topBy(pitchers, (p) => p.wins),
+    strikeouts: topBy(pitchers, (p) => p.strikeouts),
+    saves: topBy(pitchers, (p) => p.saves),
+  };
+}
 
 // 年ごとに最新のスナップショット（完結済みシーズンはseason-end代表日、当年は最新日）を1件ずつ拾う
 function summarizeByYear<T extends { date: Date }>(rows: T[]): T[] {
@@ -97,6 +136,7 @@ export default async function TeamPage({
   }
 
   const whatIf = championship ? await computeWhatIf(team.id, championship.probability) : null;
+  const teamLeaders = await getTeamLeaders(team.id);
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
@@ -148,6 +188,100 @@ export default async function TeamPage({
               </>
             )}
           </dl>
+
+          <div className="grid gap-6 sm:grid-cols-2 mb-8">
+            <div>
+              <h2 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-muted)" }}>
+                チーム内成績トップ（打者）
+              </h2>
+              <Table>
+                <tbody>
+                  {teamLeaders.avg && (
+                    <tr className="hover:bg-black/[0.03]">
+                      <Td muted>打率</Td>
+                      <Td>{teamLeaders.avg.playerName}</Td>
+                      <Td align="right">
+                        <span className="font-semibold">{teamLeaders.avg.avg.toFixed(3)}</span>
+                      </Td>
+                    </tr>
+                  )}
+                  {teamLeaders.homeRuns && (
+                    <tr className="hover:bg-black/[0.03]">
+                      <Td muted>本塁打</Td>
+                      <Td>{teamLeaders.homeRuns.playerName}</Td>
+                      <Td align="right">
+                        <span className="font-semibold">{teamLeaders.homeRuns.homeRuns}本</span>
+                      </Td>
+                    </tr>
+                  )}
+                  {teamLeaders.rbi && (
+                    <tr className="hover:bg-black/[0.03]">
+                      <Td muted>打点</Td>
+                      <Td>{teamLeaders.rbi.playerName}</Td>
+                      <Td align="right">
+                        <span className="font-semibold">{teamLeaders.rbi.rbi}打点</span>
+                      </Td>
+                    </tr>
+                  )}
+                  {teamLeaders.stolenBases && (
+                    <tr className="hover:bg-black/[0.03]">
+                      <Td muted>盗塁</Td>
+                      <Td>{teamLeaders.stolenBases.playerName}</Td>
+                      <Td align="right">
+                        <span className="font-semibold">{teamLeaders.stolenBases.stolenBases}盗塁</span>
+                      </Td>
+                    </tr>
+                  )}
+                </tbody>
+              </Table>
+            </div>
+
+            <div>
+              <h2 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-muted)" }}>
+                チーム内成績トップ（投手）
+              </h2>
+              <Table>
+                <tbody>
+                  {teamLeaders.era && (
+                    <tr className="hover:bg-black/[0.03]">
+                      <Td muted>防御率</Td>
+                      <Td>{teamLeaders.era.playerName}</Td>
+                      <Td align="right">
+                        <span className="font-semibold">{teamLeaders.era.era.toFixed(2)}</span>
+                      </Td>
+                    </tr>
+                  )}
+                  {teamLeaders.wins && (
+                    <tr className="hover:bg-black/[0.03]">
+                      <Td muted>勝利</Td>
+                      <Td>{teamLeaders.wins.playerName}</Td>
+                      <Td align="right">
+                        <span className="font-semibold">{teamLeaders.wins.wins}勝</span>
+                      </Td>
+                    </tr>
+                  )}
+                  {teamLeaders.strikeouts && (
+                    <tr className="hover:bg-black/[0.03]">
+                      <Td muted>奪三振</Td>
+                      <Td>{teamLeaders.strikeouts.playerName}</Td>
+                      <Td align="right">
+                        <span className="font-semibold">{teamLeaders.strikeouts.strikeouts}奪三振</span>
+                      </Td>
+                    </tr>
+                  )}
+                  {teamLeaders.saves && (
+                    <tr className="hover:bg-black/[0.03]">
+                      <Td muted>セーブ</Td>
+                      <Td>{teamLeaders.saves.playerName}</Td>
+                      <Td align="right">
+                        <span className="font-semibold">{teamLeaders.saves.saves}セーブ</span>
+                      </Td>
+                    </tr>
+                  )}
+                </tbody>
+              </Table>
+            </div>
+          </div>
 
           {championship && (
             <div
