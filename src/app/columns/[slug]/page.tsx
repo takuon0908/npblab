@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getColumnBySlug } from "@/lib/microcms";
 import { formatDateJa } from "@/lib/date";
+import { ArticleCover } from "@/components/ArticleCover";
 
 // microCMSサービスが未作成の段階でもビルドを通すため、ビルド時の静的生成を無効化
 export const dynamic = "force-dynamic";
@@ -77,6 +78,10 @@ export default async function ColumnPage({
       </nav>
 
       <article>
+        <div className="aspect-[16/7] rounded-lg overflow-hidden mb-8">
+          <ArticleCover slug={column.slug} />
+        </div>
+
         <header className="mb-10">
           <p
             className="text-xs font-semibold tracking-widest uppercase mb-3"

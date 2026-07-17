@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getColumns } from "@/lib/microcms";
 import { formatDateJa } from "@/lib/date";
+import { ArticleCover } from "@/components/ArticleCover";
 
 // microCMSサービスが未作成の段階でもビルドを通すよう、ビルド時の静的生成を無効化
 export const dynamic = "force-dynamic";
@@ -19,9 +20,10 @@ function excerpt(html: string, length = 88): string {
 
 export default async function ColumnsPage() {
   const { contents } = await getColumns();
+  const [hero, ...rest] = contents;
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-16">
+    <main className="mx-auto max-w-4xl px-4 py-16">
       <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: "var(--accent)" }}>
         Column
       </p>
@@ -40,26 +42,67 @@ export default async function ColumnsPage() {
           まだ記事がありません。
         </p>
       ) : (
-        <ul className="flex flex-col">
-          {contents.map((c) => (
-            <li key={c.id} style={{ borderTop: "1px solid var(--border)" }}>
-              <Link href={`/columns/${c.slug}`} className="group block py-6">
-                <p className="text-xs mb-2" style={{ color: "var(--ink-muted)" }}>
-                  {formatDateJa(new Date(c.publishedAt))}
-                </p>
-                <h2
-                  className="text-lg font-bold mb-1.5 group-hover:underline sm:text-xl"
-                  style={{ fontFamily: "var(--font-shippori-mincho)" }}
-                >
-                  {c.title}
-                </h2>
-                <p className="text-sm" style={{ color: "var(--ink-secondary)" }}>
-                  {excerpt(c.body)}
-                </p>
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <>
+          <Link
+            href={`/columns/${hero.slug}`}
+            className="group grid gap-0 sm:grid-cols-2 mb-12 rounded-lg overflow-hidden"
+            style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
+          >
+            <div className="aspect-video sm:aspect-auto sm:h-full">
+              <ArticleCover slug={hero.slug} />
+            </div>
+            <div className="p-6 flex flex-col justify-center">
+              <p className="text-xs mb-2" style={{ color: "var(--ink-muted)" }}>
+                {formatDateJa(new Date(hero.publishedAt))} ・ 新着
+              </p>
+              <h2
+                className="text-xl font-bold mb-2 leading-snug group-hover:underline sm:text-2xl"
+                style={{ fontFamily: "var(--font-shippori-mincho)", textWrap: "balance" }}
+              >
+                {hero.title}
+              </h2>
+              <p className="text-sm" style={{ color: "var(--ink-secondary)" }}>
+                {excerpt(hero.body, 110)}
+              </p>
+            </div>
+          </Link>
+
+          {rest.length > 0 && (
+            <section>
+              <h2 className="text-sm font-semibold mb-4" style={{ color: "var(--ink-muted)" }}>
+                新着記事
+              </h2>
+              <div className="grid gap-5 sm:grid-cols-2">
+                {rest.map((c) => (
+                  <Link
+                    key={c.id}
+                    href={`/columns/${c.slug}`}
+                    className="group rounded-lg overflow-hidden"
+                    style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
+                  >
+                    <div className="aspect-video">
+                      <ArticleCover slug={c.slug} />
+                    </div>
+                    <div className="p-4">
+                      <p className="text-xs mb-1.5" style={{ color: "var(--ink-muted)" }}>
+                        {formatDateJa(new Date(c.publishedAt))}
+                      </p>
+                      <h3
+                        className="font-bold mb-1 leading-snug group-hover:underline"
+                        style={{ fontFamily: "var(--font-shippori-mincho)" }}
+                      >
+                        {c.title}
+                      </h3>
+                      <p className="text-xs" style={{ color: "var(--ink-secondary)" }}>
+                        {excerpt(c.body, 70)}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+        </>
       )}
     </main>
   );
