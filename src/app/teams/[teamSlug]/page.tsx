@@ -4,8 +4,19 @@ import { prisma } from "@/lib/prisma";
 import { StatTile } from "@/components/StatTile";
 import { Meter } from "@/components/Meter";
 import { GamesAboveBelow500 } from "@/components/GamesAboveBelow500";
+import { Table, Th, Td } from "@/components/Table";
 import { computeWhatIf } from "@/lib/whatif";
 import { calcMagicNumber } from "@/lib/baseball";
+
+// 年ごとに最新のスナップショット（完結済みシーズンはseason-end代表日、当年は最新日）を1件ずつ拾う
+function summarizeByYear<T extends { date: Date }>(rows: T[]): T[] {
+  const byYear = new Map<number, T>();
+  for (const row of rows) {
+    const year = row.date.getFullYear();
+    if (!byYear.has(year)) byYear.set(year, row);
+  }
+  return [...byYear.values()].sort((a, b) => b.date.getFullYear() - a.date.getFullYear());
+}
 
 export const dynamic = "force-dynamic";
 
@@ -34,7 +45,7 @@ export default async function TeamPage({
   const team = await prisma.team.findUnique({ where: { slug: teamSlug } });
   if (!team) notFound();
 
-  const [standing, championshipHistory, remainingGames, insight, leagueInsights] = await Promise.all([
+  const [standing, championshipHistory, remainingGames, insight, leagueInsights, allStandings] = await Promise.all([
     prisma.standingsSnapshot.findFirst({ where: { teamId: team.id }, orderBy: { date: "desc" } }),
     prisma.championshipProbability.findMany({
       where: { teamId: team.id },
@@ -54,7 +65,10 @@ export default async function TeamPage({
       orderBy: { date: "desc" },
       distinct: ["teamId"],
     }),
+    prisma.standingsSnapshot.findMany({ where: { teamId: team.id }, orderBy: { date: "desc" } }),
   ]);
+
+  const yearlyStandings = summarizeByYear(allStandings);
 
   const championship = championshipHistory[0] ?? null;
   const probabilityDelta =
@@ -193,6 +207,36 @@ export default async function TeamPage({
                   {(whatIf.defenseUpProbability * 100).toFixed(1)}%
                 </div>
               </div>
+            </div>
+          )}
+
+          {yearlyStandings.length > 1 && (
+            <div className="mt-8">
+              <h2 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-muted)" }}>
+                歴代成績
+              </h2>
+              <Table>
+                <thead>
+                  <tr>
+                    <Th>年度</Th>
+                    <Th align="right">成績</Th>
+                    <Th align="right">勝率</Th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {yearlyStandings.map((s) => (
+                    <tr key={s.date.getFullYear()} className="hover:bg-black/[0.03]">
+                      <Td>{s.date.getFullYear()}年</Td>
+                      <Td align="right" muted>
+                        {s.wins}勝{s.losses}敗{s.draws}分
+                      </Td>
+                      <Td align="right">
+                        <span className="font-semibold">{s.winPct.toFixed(3)}</span>
+                      </Td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
             </div>
           )}
         </>
