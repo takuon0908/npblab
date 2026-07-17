@@ -79,7 +79,10 @@ export default async function ColumnPage({
 
       <article>
         <div className="aspect-[16/7] rounded-lg overflow-hidden mb-8">
-          <ArticleCover slug={column.slug} />
+          <ArticleCover
+            slug={column.slug}
+            text={`${column.title} ${column.body.replace(/<[^>]+>/g, "")}`}
+          />
         </div>
 
         <header className="mb-10">

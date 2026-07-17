@@ -13,8 +13,12 @@ export const metadata: Metadata = {
   alternates: { canonical: "/columns" },
 };
 
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]+>/g, "").trim();
+}
+
 function excerpt(html: string, length = 88): string {
-  const text = html.replace(/<[^>]+>/g, "").trim();
+  const text = stripHtml(html);
   return text.length > length ? `${text.slice(0, length)}…` : text;
 }
 
@@ -49,7 +53,7 @@ export default async function ColumnsPage() {
             style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
           >
             <div className="aspect-video sm:aspect-auto sm:h-full">
-              <ArticleCover slug={hero.slug} />
+              <ArticleCover slug={hero.slug} text={`${hero.title} ${stripHtml(hero.body)}`} />
             </div>
             <div className="p-6 flex flex-col justify-center">
               <p className="text-xs mb-2" style={{ color: "var(--ink-muted)" }}>
@@ -81,7 +85,7 @@ export default async function ColumnsPage() {
                     style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
                   >
                     <div className="aspect-video">
-                      <ArticleCover slug={c.slug} />
+                      <ArticleCover slug={c.slug} text={`${c.title} ${stripHtml(c.body)}`} />
                     </div>
                     <div className="p-4">
                       <p className="text-xs mb-1.5" style={{ color: "var(--ink-muted)" }}>

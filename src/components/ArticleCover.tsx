@@ -1,24 +1,19 @@
-// 記事のカバーイラスト。写真素材を使わず、slugから決定的に選んだ配色でSVGを生成する。
+import { themeForArticle } from "@/lib/teamTheme";
+
+// 記事のカバーイラスト。写真素材を使わず、記事本文で言及されている球団のチームカラーを
+// 使ってSVGを生成する（該当球団が無ければタイトル/slugからの決定的な配色にフォールバック）。
 // ダイアゴナルなカラーブロック＋縫い目ボールのアイコンで、スポーツブック的な力強いタッチにしている
-const PALETTES = [
-  { bg: "#12181f", accent: "#22c55e" },
-  { bg: "#1a1210", accent: "#f97316" },
-  { bg: "#0f1729", accent: "#3b82f6" },
-  { bg: "#1a0f14", accent: "#ef4444" },
-  { bg: "#160f1a", accent: "#a855f7" },
-  { bg: "#141a12", accent: "#eab308" },
-];
 
-function pickPalette(slug: string) {
-  let hash = 0;
-  for (let i = 0; i < slug.length; i++) {
-    hash = (hash * 31 + slug.charCodeAt(i)) >>> 0;
-  }
-  return PALETTES[hash % PALETTES.length];
-}
-
-export function ArticleCover({ slug, className }: { slug: string; className?: string }) {
-  const { bg, accent } = pickPalette(slug);
+export function ArticleCover({
+  slug,
+  text,
+  className,
+}: {
+  slug: string;
+  text: string;
+  className?: string;
+}) {
+  const { bg, accent } = themeForArticle(slug, text);
   const gradId = `cover-fade-${slug}`;
 
   return (
