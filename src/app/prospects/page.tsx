@@ -67,7 +67,9 @@ export default async function ProspectsPage() {
                       <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
                         {p.rank}
                       </span>
-                      {p.playerName}
+                      <Link href={`/players/${p.playerId}`} className="hover:underline">
+                        {p.playerName}
+                      </Link>
                       <Link
                         href={`/teams/${p.team.slug}`}
                         className="text-xs ml-1 hover:underline"
@@ -108,7 +110,9 @@ export default async function ProspectsPage() {
                       <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
                         {p.rank}
                       </span>
-                      {p.playerName}
+                      <Link href={`/players/${p.playerId}`} className="hover:underline">
+                        {p.playerName}
+                      </Link>
                       <Link
                         href={`/teams/${p.team.slug}`}
                         className="text-xs ml-1 hover:underline"

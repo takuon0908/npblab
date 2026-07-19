@@ -141,7 +141,9 @@ export default async function TitlesPage() {
                             <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
                               {i + 1}
                             </span>
-                            {row.playerName}
+                            <Link href={`/players/${row.playerId}`} className="hover:underline">
+                              {row.playerName}
+                            </Link>
                             <Link
                               href={`/teams/${row.team.slug}`}
                               className="text-xs ml-1 hover:underline"
@@ -179,7 +181,15 @@ export default async function TitlesPage() {
           <h2 className="font-semibold mb-1">首位打者・防御率（規定到達者）</h2>
           <p className="text-xs mb-4" style={{ color: "var(--ink-muted)" }}>
             規定打席（チーム試合数×3.1）・規定投球回（チーム試合数×1）に到達した選手の現在値です。
-            比率成績のため、当サイトの残り試合シミュレーションによる獲得確率は算出していません。
+            比率成績のため、当サイトの残り試合シミュレーションによる獲得確率は算出していません。規定未到達の選手も含めた
+            <Link href="/titles/batting-average" className="mx-1 hover:underline" style={{ color: "var(--accent)" }}>
+              打率
+            </Link>
+            /
+            <Link href="/titles/era" className="mx-1 hover:underline" style={{ color: "var(--accent)" }}>
+              防御率
+            </Link>
+            の全選手ランキングも見られます。
           </p>
           <div className="grid gap-8 sm:grid-cols-2 min-w-0">
             <div>
@@ -205,7 +215,9 @@ export default async function TitlesPage() {
                           <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
                             {i + 1}
                           </span>
-                          {b.playerName}
+                          <Link href={`/players/${b.playerId}`} className="hover:underline">
+                            {b.playerName}
+                          </Link>
                           <Link
                             href={`/teams/${b.team.slug}`}
                             className="text-xs ml-1 hover:underline"
@@ -247,7 +259,9 @@ export default async function TitlesPage() {
                           <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
                             {i + 1}
                           </span>
-                          {p.playerName}
+                          <Link href={`/players/${p.playerId}`} className="hover:underline">
+                            {p.playerName}
+                          </Link>
                           <Link
                             href={`/teams/${p.team.slug}`}
                             className="text-xs ml-1 hover:underline"

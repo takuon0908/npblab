@@ -7,6 +7,13 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const teams = await prisma.team.findMany({ select: { slug: true } });
 
+  const season = new Date().getFullYear();
+  const [battingPlayers, pitchingPlayers] = await Promise.all([
+    prisma.playerBattingStat.findMany({ where: { season }, distinct: ["playerId"], select: { playerId: true } }),
+    prisma.playerPitchingStat.findMany({ where: { season }, distinct: ["playerId"], select: { playerId: true } }),
+  ]);
+  const playerIds = [...new Set([...battingPlayers, ...pitchingPlayers].map((p) => p.playerId))];
+
   let columnSlugs: string[] = [];
   try {
     const { contents } = await getColumns(100);
@@ -20,6 +27,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/games`, changeFrequency: "daily", priority: 0.9 },
     { url: `${siteUrl}/teams`, changeFrequency: "daily", priority: 0.9 },
     { url: `${siteUrl}/titles`, changeFrequency: "daily", priority: 0.9 },
+    { url: `${siteUrl}/titles/batting-average`, changeFrequency: "daily", priority: 0.7 },
+    { url: `${siteUrl}/titles/era`, changeFrequency: "daily", priority: 0.7 },
     { url: `${siteUrl}/prospects`, changeFrequency: "daily", priority: 0.8 },
     { url: `${siteUrl}/analysis`, changeFrequency: "daily", priority: 0.8 },
     { url: `${siteUrl}/columns`, changeFrequency: "daily", priority: 0.7 },
@@ -32,11 +41,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
+  const playerRoutes: MetadataRoute.Sitemap = playerIds.map((playerId) => ({
+    url: `${siteUrl}/players/${encodeURIComponent(playerId)}`,
+    changeFrequency: "daily",
+    priority: 0.6,
+  }));
+
   const columnRoutes: MetadataRoute.Sitemap = columnSlugs.map((slug) => ({
     url: `${siteUrl}/columns/${slug}`,
     changeFrequency: "weekly",
     priority: 0.6,
   }));
 
-  return [...staticRoutes, ...teamRoutes, ...columnRoutes];
+  return [...staticRoutes, ...teamRoutes, ...playerRoutes, ...columnRoutes];
 }

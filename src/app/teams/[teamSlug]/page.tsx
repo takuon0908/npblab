@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Level } from "@prisma/client";
@@ -199,7 +200,11 @@ export default async function TeamPage({
                   {teamLeaders.avg && (
                     <tr className="hover:bg-black/[0.03]">
                       <Td muted>打率</Td>
-                      <Td>{teamLeaders.avg.playerName}</Td>
+                      <Td>
+                        <Link href={`/players/${teamLeaders.avg.playerId}`} className="hover:underline">
+                          {teamLeaders.avg.playerName}
+                        </Link>
+                      </Td>
                       <Td align="right">
                         <span className="font-semibold">{teamLeaders.avg.avg.toFixed(3)}</span>
                       </Td>
@@ -208,7 +213,11 @@ export default async function TeamPage({
                   {teamLeaders.homeRuns && (
                     <tr className="hover:bg-black/[0.03]">
                       <Td muted>本塁打</Td>
-                      <Td>{teamLeaders.homeRuns.playerName}</Td>
+                      <Td>
+                        <Link href={`/players/${teamLeaders.homeRuns.playerId}`} className="hover:underline">
+                          {teamLeaders.homeRuns.playerName}
+                        </Link>
+                      </Td>
                       <Td align="right">
                         <span className="font-semibold">{teamLeaders.homeRuns.homeRuns}本</span>
                       </Td>
@@ -217,7 +226,11 @@ export default async function TeamPage({
                   {teamLeaders.rbi && (
                     <tr className="hover:bg-black/[0.03]">
                       <Td muted>打点</Td>
-                      <Td>{teamLeaders.rbi.playerName}</Td>
+                      <Td>
+                        <Link href={`/players/${teamLeaders.rbi.playerId}`} className="hover:underline">
+                          {teamLeaders.rbi.playerName}
+                        </Link>
+                      </Td>
                       <Td align="right">
                         <span className="font-semibold">{teamLeaders.rbi.rbi}打点</span>
                       </Td>
@@ -226,7 +239,11 @@ export default async function TeamPage({
                   {teamLeaders.stolenBases && (
                     <tr className="hover:bg-black/[0.03]">
                       <Td muted>盗塁</Td>
-                      <Td>{teamLeaders.stolenBases.playerName}</Td>
+                      <Td>
+                        <Link href={`/players/${teamLeaders.stolenBases.playerId}`} className="hover:underline">
+                          {teamLeaders.stolenBases.playerName}
+                        </Link>
+                      </Td>
                       <Td align="right">
                         <span className="font-semibold">{teamLeaders.stolenBases.stolenBases}盗塁</span>
                       </Td>
@@ -245,7 +262,11 @@ export default async function TeamPage({
                   {teamLeaders.era && (
                     <tr className="hover:bg-black/[0.03]">
                       <Td muted>防御率</Td>
-                      <Td>{teamLeaders.era.playerName}</Td>
+                      <Td>
+                        <Link href={`/players/${teamLeaders.era.playerId}`} className="hover:underline">
+                          {teamLeaders.era.playerName}
+                        </Link>
+                      </Td>
                       <Td align="right">
                         <span className="font-semibold">{teamLeaders.era.era.toFixed(2)}</span>
                       </Td>
@@ -254,7 +275,11 @@ export default async function TeamPage({
                   {teamLeaders.wins && (
                     <tr className="hover:bg-black/[0.03]">
                       <Td muted>勝利</Td>
-                      <Td>{teamLeaders.wins.playerName}</Td>
+                      <Td>
+                        <Link href={`/players/${teamLeaders.wins.playerId}`} className="hover:underline">
+                          {teamLeaders.wins.playerName}
+                        </Link>
+                      </Td>
                       <Td align="right">
                         <span className="font-semibold">{teamLeaders.wins.wins}勝</span>
                       </Td>
@@ -263,7 +288,11 @@ export default async function TeamPage({
                   {teamLeaders.strikeouts && (
                     <tr className="hover:bg-black/[0.03]">
                       <Td muted>奪三振</Td>
-                      <Td>{teamLeaders.strikeouts.playerName}</Td>
+                      <Td>
+                        <Link href={`/players/${teamLeaders.strikeouts.playerId}`} className="hover:underline">
+                          {teamLeaders.strikeouts.playerName}
+                        </Link>
+                      </Td>
                       <Td align="right">
                         <span className="font-semibold">{teamLeaders.strikeouts.strikeouts}奪三振</span>
                       </Td>
@@ -272,7 +301,11 @@ export default async function TeamPage({
                   {teamLeaders.saves && (
                     <tr className="hover:bg-black/[0.03]">
                       <Td muted>セーブ</Td>
-                      <Td>{teamLeaders.saves.playerName}</Td>
+                      <Td>
+                        <Link href={`/players/${teamLeaders.saves.playerId}`} className="hover:underline">
+                          {teamLeaders.saves.playerName}
+                        </Link>
+                      </Td>
                       <Td align="right">
                         <span className="font-semibold">{teamLeaders.saves.saves}セーブ</span>
                       </Td>

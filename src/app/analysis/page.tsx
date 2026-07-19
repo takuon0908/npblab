@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { ProspectCategory, Level } from "@prisma/client";
 import { Table, Th, Td } from "@/components/Table";
 import { latestPerPlayer } from "@/lib/latestPerPlayer";
-import { calcFipConstant, calcFip, calcWoba } from "@/lib/sabermetrics";
+import { calcFipConstant, calcFip, calcWoba, calcWhip, calcKPercent, calcBBPercent } from "@/lib/sabermetrics";
 import { teamAbbr } from "@/lib/teamAbbr";
 
 const QUALIFYING_PA_PER_GAME = 3.1;
@@ -70,7 +70,23 @@ async function getSabermetricsLeaders() {
     .sort((a, b) => a.fip - b.fip)
     .slice(0, 5);
 
-  return { wobaLeaders, fipLeaders };
+  const whipLeaders = qualifiedPitchers
+    .map((p) => ({ ...p, whip: calcWhip(p) }))
+    .sort((a, b) => a.whip - b.whip)
+    .slice(0, 5);
+
+  // K%は高いほど三振が多く、BB%は高いほど四球が多い（＝選球眼が良い）ことを示す
+  const kPercentLeaders = qualifiedBatters
+    .map((b) => ({ ...b, kPercent: calcKPercent(b) }))
+    .sort((a, b) => a.kPercent - b.kPercent)
+    .slice(0, 5);
+
+  const bbPercentLeaders = qualifiedBatters
+    .map((b) => ({ ...b, bbPercent: calcBBPercent(b) }))
+    .sort((a, b) => b.bbPercent - a.bbPercent)
+    .slice(0, 5);
+
+  return { wobaLeaders, fipLeaders, whipLeaders, kPercentLeaders, bbPercentLeaders };
 }
 
 export default async function AnalysisPage() {
@@ -112,7 +128,9 @@ export default async function AnalysisPage() {
                   <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
                     {r.rank}
                   </span>
-                  {r.playerName}
+                  <Link href={`/players/${r.playerId}`} className="hover:underline">
+                    {r.playerName}
+                  </Link>
                   <span
                     className="text-[10px] ml-1.5 px-1 py-0.5 rounded"
                     style={{
@@ -168,7 +186,9 @@ export default async function AnalysisPage() {
                         <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
                           {i + 1}
                         </span>
-                        {b.playerName}
+                        <Link href={`/players/${b.playerId}`} className="hover:underline">
+                          {b.playerName}
+                        </Link>
                         <Link
                           href={`/teams/${b.team.slug}`}
                           className="text-xs ml-1 hover:underline"
@@ -204,7 +224,9 @@ export default async function AnalysisPage() {
                         <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
                           {i + 1}
                         </span>
-                        {p.playerName}
+                        <Link href={`/players/${p.playerId}`} className="hover:underline">
+                          {p.playerName}
+                        </Link>
                         <Link
                           href={`/teams/${p.team.slug}`}
                           className="text-xs ml-1 hover:underline"
@@ -215,6 +237,131 @@ export default async function AnalysisPage() {
                       </Td>
                       <Td align="right">
                         <span className="font-semibold text-base">{p.fip.toFixed(2)}</span>
+                      </Td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {sabermetrics && (
+        <div className="mt-12">
+          <h2 className="font-semibold mb-1">WHIP・K%・BB%</h2>
+          <p className="text-xs mb-4" style={{ color: "var(--ink-muted)" }}>
+            WHIPは投手が1イニングあたりに出した走者数（低いほど良い）。K%・BB%は打者の全打席に占める三振・四球の割合で、
+            選球眼やアプローチの傾向を示します。規定打席・規定投球回に到達した選手が対象です。
+          </p>
+          <div className="grid gap-8 sm:grid-cols-3 min-w-0">
+            <div>
+              <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
+                WHIP（投手）
+              </h3>
+              <Table>
+                <thead>
+                  <tr>
+                    <Th>選手</Th>
+                    <Th align="right">WHIP</Th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sabermetrics.whipLeaders.map((p, i) => (
+                    <tr key={p.playerId} className="hover:bg-black/[0.03]">
+                      <Td>
+                        <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
+                          {i + 1}
+                        </span>
+                        <Link href={`/players/${p.playerId}`} className="hover:underline">
+                          {p.playerName}
+                        </Link>
+                        <Link
+                          href={`/teams/${p.team.slug}`}
+                          className="text-xs ml-1 hover:underline"
+                          style={{ color: "var(--ink-secondary)" }}
+                        >
+                          ({teamAbbr(p.team.slug)})
+                        </Link>
+                      </Td>
+                      <Td align="right">
+                        <span className="font-semibold text-base">{p.whip.toFixed(2)}</span>
+                      </Td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
+                低K%（打者、三振が少ない順）
+              </h3>
+              <Table>
+                <thead>
+                  <tr>
+                    <Th>選手</Th>
+                    <Th align="right">K%</Th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sabermetrics.kPercentLeaders.map((b, i) => (
+                    <tr key={b.playerId} className="hover:bg-black/[0.03]">
+                      <Td>
+                        <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
+                          {i + 1}
+                        </span>
+                        <Link href={`/players/${b.playerId}`} className="hover:underline">
+                          {b.playerName}
+                        </Link>
+                        <Link
+                          href={`/teams/${b.team.slug}`}
+                          className="text-xs ml-1 hover:underline"
+                          style={{ color: "var(--ink-secondary)" }}
+                        >
+                          ({teamAbbr(b.team.slug)})
+                        </Link>
+                      </Td>
+                      <Td align="right">
+                        <span className="font-semibold text-base">{(b.kPercent * 100).toFixed(1)}%</span>
+                      </Td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
+                高BB%（打者、四球が多い順）
+              </h3>
+              <Table>
+                <thead>
+                  <tr>
+                    <Th>選手</Th>
+                    <Th align="right">BB%</Th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sabermetrics.bbPercentLeaders.map((b, i) => (
+                    <tr key={b.playerId} className="hover:bg-black/[0.03]">
+                      <Td>
+                        <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
+                          {i + 1}
+                        </span>
+                        <Link href={`/players/${b.playerId}`} className="hover:underline">
+                          {b.playerName}
+                        </Link>
+                        <Link
+                          href={`/teams/${b.team.slug}`}
+                          className="text-xs ml-1 hover:underline"
+                          style={{ color: "var(--ink-secondary)" }}
+                        >
+                          ({teamAbbr(b.team.slug)})
+                        </Link>
+                      </Td>
+                      <Td align="right">
+                        <span className="font-semibold text-base">{(b.bbPercent * 100).toFixed(1)}%</span>
                       </Td>
                     </tr>
                   ))}

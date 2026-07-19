@@ -17,7 +17,8 @@ NPB(プロ野球)のデータを独自分析するアフィリエイトブログ
 
 ## アーキテクチャ
 
-- `src/app/`: Next.js App Router のページ（`/games`, `/teams`, `/titles`, `/prospects`, `/analysis`, `/columns`, `/about/methodology`）。全て`export const dynamic = "force-dynamic"`でDBを都度読む
+- `src/app/`: Next.js App Router のページ（`/games`, `/teams`, `/titles`, `/titles/batting-average`, `/titles/era`, `/prospects`, `/analysis`, `/players/[playerId]`, `/columns`, `/about/methodology`）。全て`export const dynamic = "force-dynamic"`でDBを都度読む
+- `src/app/players/[playerId]/page.tsx`: 個人選手ページ。`playerId`は`scripts/shared/slugifyPlayer.ts`の`teamSlug-選手名`形式のスラッグで、日本語を含むため動的セグメントは**`decodeURIComponent`で明示的にデコードする必要がある**（Next.js 16でparamsが自動デコードされずパーセントエンコードのまま渡ってきて404になるバグに遭遇したため）。1軍/2軍成績・LABバリュー・年度別成績を表示し、他ページ（球団/タイトル/独自指標/2軍注目選手）の選手名リンク先になる
 - `src/lib/prisma.ts`: Prismaクライアントのシングルトン（`@prisma/adapter-pg`使用）
 - `src/lib/whatif.ts`: 補強What-Ifシミュレーション（既存の`simulateLeagueChampionship`を再利用）
 - `src/lib/date.ts`: 日付表示の共通フォーマッタ（`formatDateJa`）
@@ -93,6 +94,9 @@ NPB(プロ野球)のデータを独自分析するアフィリエイトブログ
 - 予告先発投手を`/games`に表示
 - お気に入り球団機能（localStorage、通知なし）を追加
 - GA4アクセス解析タグを実装（本番ビルドでのみ読み込み。CEOがGA4管理画面でリアルタイムレポートを見て計測開始を確認する必要あり）
+- 個人選手ページ(`/players/[playerId]`)を新設。球団/タイトル/独自指標/2軍注目選手ページの選手名からリンク、sitemapにも追加
+- WHIP・K%・BB%を`/analysis`に追加（既存カラムから算出、選手ページにも表示）
+- 規定未到達選手も含む打率・防御率の全選手ランキング(`/titles/batting-average`, `/titles/era`)を追加
 
 ## バックログ（次に手を付けるとしたら）
 

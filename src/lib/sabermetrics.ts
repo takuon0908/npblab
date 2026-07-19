@@ -51,3 +51,20 @@ export function calcWoba(b: BattingLine): number {
     0.69 * b.walks + 0.72 * b.hitByPitch + 0.89 * singles + 1.27 * b.doubles + 1.62 * b.triples + 2.1 * b.homeRuns;
   return numerator / b.plateAppearances;
 }
+
+// WHIP(Walks plus Hits per Inning Pitched): 1イニングあたり何人の走者を出したか
+export function calcWhip(p: { walks: number; hits: number; inningsPitched: number }): number {
+  if (p.inningsPitched === 0) return 0;
+  return (p.walks + p.hits) / p.inningsPitched;
+}
+
+// K%・BB%: 打席に占める三振/四球の割合。打者の選球眼・アプローチを見る指標
+export function calcKPercent(b: { strikeouts: number; plateAppearances: number }): number {
+  if (b.plateAppearances === 0) return 0;
+  return b.strikeouts / b.plateAppearances;
+}
+
+export function calcBBPercent(b: { walks: number; plateAppearances: number }): number {
+  if (b.plateAppearances === 0) return 0;
+  return b.walks / b.plateAppearances;
+}
