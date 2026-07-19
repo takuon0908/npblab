@@ -16,25 +16,34 @@ export async function SiteHeader() {
 
   return (
     <header style={{ borderBottom: "1px solid var(--border)" }}>
-      <div className="mx-auto max-w-4xl px-4 py-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 sm:py-4">
-        <Link href="/" className="font-semibold tracking-tight whitespace-nowrap">
-          プロ野球LAB
-        </Link>
-        <nav
-          className="flex items-center gap-3 text-xs overflow-x-auto sm:gap-5 sm:text-sm"
-          style={{ color: "var(--ink-secondary)" }}
-        >
-          {NAV.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="whitespace-nowrap hover:opacity-70 transition-opacity"
-            >
-              {item.label}
-            </Link>
-          ))}
+      <div className="mx-auto max-w-4xl px-4 py-3 sm:py-4">
+        <div className="flex items-center justify-between gap-3">
+          <Link href="/" className="font-semibold tracking-tight whitespace-nowrap">
+            プロ野球LAB
+          </Link>
           <FavoriteTeamPicker teams={teams} />
-        </nav>
+        </div>
+        <div className="relative mt-2">
+          <nav
+            className="flex gap-3 text-xs overflow-x-auto sm:gap-5 sm:text-sm"
+            style={{ color: "var(--ink-secondary)" }}
+          >
+            {NAV.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="whitespace-nowrap hover:opacity-70 transition-opacity pb-0.5"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+          {/* ナビがスクロール可能なことを示すフェード（右端が見切れて隠れているのに気づけない問題への対処） */}
+          <div
+            className="pointer-events-none absolute right-0 top-0 h-full w-8"
+            style={{ background: "linear-gradient(to right, transparent, var(--page))" }}
+          />
+        </div>
       </div>
     </header>
   );
