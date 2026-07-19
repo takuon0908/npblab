@@ -1,12 +1,19 @@
 // ランキング/一覧系ページで共通利用するテーブルの外枠。
-// 横に長い表はoverflow-x-autoでスクロールさせる（npb.jp等の慣習にならう）
+// 横に長い表はoverflow-x-autoでスクロールさせる（npb.jp等の慣習にならう）。
+// スクロールできること自体が伝わりにくい（見切れているだけに見える）ため、右端にフェードを重ねている
 export function Table({ children }: { children: React.ReactNode }) {
   return (
     <div
-      className="overflow-x-auto rounded-lg min-w-0"
+      className="relative rounded-lg min-w-0"
       style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
     >
-      <table className="w-full text-sm border-collapse">{children}</table>
+      <div className="overflow-x-auto rounded-lg">
+        <table className="w-full text-sm border-collapse">{children}</table>
+      </div>
+      <div
+        className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 rounded-r-lg"
+        style={{ background: "linear-gradient(to right, transparent, var(--surface))" }}
+      />
     </div>
   );
 }

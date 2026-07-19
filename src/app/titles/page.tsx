@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { TitleCategory, Level } from "@prisma/client";
 import { Table, Th, Td } from "@/components/Table";
 import { latestPerPlayer } from "@/lib/latestPerPlayer";
+import { teamAbbr } from "@/lib/teamAbbr";
 
 // NPBの規定打席・規定投球回の定義（チーム試合数を基準にした変動値）
 const QUALIFYING_PA_PER_GAME = 3.1;
@@ -146,7 +147,7 @@ export default async function TitlesPage() {
                               className="text-xs ml-1 hover:underline"
                               style={{ color: "var(--ink-secondary)" }}
                             >
-                              ({row.team.name})
+                              ({teamAbbr(row.team.slug)})
                             </Link>
                           </Td>
                           <Td align="right">
@@ -210,7 +211,7 @@ export default async function TitlesPage() {
                             className="text-xs ml-1 hover:underline"
                             style={{ color: "var(--ink-secondary)" }}
                           >
-                            ({b.team.name})
+                            ({teamAbbr(b.team.slug)})
                           </Link>
                         </Td>
                         <Td align="right">
@@ -252,7 +253,7 @@ export default async function TitlesPage() {
                             className="text-xs ml-1 hover:underline"
                             style={{ color: "var(--ink-secondary)" }}
                           >
-                            ({p.team.name})
+                            ({teamAbbr(p.team.slug)})
                           </Link>
                         </Td>
                         <Td align="right">

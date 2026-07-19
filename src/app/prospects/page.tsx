@@ -3,6 +3,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ProspectCategory } from "@prisma/client";
 import { Table, Th, Td } from "@/components/Table";
+import { teamAbbr } from "@/lib/teamAbbr";
 
 export const dynamic = "force-dynamic";
 
@@ -72,7 +73,7 @@ export default async function ProspectsPage() {
                         className="text-xs ml-1 hover:underline"
                         style={{ color: "var(--ink-secondary)" }}
                       >
-                        ({p.team.name})
+                        ({teamAbbr(p.team.slug)})
                       </Link>
                     </Td>
                     <Td align="right" muted>
@@ -113,7 +114,7 @@ export default async function ProspectsPage() {
                         className="text-xs ml-1 hover:underline"
                         style={{ color: "var(--ink-secondary)" }}
                       >
-                        ({p.team.name})
+                        ({teamAbbr(p.team.slug)})
                       </Link>
                     </Td>
                     <Td align="right" muted>

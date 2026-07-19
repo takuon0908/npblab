@@ -5,6 +5,7 @@ import { ProspectCategory, Level } from "@prisma/client";
 import { Table, Th, Td } from "@/components/Table";
 import { latestPerPlayer } from "@/lib/latestPerPlayer";
 import { calcFipConstant, calcFip, calcWoba } from "@/lib/sabermetrics";
+import { teamAbbr } from "@/lib/teamAbbr";
 
 const QUALIFYING_PA_PER_GAME = 3.1;
 const QUALIFYING_IP_PER_GAME = 1;
@@ -100,7 +101,6 @@ export default async function AnalysisPage() {
           <thead>
             <tr>
               <Th>選手</Th>
-              <Th>区分</Th>
               <Th align="right">成績</Th>
               <Th align="right">LABバリュー</Th>
             </tr>
@@ -113,19 +113,25 @@ export default async function AnalysisPage() {
                     {r.rank}
                   </span>
                   {r.playerName}
+                  <span
+                    className="text-[10px] ml-1.5 px-1 py-0.5 rounded"
+                    style={{
+                      color: r.category === ProspectCategory.BATTING ? "var(--good)" : "var(--accent)",
+                      background: r.category === ProspectCategory.BATTING ? "var(--good-soft)" : "var(--accent-track)",
+                    }}
+                  >
+                    {CATEGORY_LABEL[r.category]}
+                  </span>
                   <Link
                     href={`/teams/${r.team.slug}`}
                     className="text-xs ml-1 hover:underline"
                     style={{ color: "var(--ink-secondary)" }}
                   >
-                    ({r.team.name})
+                    ({teamAbbr(r.team.slug)})
                   </Link>
                 </Td>
-                <Td muted>{CATEGORY_LABEL[r.category]}</Td>
                 <Td align="right" muted>
-                  {r.category === ProspectCategory.BATTING
-                    ? `OPS ${r.rawStat.toFixed(3)}`
-                    : `防御率 ${r.rawStat.toFixed(2)}`}
+                  {r.category === ProspectCategory.BATTING ? r.rawStat.toFixed(3) : r.rawStat.toFixed(2)}
                 </Td>
                 <Td align="right">
                   <span className="font-semibold">{r.value.toFixed(2)}</span>
@@ -168,7 +174,7 @@ export default async function AnalysisPage() {
                           className="text-xs ml-1 hover:underline"
                           style={{ color: "var(--ink-secondary)" }}
                         >
-                          ({b.team.name})
+                          ({teamAbbr(b.team.slug)})
                         </Link>
                       </Td>
                       <Td align="right">
@@ -204,7 +210,7 @@ export default async function AnalysisPage() {
                           className="text-xs ml-1 hover:underline"
                           style={{ color: "var(--ink-secondary)" }}
                         >
-                          ({p.team.name})
+                          ({teamAbbr(p.team.slug)})
                         </Link>
                       </Td>
                       <Td align="right">
