@@ -76,11 +76,10 @@ NPB(プロ野球)のデータを独自分析するアフィリエイトブログ
 
 ## 未着手（次のステップ、CEOの判断/操作が必要なもの）
 
-1. **アクセス解析(GA4等)が未導入 — 最優先**: Vercel Analytics/Speed Insightsは導入済みだが、より詳細な行動分析にはGA4が必要。CEOにGA4プロパティ作成を依頼し、測定IDを受け取り次第、実装側で組み込む
-2. 収益化手段が未導入（広告・アフィリエイトの契約ゼロ）: `growth-strategist`が選択肢を整理済み（`strategy/`配下、gitignore対象の内部メモ）。ASP登録・AdSense審査申請等はCEOの作業が必要
-3. GitHub Actionsで日次パイプライン自動化（scrape→simulate→analyze→prospects→mvp）— Secrets設定・動作確認まで完了。mvpステップは`.github/workflows/daily-pipeline.yml`にまだ追加していない（workflowファイルの変更はPATのworkflow scope制限でpushできないため、GitHub Web UIでの手動追加が必要）
-4. `NEXT_PUBLIC_SITE_URL`をVercel環境変数に追加（デプロイ後ドメイン確定後の設定、`https://npblab.vercel.app`）
-5. Search Console登録
+1. 収益化手段が未導入（広告・アフィリエイトの契約ゼロ）: `growth-strategist`が選択肢を整理済み（`strategy/`配下、gitignore対象の内部メモ）。ASP登録・AdSense審査申請等はCEOの作業が必要
+2. GitHub Actionsで日次パイプライン自動化（scrape→simulate→analyze→prospects→mvp）— Secrets設定・動作確認まで完了。mvpステップは`.github/workflows/daily-pipeline.yml`にまだ追加していない（workflowファイルの変更はPATのworkflow scope制限でpushできないため、GitHub Web UIでの手動追加が必要）
+3. `NEXT_PUBLIC_SITE_URL`をVercel環境変数に追加（デプロイ後ドメイン確定後の設定、`https://npblab.vercel.app`）
+4. Search Console登録
 
 ## 完了済み（このセッションで対応）
 
@@ -93,6 +92,7 @@ NPB(プロ野球)のデータを独自分析するアフィリエイトブログ
 - 試合結果に勝敗投手・セーブ投手を表示（ボックススコアページの埋め込みリンクを利用）
 - 予告先発投手を`/games`に表示
 - お気に入り球団機能（localStorage、通知なし）を追加
+- GA4アクセス解析タグを実装（本番ビルドでのみ読み込み。CEOがGA4管理画面でリアルタイムレポートを見て計測開始を確認する必要あり）
 
 ## バックログ（次に手を付けるとしたら）
 
