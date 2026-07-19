@@ -1,7 +1,8 @@
 // 過去シーズンのバックフィル用スクリプト
 // npb.jpの過去シーズンページ（シーズン終了後なので最終成績が載っている）から
-// 順位表・1軍個人成績を取得し、season-end代表日付(11/30)でDBにupsertする。
-// 日次スクレイパーと違い、2軍成績・試合日程・タイトルリーダーズは対象外（過去分の価値が薄いため）
+// 順位表・1軍/2軍個人成績を取得し、season-end代表日付(11/30)でDBにupsertする。
+// 2軍→1軍の成長を追う分析（例: 前年2軍で良かった選手が翌年1軍でどうなったか）に使うため2軍も対象。
+// 日次スクレイパーと違い、試合日程・タイトルリーダーズは対象外（過去分の価値が薄いため）
 
 import { PrismaClient, Level } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
@@ -68,34 +69,39 @@ async function backfillTeamPlayerStats(year: number, date: Date, team: (typeof T
   let battingCount = 0;
   let pitchingCount = 0;
 
-  try {
-    const battingHtml = await fetchHtml(`https://npb.jp/bis/${year}/stats/idb1_${team.urlCode}.html`);
-    const battingRows = parseIndividualBatting(battingHtml);
-    for (const row of battingRows) {
-      if (row.games === 0) continue;
-      const playerId = slugifyPlayer(row.playerName, team.slug);
-      await prisma.playerBattingStat.upsert({
-        where: { playerId_level_date: { playerId, level: Level.ICHIGUN, date } },
-        update: { ...row, teamId: teamRecord.id, season: year },
-        create: { ...row, playerId, teamId: teamRecord.id, level: Level.ICHIGUN, season: year, date },
-      });
-      battingCount++;
-    }
+  for (const [level, prefix] of [
+    [Level.ICHIGUN, 1],
+    [Level.NIGUN, 2],
+  ] as const) {
+    try {
+      const battingHtml = await fetchHtml(`https://npb.jp/bis/${year}/stats/idb${prefix}_${team.urlCode}.html`);
+      const battingRows = parseIndividualBatting(battingHtml);
+      for (const row of battingRows) {
+        if (row.games === 0) continue;
+        const playerId = slugifyPlayer(row.playerName, team.slug);
+        await prisma.playerBattingStat.upsert({
+          where: { playerId_level_date: { playerId, level, date } },
+          update: { ...row, teamId: teamRecord.id, season: year },
+          create: { ...row, playerId, teamId: teamRecord.id, level, season: year, date },
+        });
+        battingCount++;
+      }
 
-    const pitchingHtml = await fetchHtml(`https://npb.jp/bis/${year}/stats/idp1_${team.urlCode}.html`);
-    const pitchingRows = parseIndividualPitching(pitchingHtml);
-    for (const row of pitchingRows) {
-      if (row.appearances === 0) continue;
-      const playerId = slugifyPlayer(row.playerName, team.slug);
-      await prisma.playerPitchingStat.upsert({
-        where: { playerId_level_date: { playerId, level: Level.ICHIGUN, date } },
-        update: { ...row, teamId: teamRecord.id, season: year },
-        create: { ...row, playerId, teamId: teamRecord.id, level: Level.ICHIGUN, season: year, date },
-      });
-      pitchingCount++;
+      const pitchingHtml = await fetchHtml(`https://npb.jp/bis/${year}/stats/idp${prefix}_${team.urlCode}.html`);
+      const pitchingRows = parseIndividualPitching(pitchingHtml);
+      for (const row of pitchingRows) {
+        if (row.appearances === 0) continue;
+        const playerId = slugifyPlayer(row.playerName, team.slug);
+        await prisma.playerPitchingStat.upsert({
+          where: { playerId_level_date: { playerId, level, date } },
+          update: { ...row, teamId: teamRecord.id, season: year },
+          create: { ...row, playerId, teamId: teamRecord.id, level, season: year, date },
+        });
+        pitchingCount++;
+      }
+    } catch (err) {
+      console.warn(`個人成績 ${year} ${team.slug} level=${level} の取得に失敗:`, err);
     }
-  } catch (err) {
-    console.warn(`個人成績 ${year} ${team.slug} の取得に失敗:`, err);
   }
 
   return { battingCount, pitchingCount };
