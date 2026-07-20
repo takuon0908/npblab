@@ -10,7 +10,7 @@ NPB(プロ野球)のデータを独自分析するアフィリエイトブログ
 
 ## 本番環境
 
-- サイト: https://npblab.vercel.app （Vercel）
+- サイト: https://www.npblab.com （独自ドメイン、Vercel。旧URL https://npblab.vercel.app は301リダイレクト設定済み）
 - リポジトリ: https://github.com/takuon0908/npblab
 - DB: Supabase (Postgres)。`DATABASE_URL`はpgbouncerプーリング接続(port 6543)、`DIRECT_URL`はセッションモード(port 5432、マイグレーション専用)
 - コラムCMS: microCMS（サービスドメイン`t230hpy6je`、エンドポイント`columns`。フィールドは`title`/`slug`/`body`で完全一致必須）
@@ -77,10 +77,8 @@ NPB(プロ野球)のデータを独自分析するアフィリエイトブログ
 
 ## 未着手（次のステップ、CEOの判断/操作が必要なもの）
 
-1. **Search Console未登録 — インデックスされていない主因**: sitemap/canonical/OGP画像がlocalhostを指していたバグは修正済み（下記参照）だが、Googleにサイトの存在を伝えるSearch Console自体が未登録。CEOがプロパティ作成→所有権確認（HTMLタグ方式推奨、発行されたverificationコードをボスに渡せば`layout.tsx`に組み込む）→サイトマップ送信、が必要
-2. 収益化手段が未導入（広告・アフィリエイトの契約ゼロ）: `growth-strategist`が選択肢を整理済み（`strategy/`配下、gitignore対象の内部メモ）。ASP登録・AdSense審査申請等はCEOの作業が必要
-3. GitHub Actionsで日次パイプライン自動化（scrape→simulate→analyze→prospects→mvp）— Secrets設定・動作確認まで完了。mvpステップは`.github/workflows/daily-pipeline.yml`にまだ追加していない（workflowファイルの変更はPATのworkflow scope制限でpushできないため、GitHub Web UIでの手動追加が必要）
-4. `NEXT_PUBLIC_SITE_URL`のVercel環境変数への明示的な設定（任意。`src/lib/siteUrl.ts`がVercelの自動環境変数にフォールバックするため必須ではないが、より確実にしたい場合はCEOが設定可能）
+1. 収益化手段が未導入（広告・アフィリエイトの契約ゼロ）: `growth-strategist`が選択肢を整理済み（`strategy/`配下、gitignore対象の内部メモ）。ASP登録・AdSense審査申請等はCEOの作業が必要
+2. GitHub Actionsで日次パイプライン自動化（scrape→simulate→analyze→prospects→mvp）— Secrets設定・動作確認まで完了。mvpステップは`.github/workflows/daily-pipeline.yml`にまだ追加していない（workflowファイルの変更はPATのworkflow scope制限でpushできないため、GitHub Web UIでの手動追加が必要）
 
 ## 完了済み（このセッションで対応）
 
@@ -99,6 +97,8 @@ NPB(プロ野球)のデータを独自分析するアフィリエイトブログ
 - 規定未到達選手も含む打率・防御率の全選手ランキング(`/titles/batting-average`, `/titles/era`)を追加
 - 球団ページに全選手一覧(`/teams/[teamSlug]/roster`)を追加。チーム内トップだけでなく1軍・2軍全選手を選手ページへリンク
 - **重大バグ修正**: `NEXT_PUBLIC_SITE_URL`が本番Vercelに未設定で、sitemap.xml・robots.txt・canonicalタグ・OGP画像URLが全て`http://localhost:3000`を指していた（検索エンジンがインデックスできない状態）。`src/lib/siteUrl.ts`でVercelの自動環境変数(`VERCEL_PROJECT_PRODUCTION_URL`)にフォールバックするよう修正し、本番で解消確認済み
+- **独自ドメイン移行**: `npblab.vercel.app`から`www.npblab.com`へ移行完了。CloudflareでA/CNAMEレコード設定、Vercel側でドメイン追加・Production指定（旧URLは自動301リダイレクト）、`NEXT_PUBLIC_SITE_URL`をVercel環境変数に明示的に設定。canonical/sitemap/OGP画像が新ドメインを指すこと確認済み
+- **Search Console登録・確認完了**: HTMLタグ方式で所有権確認（`metadata.verification.google`に設定）、旧ドメイン用に加え新ドメイン`www.npblab.com`用のプロパティも追加・サイトマップ送信済み
 
 ## バックログ（次に手を付けるとしたら）
 
