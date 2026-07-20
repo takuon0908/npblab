@@ -6,6 +6,8 @@ import { formatDateJa } from "@/lib/date";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 import { GoodButton } from "@/components/GoodButton";
 import { getLikeCount } from "@/lib/columnLikes";
+import { ViewTracker } from "@/components/ViewTracker";
+import { getViewCount } from "@/lib/columnViews";
 
 // microCMSサービスが未作成の段階でもビルドを通すため、ビルド時の静的生成を無効化
 export const dynamic = "force-dynamic";
@@ -35,7 +37,11 @@ export default async function ColumnPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [column, likeCount] = await Promise.all([getColumnBySlug(slug), getLikeCount(slug)]);
+  const [column, likeCount, viewCount] = await Promise.all([
+    getColumnBySlug(slug),
+    getLikeCount(slug),
+    getViewCount(slug),
+  ]);
   if (!column) notFound();
 
   const publishedDate = new Date(column.publishedAt);
@@ -68,6 +74,8 @@ export default async function ColumnPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
+
+      <ViewTracker slug={column.slug} />
 
       <nav className="mb-8 text-xs" style={{ color: "var(--ink-muted)" }} aria-label="パンくずリスト">
         <Link href="/" className="hover:underline">
@@ -102,6 +110,7 @@ export default async function ColumnPage({
           </h1>
           <p className="text-sm" style={{ color: "var(--ink-muted)" }}>
             {formatDateJa(publishedDate)}
+            {viewCount > 0 && ` ・ ${viewCount}回閲覧`}
           </p>
         </header>
 

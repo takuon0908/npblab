@@ -39,8 +39,13 @@ export default async function ColumnsPage() {
       >
         コラム
       </h1>
-      <p className="text-sm mb-10" style={{ color: "var(--ink-secondary)" }}>
+      <p className="text-sm mb-4" style={{ color: "var(--ink-secondary)" }}>
         優勝確率シミュレーションやタイトルレースの数字から、当サイトのライター陣が読み解く考察記事です。
+      </p>
+      <p className="text-sm mb-10">
+        <Link href="/columns/ranking" className="hover:underline" style={{ color: "var(--accent)" }}>
+          人気記事ランキングを見る →
+        </Link>
       </p>
 
       {contents.length === 0 ? (

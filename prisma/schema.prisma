@@ -276,3 +276,10 @@ model ColumnLike {
   slug  String @id
   count Int    @default(0)
 }
+
+// コラム記事の閲覧数。ブラウザのsessionStorageで同一タブ内の重複カウントを防ぎつつ、
+// 記事詳細ページの表示時にクライアント側からインクリメントする
+model ColumnView {
+  slug  String @id
+  count Int    @default(0)
+}
