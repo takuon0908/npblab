@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getColumns } from "@/lib/microcms";
 import { formatDateJa } from "@/lib/date";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
+import { getLikeCounts } from "@/lib/columnLikes";
 
 // microCMSサービスが未作成の段階でもビルドを通すよう、ビルド時の静的生成を無効化
 export const dynamic = "force-dynamic";
@@ -25,6 +26,7 @@ function excerpt(html: string, length = 88): string {
 export default async function ColumnsPage() {
   const { contents } = await getColumns();
   const [hero, ...rest] = contents;
+  const likeCounts = await getLikeCounts(contents.map((c) => c.slug));
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
@@ -58,6 +60,7 @@ export default async function ColumnsPage() {
             <div className="p-6 flex flex-col justify-center">
               <p className="text-xs mb-2" style={{ color: "var(--ink-muted)" }}>
                 {formatDateJa(new Date(hero.publishedAt))} ・ 新着
+                {likeCounts[hero.slug] > 0 && ` ・ 👍 ${likeCounts[hero.slug]}`}
               </p>
               <h2
                 className="text-xl font-bold mb-2 leading-snug group-hover:underline sm:text-2xl"
@@ -90,6 +93,7 @@ export default async function ColumnsPage() {
                     <div className="p-4">
                       <p className="text-xs mb-1.5" style={{ color: "var(--ink-muted)" }}>
                         {formatDateJa(new Date(c.publishedAt))}
+                        {likeCounts[c.slug] > 0 && ` ・ 👍 ${likeCounts[c.slug]}`}
                       </p>
                       <h3
                         className="font-bold mb-1 leading-snug group-hover:underline"

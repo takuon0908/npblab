@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { getColumnBySlug } from "@/lib/microcms";
 import { formatDateJa } from "@/lib/date";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
+import { GoodButton } from "@/components/GoodButton";
+import { getLikeCount } from "@/lib/columnLikes";
 
 // microCMSサービスが未作成の段階でもビルドを通すため、ビルド時の静的生成を無効化
 export const dynamic = "force-dynamic";
@@ -33,7 +35,7 @@ export default async function ColumnPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const column = await getColumnBySlug(slug);
+  const [column, likeCount] = await Promise.all([getColumnBySlug(slug), getLikeCount(slug)]);
   if (!column) notFound();
 
   const publishedDate = new Date(column.publishedAt);
@@ -120,6 +122,10 @@ export default async function ColumnPage({
           }
           dangerouslySetInnerHTML={{ __html: column.body }}
         />
+
+        <div className="mt-10 flex justify-center">
+          <GoodButton slug={column.slug} initialCount={likeCount} />
+        </div>
       </article>
 
       <div className="mt-14 pt-6" style={{ borderTop: "1px solid var(--border)" }}>

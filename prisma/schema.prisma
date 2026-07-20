@@ -269,3 +269,10 @@ model ProspectRating {
 
   @@unique([playerId, category, date])
 }
+
+// コラム記事のGood(いいね)カウント。ユーザー登録がないサイトのため、誰が押したかはlocalStorage側で管理し
+// DBには記事ごとの合計数だけを持つ
+model ColumnLike {
+  slug  String @id
+  count Int    @default(0)
+}
