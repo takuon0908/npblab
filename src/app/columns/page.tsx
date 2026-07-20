@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getColumns } from "@/lib/microcms";
 import { formatDateJa } from "@/lib/date";
-import { ArticleCover } from "@/components/ArticleCover";
+import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 
 // microCMSサービスが未作成の段階でもビルドを通すよう、ビルド時の静的生成を無効化
 export const dynamic = "force-dynamic";
@@ -53,7 +53,7 @@ export default async function ColumnsPage() {
             style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
           >
             <div className="aspect-video sm:aspect-auto sm:h-full">
-              <ArticleCover slug={hero.slug} text={`${hero.title} ${stripHtml(hero.body)}`} />
+              <ArticleCoverImage slug={hero.slug} text={`${hero.title} ${stripHtml(hero.body)}`} />
             </div>
             <div className="p-6 flex flex-col justify-center">
               <p className="text-xs mb-2" style={{ color: "var(--ink-muted)" }}>
@@ -85,7 +85,7 @@ export default async function ColumnsPage() {
                     style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
                   >
                     <div className="aspect-video">
-                      <ArticleCover slug={c.slug} text={`${c.title} ${stripHtml(c.body)}`} />
+                      <ArticleCoverImage slug={c.slug} text={`${c.title} ${stripHtml(c.body)}`} />
                     </div>
                     <div className="p-4">
                       <p className="text-xs mb-1.5" style={{ color: "var(--ink-muted)" }}>
