@@ -5,6 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { siteUrl } from "@/lib/siteUrl";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -23,9 +24,6 @@ const shipporiMincho = Shippori_Mincho({
   weight: ["500", "700"],
   subsets: ["latin"],
 });
-
-// TODO: 実際のドメインが決まったらNEXT_PUBLIC_SITE_URLを設定する
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
