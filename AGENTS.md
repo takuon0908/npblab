@@ -77,8 +77,13 @@ NPB(プロ野球)のデータを独自分析するアフィリエイトブログ
 
 ## 未着手（次のステップ、CEOの判断/操作が必要なもの）
 
-1. 収益化手段が未導入（広告・アフィリエイトの契約ゼロ）: `growth-strategist`が選択肢を整理済み（`strategy/`配下、gitignore対象の内部メモ）。ASP登録・AdSense審査申請等はCEOの作業が必要
-2. GitHub Actionsで日次パイプライン自動化（scrape→simulate→analyze→prospects→mvp）— Secrets設定・動作確認まで完了。mvpステップは`.github/workflows/daily-pipeline.yml`にまだ追加していない（workflowファイルの変更はPATのworkflow scope制限でpushできないため、GitHub Web UIでの手動追加が必要）
+1. **下書き37本の最終確認・公開**: `content-drafts/`にNPB分析系7本＋野球初心者向けシリーズ30本（投球/打撃の科学・守備走塁基礎・体づくり怪我予防・ルール入門・成績指標入門・用具選び、各5本）が揃っている。editorレビュー→指摘事項（構文エラー・誤引用・事実誤認等）はすべて修正済みで、公開待ちの状態。「全部公開していいよ」との指示は以前もらっているが、本数がかなり増えたため念のため最終確認をお願いしたい。OKなら`npx tsx --env-file=.env.local scripts/publish/publish-drafts.ts`で一括公開する
+2. **カバー画像用プロンプトの画像化**: `content-drafts/image-prompts.md`に37記事分の画像生成プロンプトを用意済み（平良海馬の画像と同スタイル）。CEOがGemini等で生成して送ってくれれば、`public/covers/{slug}.jpg`に配置して反映する。実在選手（村上頌樹・佐藤輝明）を描くプロンプトのみ肖像権上の注意点を明記している
+3. **microCMSにカテゴリ・タグのフィールド追加**（ダッシュボード操作）: `category`（セレクト、選択肢はNPBデータ分析/選手フィーチャー/ペナントレース速報/野球理論/ルール・基礎知識/体づくり・怪我予防/用具選び）と`tags`（複数テキスト）。追加でき次第カテゴリ分け・タグ機能のUIを実装する
+4. **microCMSに残っている空のテスト記事「作成」の削除**: 2026年7月12日公開のダミー記事が1件残っている（`/columns/ranking`確認中に発見）。書き込み権限のあるAPIキーはあるので、削除してよければ指示してほしい
+5. **GA4のリアルタイムレポート確認**: 新ドメイン用の測定ID(`G-5KVWQ8HCKB`)に切り替え済み。実際にアクセスが計測されているかCEOの方でGA4管理画面から確認してほしい
+6. 収益化手段が未導入（広告・アフィリエイトの契約ゼロ）: `growth-strategist`が選択肢を整理済み（`strategy/`配下、gitignore対象の内部メモ）。ASP登録・AdSense審査申請等はCEOの作業が必要
+7. GitHub Actionsで日次パイプライン自動化（scrape→simulate→analyze→prospects→mvp）— Secrets設定・動作確認まで完了。mvpステップは`.github/workflows/daily-pipeline.yml`にまだ追加していない（workflowファイルの変更はPATのworkflow scope制限でpushできないため、GitHub Web UIでの手動追加が必要）
 
 ## 完了済み（このセッションで対応）
 
@@ -99,6 +104,10 @@ NPB(プロ野球)のデータを独自分析するアフィリエイトブログ
 - **重大バグ修正**: `NEXT_PUBLIC_SITE_URL`が本番Vercelに未設定で、sitemap.xml・robots.txt・canonicalタグ・OGP画像URLが全て`http://localhost:3000`を指していた（検索エンジンがインデックスできない状態）。`src/lib/siteUrl.ts`でVercelの自動環境変数(`VERCEL_PROJECT_PRODUCTION_URL`)にフォールバックするよう修正し、本番で解消確認済み
 - **独自ドメイン移行**: `npblab.vercel.app`から`www.npblab.com`へ移行完了。CloudflareでA/CNAMEレコード設定、Vercel側でドメイン追加・Production指定（旧URLは自動301リダイレクト）、`NEXT_PUBLIC_SITE_URL`をVercel環境変数に明示的に設定。canonical/sitemap/OGP画像が新ドメインを指すこと確認済み
 - **Search Console登録・確認完了**: HTMLタグ方式で所有権確認（`metadata.verification.google`に設定）、旧ドメイン用に加え新ドメイン`www.npblab.com`用のプロパティも追加・サイトマップ送信済み
+- **野球初心者向け記事シリーズ30本を執筆**: 「科学的に正しい野球理論」をテーマに、投球の科学5本・打撃の科学5本・守備走塁基礎5本・体づくり怪我予防5本・ルール入門5本・成績指標の読み方5本を執筆（`content-drafts/`）。editorレビューで見つかった構文エラー・誤引用・事実誤認（GIRD統計の誤読、内反/外反の誤訳、Drivelineのリンク切れ、frontmatter誤記等）はすべて修正済み
+- **コラム記事に専用カバー画像の仕組みを追加**: `src/components/ArticleCoverImage.tsx`が`public/covers/{slug}`の画像を優先表示し、無ければ従来のSVG自動生成にフォールバック。平良海馬記事に適用済み、残り36記事分のプロンプトは`content-drafts/image-prompts.md`に用意
+- **コラム記事にGood(いいね)機能を追加**: `ColumnLike`モデル、`/api/columns/like`、localStorageで多重押下を防止する`GoodButton`
+- **コラム記事の閲覧数ランキングを追加**: `ColumnView`モデル、記事ページに`ViewTracker`を埋め込み、`/columns/ranking`で閲覧数順に一覧表示
 
 ## バックログ（次に手を付けるとしたら）
 
