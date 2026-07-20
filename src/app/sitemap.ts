@@ -35,11 +35,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/about/methodology`, changeFrequency: "monthly", priority: 0.4 },
   ];
 
-  const teamRoutes: MetadataRoute.Sitemap = teams.map((t) => ({
-    url: `${siteUrl}/teams/${t.slug}`,
-    changeFrequency: "daily",
-    priority: 0.8,
-  }));
+  const teamRoutes: MetadataRoute.Sitemap = teams.flatMap((t) => [
+    { url: `${siteUrl}/teams/${t.slug}`, changeFrequency: "daily" as const, priority: 0.8 },
+    { url: `${siteUrl}/teams/${t.slug}/roster`, changeFrequency: "daily" as const, priority: 0.6 },
+  ]);
 
   const playerRoutes: MetadataRoute.Sitemap = playerIds.map((playerId) => ({
     url: `${siteUrl}/players/${encodeURIComponent(playerId)}`,

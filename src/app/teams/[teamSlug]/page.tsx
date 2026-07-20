@@ -316,6 +316,12 @@ export default async function TeamPage({
             </div>
           </div>
 
+          <p className="text-xs mb-8" style={{ color: "var(--ink-muted)" }}>
+            <Link href={`/teams/${team.slug}/roster`} className="hover:underline" style={{ color: "var(--accent)" }}>
+              全選手の成績を見る →
+            </Link>
+          </p>
+
           {championship && (
             <div
               className="rounded-lg p-5 mb-8"
