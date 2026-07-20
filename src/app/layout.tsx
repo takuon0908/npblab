@@ -38,6 +38,9 @@ export const metadata: Metadata = {
     locale: "ja_JP",
     type: "website",
   },
+  verification: {
+    google: "ZrRa9EIIMCpIUswfoTZC2oLp8MwXwt6HsPvOQxbpORU",
+  },
 };
 
 const jsonLd = {
