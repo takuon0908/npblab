@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getColumns } from "@/lib/microcms";
+import { getColumns, CATEGORIES } from "@/lib/microcms";
 import { formatDateJa } from "@/lib/date";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 import { getLikeCounts } from "@/lib/columnLikes";
@@ -23,8 +23,13 @@ function excerpt(html: string, length = 88): string {
   return text.length > length ? `${text.slice(0, length)}…` : text;
 }
 
-export default async function ColumnsPage() {
-  const { contents } = await getColumns();
+export default async function ColumnsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string }>;
+}) {
+  const { category } = await searchParams;
+  const { contents } = await getColumns(20, category);
   const [hero, ...rest] = contents;
   const likeCounts = await getLikeCounts(contents.map((c) => c.slug));
 
@@ -42,11 +47,39 @@ export default async function ColumnsPage() {
       <p className="text-sm mb-4" style={{ color: "var(--ink-secondary)" }}>
         優勝確率シミュレーションやタイトルレースの数字から、当サイトのライター陣が読み解く考察記事です。
       </p>
-      <p className="text-sm mb-10">
+      <p className="text-sm mb-6">
         <Link href="/columns/ranking" className="hover:underline" style={{ color: "var(--accent)" }}>
           人気記事ランキングを見る →
         </Link>
       </p>
+
+      <div className="flex flex-wrap gap-2 mb-10">
+        <Link
+          href="/columns"
+          className="rounded-full px-3 py-1 text-xs font-medium"
+          style={
+            !category
+              ? { background: "var(--accent)", color: "#fff" }
+              : { border: "1px solid var(--border)", color: "var(--ink-secondary)" }
+          }
+        >
+          すべて
+        </Link>
+        {CATEGORIES.map((c) => (
+          <Link
+            key={c}
+            href={`/columns?category=${encodeURIComponent(c)}`}
+            className="rounded-full px-3 py-1 text-xs font-medium"
+            style={
+              category === c
+                ? { background: "var(--accent)", color: "#fff" }
+                : { border: "1px solid var(--border)", color: "var(--ink-secondary)" }
+            }
+          >
+            {c}
+          </Link>
+        ))}
+      </div>
 
       {contents.length === 0 ? (
         <p className="text-sm" style={{ color: "var(--ink-secondary)" }}>

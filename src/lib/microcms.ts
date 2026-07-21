@@ -17,13 +17,29 @@ export interface Column {
   slug: string;
   body: string; // リッチエディタのHTML
   publishedAt: string;
+  category?: string[]; // 複数選択フィールド。未設定記事は空配列
   tags?: string[];
 }
 
-export async function getColumns(limit = 20) {
+// カテゴリの固定リスト（microCMS側のセレクト肢と合わせる）
+export const CATEGORIES = [
+  "NPBデータ分析",
+  "選手フィーチャー",
+  "ペナントレース速報",
+  "野球理論（科学的検証）",
+  "ルール・基礎知識",
+  "体づくり・怪我予防",
+  "用具選び",
+] as const;
+
+export async function getColumns(limit = 20, category?: string) {
   return getClient().getList<Column>({
     endpoint: "columns",
-    queries: { limit, orders: "-publishedAt" },
+    queries: {
+      limit,
+      orders: "-publishedAt",
+      ...(category ? { filters: `category[contains]${category}` } : {}),
+    },
   });
 }
 

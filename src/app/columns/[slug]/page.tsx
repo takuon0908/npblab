@@ -112,6 +112,20 @@ export default async function ColumnPage({
             {formatDateJa(publishedDate)}
             {viewCount > 0 && ` ・ ${viewCount}回閲覧`}
           </p>
+          {column.category && column.category.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-3">
+              {column.category.map((c) => (
+                <Link
+                  key={c}
+                  href={`/columns?category=${encodeURIComponent(c)}`}
+                  className="rounded-full px-2.5 py-0.5 text-xs hover:underline"
+                  style={{ background: "var(--accent-track)", color: "var(--accent)" }}
+                >
+                  {c}
+                </Link>
+              ))}
+            </div>
+          )}
         </header>
 
         <div style={{ borderTop: "1px solid var(--border)" }} className="mb-10" />
