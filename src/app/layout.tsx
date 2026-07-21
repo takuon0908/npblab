@@ -5,6 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { AdSense } from "@/components/AdSense";
 import { siteUrl } from "@/lib/siteUrl";
 import "./globals.css";
 
@@ -71,6 +72,7 @@ export default function RootLayout({
         <Analytics />
         <SpeedInsights />
         <GoogleAnalytics />
+        <AdSense />
       </body>
     </html>
   );
