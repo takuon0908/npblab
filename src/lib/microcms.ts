@@ -18,7 +18,7 @@ export interface Column {
   body: string; // リッチエディタのHTML
   publishedAt: string;
   category?: string[]; // 複数選択フィールド。未設定記事は空配列
-  tags?: string[];
+  tags?: string; // テキストフィールド（カンマ区切りで複数タグを表現）。未入力の記事はキー自体が無い
 }
 
 // カテゴリの固定リスト（microCMS側のセレクト肢と合わせる）
@@ -32,13 +32,29 @@ export const CATEGORIES = [
   "用具選び",
 ] as const;
 
-export async function getColumns(limit = 20, category?: string) {
+// tagsフィールド(カンマ区切りの文字列)をトリム済みの配列に変換する
+export function parseTags(tags?: string): string[] {
+  if (!tags) return [];
+  return tags
+    .split(/[,、]/)
+    .map((t) => t.trim())
+    .filter(Boolean);
+}
+
+export async function getColumns(limit = 20, category?: string, tag?: string) {
+  const filters = [
+    category ? `category[contains]${category}` : null,
+    tag ? `tags[contains]${tag}` : null,
+  ]
+    .filter(Boolean)
+    .join("[and]");
+
   return getClient().getList<Column>({
     endpoint: "columns",
     queries: {
       limit,
       orders: "-publishedAt",
-      ...(category ? { filters: `category[contains]${category}` } : {}),
+      ...(filters ? { filters } : {}),
     },
   });
 }

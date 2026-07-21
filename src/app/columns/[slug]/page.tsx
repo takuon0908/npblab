@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getColumnBySlug } from "@/lib/microcms";
+import { getColumnBySlug, parseTags } from "@/lib/microcms";
 import { formatDateJa } from "@/lib/date";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 import { GoodButton } from "@/components/GoodButton";
@@ -122,6 +122,20 @@ export default async function ColumnPage({
                   style={{ background: "var(--accent-track)", color: "var(--accent)" }}
                 >
                   {c}
+                </Link>
+              ))}
+            </div>
+          )}
+          {parseTags(column.tags).length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {parseTags(column.tags).map((t) => (
+                <Link
+                  key={t}
+                  href={`/columns?tag=${encodeURIComponent(t)}`}
+                  className="rounded-full px-2.5 py-0.5 text-xs hover:underline"
+                  style={{ border: "1px solid var(--border)", color: "var(--ink-muted)" }}
+                >
+                  #{t}
                 </Link>
               ))}
             </div>

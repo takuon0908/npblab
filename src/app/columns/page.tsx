@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getColumns, CATEGORIES } from "@/lib/microcms";
+import { getColumns, parseTags, CATEGORIES } from "@/lib/microcms";
 import { formatDateJa } from "@/lib/date";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 import { getLikeCounts } from "@/lib/columnLikes";
@@ -26,10 +26,10 @@ function excerpt(html: string, length = 88): string {
 export default async function ColumnsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string; tag?: string }>;
 }) {
-  const { category } = await searchParams;
-  const { contents } = await getColumns(20, category);
+  const { category, tag } = await searchParams;
+  const { contents } = await getColumns(20, category, tag);
   const [hero, ...rest] = contents;
   const likeCounts = await getLikeCounts(contents.map((c) => c.slug));
 
@@ -81,6 +81,19 @@ export default async function ColumnsPage({
         ))}
       </div>
 
+      {tag && (
+        <p className="text-sm mb-8">
+          タグ「#{tag}」で絞り込み中 ・{" "}
+          <Link
+            href={category ? `/columns?category=${encodeURIComponent(category)}` : "/columns"}
+            className="hover:underline"
+            style={{ color: "var(--accent)" }}
+          >
+            解除する
+          </Link>
+        </p>
+      )}
+
       {contents.length === 0 ? (
         <p className="text-sm" style={{ color: "var(--ink-secondary)" }}>
           まだ記事がありません。
@@ -109,6 +122,11 @@ export default async function ColumnsPage({
               <p className="text-sm" style={{ color: "var(--ink-secondary)" }}>
                 {excerpt(hero.body, 110)}
               </p>
+              {parseTags(hero.tags).length > 0 && (
+                <p className="text-xs mt-2" style={{ color: "var(--ink-muted)" }}>
+                  {parseTags(hero.tags).map((t) => `#${t}`).join(" ")}
+                </p>
+              )}
             </div>
           </Link>
 
@@ -142,6 +160,11 @@ export default async function ColumnsPage({
                       <p className="text-xs" style={{ color: "var(--ink-secondary)" }}>
                         {excerpt(c.body, 70)}
                       </p>
+                      {parseTags(c.tags).length > 0 && (
+                        <p className="text-xs mt-1.5" style={{ color: "var(--ink-muted)" }}>
+                          {parseTags(c.tags).map((t) => `#${t}`).join(" ")}
+                        </p>
+                      )}
                     </div>
                   </Link>
                 ))}
