@@ -24,6 +24,24 @@ interface ParsedDraft {
   body: string;
 }
 
+// microCMSのcategoryが必須フィールドのため、slugのパターンから自動でカテゴリを割り当てる。
+// 該当しない場合はNPBデータ分析にフォールバックする
+const CATEGORY_RULES: [RegExp, string][] = [
+  [/^(pitching-myth|pitching-velocity|batting-myth|tactics|fielding-basics|baserunning-basics|mental-science)-/, "野球理論（科学的検証）"],
+  [/^rules-basics-/, "ルール・基礎知識"],
+  [/^injury-prevention-/, "体づくり・怪我予防"],
+  [/^gear-guide-/, "用具選び"],
+  [/^pennant-race-/, "ペナントレース速報"],
+  [/^(satoh|murakami|taira)-/, "選手フィーチャー"],
+];
+
+function inferCategory(slug: string): string {
+  for (const [pattern, category] of CATEGORY_RULES) {
+    if (pattern.test(slug)) return category;
+  }
+  return "NPBデータ分析";
+}
+
 function parseDraft(raw: string, fileName: string): ParsedDraft {
   const match = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
   if (!match) throw new Error(`${fileName}: frontmatterが見つかりません`);
@@ -67,7 +85,7 @@ async function main() {
 
     const result = await client.create({
       endpoint: "columns",
-      content: { title: draft.title, slug: draft.slug, body: draft.body },
+      content: { title: draft.title, slug: draft.slug, body: draft.body, category: [inferCategory(draft.slug)] },
       isDraft: false,
     });
 
