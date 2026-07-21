@@ -34,3 +34,6 @@ jobs:
 
       - name: Compute prospect rankings
         run: npm run prospects
+
+      - name: Compute LABバリュー(MVP) rankings
+        run: npm run mvp
