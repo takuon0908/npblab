@@ -7,7 +7,7 @@ export function Table({ children }: { children: React.ReactNode }) {
       className="relative rounded-none min-w-0"
       style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
     >
-      <div className="overflow-x-auto rounded-none">
+      <div className="overflow-x-auto rounded-none [&_tbody_tr:hover]:bg-[var(--page)]">
         <table className="w-full text-sm border-collapse">{children}</table>
       </div>
       <div

@@ -18,8 +18,8 @@ export function FavoriteTeamPicker({ teams }: { teams: { slug: string; name: str
         setSelected(value);
         setFavoriteTeam(value || null);
       }}
-      className="text-xs rounded px-1.5 py-1 bg-transparent"
-      style={{ border: "1px solid var(--border)", color: "var(--ink-secondary)" }}
+      className="text-xs rounded-none px-1.5 py-1 bg-transparent"
+      style={{ border: "1px solid var(--border-strong)", color: "var(--ink-secondary)" }}
       aria-label="お気に入り球団"
     >
       <option value="">お気に入り球団</option>
