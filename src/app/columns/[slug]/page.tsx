@@ -8,6 +8,7 @@ import { GoodButton } from "@/components/GoodButton";
 import { getLikeCount } from "@/lib/columnLikes";
 import { ViewTracker } from "@/components/ViewTracker";
 import { getViewCount } from "@/lib/columnViews";
+import { siteUrl } from "@/lib/siteUrl";
 
 // microCMSサービスが未作成の段階でもビルドを通すため、ビルド時の静的生成を無効化
 export const dynamic = "force-dynamic";
@@ -59,8 +60,8 @@ export default async function ColumnPage({
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "プロ野球LAB", item: "/" },
-      { "@type": "ListItem", position: 2, name: "コラム", item: "/columns" },
+      { "@type": "ListItem", position: 1, name: "プロ野球LAB", item: siteUrl },
+      { "@type": "ListItem", position: 2, name: "コラム", item: `${siteUrl}/columns` },
       { "@type": "ListItem", position: 3, name: column.title },
     ],
   };
