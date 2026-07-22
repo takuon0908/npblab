@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getColumnBySlug, parseTags } from "@/lib/microcms";
+import { getColumnBySlug, getColumns, parseTags } from "@/lib/microcms";
 import { formatDateJa } from "@/lib/date";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 import { GoodButton } from "@/components/GoodButton";
@@ -10,8 +10,17 @@ import { ViewTracker } from "@/components/ViewTracker";
 import { getViewCount } from "@/lib/columnViews";
 import { siteUrl } from "@/lib/siteUrl";
 
-// microCMSサービスが未作成の段階でもビルドを通すため、ビルド時の静的生成を無効化
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  try {
+    const { contents } = await getColumns(100);
+    return contents.map((column) => ({ slug: column.slug }));
+  } catch {
+    // microCMS未設定のビルド環境でも失敗させない
+    return [];
+  }
+}
 
 export async function generateMetadata({
   params,
@@ -52,8 +61,11 @@ export default async function ColumnPage({
     "@type": "Article",
     headline: column.title,
     datePublished: column.publishedAt,
+    dateModified: column.updatedAt || column.publishedAt,
+    image: [`${siteUrl}/columns/${column.slug}/opengraph-image`],
     author: { "@type": "Organization", name: "プロ野球LAB" },
     publisher: { "@type": "Organization", name: "プロ野球LAB" },
+    mainEntityOfPage: { "@type": "WebPage", "@id": `${siteUrl}/columns/${column.slug}` },
   };
 
   const breadcrumbJsonLd = {
@@ -93,6 +105,7 @@ export default async function ColumnPage({
           <ArticleCoverImage
             slug={column.slug}
             text={`${column.title} ${column.body.replace(/<[^>]+>/g, "")}`}
+            priority
           />
         </div>
 

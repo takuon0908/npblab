@@ -6,7 +6,7 @@ import { Table, Th, Td } from "@/components/Table";
 import { latestPerPlayer } from "@/lib/latestPerPlayer";
 import { teamAbbr } from "@/lib/teamAbbr";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "打率ランキング（全選手）",

@@ -10,7 +10,7 @@ import { teamAbbr } from "@/lib/teamAbbr";
 const QUALIFYING_PA_PER_GAME = 3.1;
 const QUALIFYING_IP_PER_GAME = 1;
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "独自指標 LABバリューMVPランキング",

@@ -58,7 +58,12 @@ function summarizeByYear<T extends { date: Date }>(rows: T[]): T[] {
   return [...byYear.values()].sort((a, b) => b.date.getFullYear() - a.date.getFullYear());
 }
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const teams = await prisma.team.findMany({ select: { slug: true } });
+  return teams.map((team) => ({ teamSlug: team.slug }));
+}
 
 export async function generateMetadata({
   params,

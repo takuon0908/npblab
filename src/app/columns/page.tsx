@@ -5,8 +5,7 @@ import { formatDateJa } from "@/lib/date";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 import { getLikeCounts } from "@/lib/columnLikes";
 
-// microCMSサービスが未作成の段階でもビルドを通すよう、ビルド時の静的生成を無効化
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "コラム",
@@ -106,7 +105,7 @@ export default async function ColumnsPage({
             style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
           >
             <div className="aspect-video sm:aspect-auto sm:h-full">
-              <ArticleCoverImage slug={hero.slug} text={`${hero.title} ${stripHtml(hero.body)}`} />
+              <ArticleCoverImage slug={hero.slug} text={`${hero.title} ${stripHtml(hero.body)}`} priority />
             </div>
             <div className="p-6 flex flex-col justify-center">
               <p className="text-xs mb-2" style={{ color: "var(--ink-muted)" }}>

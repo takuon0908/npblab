@@ -8,7 +8,12 @@ import { StatTile } from "@/components/StatTile";
 import { calcFipConstant, calcFip, calcWoba, calcWhip, calcKPercent, calcBBPercent } from "@/lib/sabermetrics";
 import { latestPerPlayer } from "@/lib/latestPerPlayer";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+
+// 選手数が多く全件のビルド時プリレンダーは重いため、初回アクセス時にオンデマンドでISR生成する
+export async function generateStaticParams() {
+  return [];
+}
 
 const LEVEL_LABEL: Record<Level, string> = {
   [Level.ICHIGUN]: "1軍",

@@ -6,7 +6,12 @@ import { Level } from "@prisma/client";
 import { Table, Th, Td } from "@/components/Table";
 import { latestPerPlayer } from "@/lib/latestPerPlayer";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const teams = await prisma.team.findMany({ select: { slug: true } });
+  return teams.map((team) => ({ teamSlug: team.slug }));
+}
 
 const LEVEL_LABEL: Record<Level, string> = {
   [Level.ICHIGUN]: "1軍",

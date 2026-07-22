@@ -5,7 +5,7 @@ import { formatDateJa } from "@/lib/date";
 import { FavoriteAwareGameGrid } from "@/components/FavoriteAwareGameGrid";
 import { teamAbbr } from "@/lib/teamAbbr";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "試合結果",

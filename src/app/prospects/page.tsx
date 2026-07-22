@@ -5,7 +5,7 @@ import { ProspectCategory } from "@prisma/client";
 import { Table, Th, Td } from "@/components/Table";
 import { teamAbbr } from "@/lib/teamAbbr";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "2軍注目選手ランキング・1軍昇格候補",

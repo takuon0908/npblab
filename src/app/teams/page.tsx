@@ -7,7 +7,7 @@ import { GamesAboveBelow500 } from "@/components/GamesAboveBelow500";
 import { Table, Th, Td } from "@/components/Table";
 import { calcMagicNumber } from "@/lib/baseball";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "セ・パ12球団 優勝確率一覧",

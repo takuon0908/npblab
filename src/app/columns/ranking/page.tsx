@@ -5,7 +5,7 @@ import { getViewCounts } from "@/lib/columnViews";
 import { Table, Th, Td } from "@/components/Table";
 import { formatDateJa } from "@/lib/date";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "人気記事ランキング",

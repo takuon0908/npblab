@@ -4,7 +4,7 @@ import { formatDateJa } from "@/lib/date";
 import { getLatestDayGames } from "@/lib/games";
 import { FavoriteAwareGameGrid } from "@/components/FavoriteAwareGameGrid";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },

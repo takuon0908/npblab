@@ -17,6 +17,7 @@ export interface Column {
   slug: string;
   body: string; // リッチエディタのHTML
   publishedAt: string;
+  updatedAt: string;
   category?: string[]; // 複数選択フィールド。未設定記事は空配列
   tags?: string; // テキストフィールド（カンマ区切りで複数タグを表現）。未入力の記事はキー自体が無い
 }
