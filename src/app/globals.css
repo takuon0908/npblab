@@ -2,16 +2,19 @@
 @plugin "@tailwindcss/typography";
 
 :root {
-  --page: #f9f9f7;
-  --surface: #fcfcfb;
-  --ink: #0b0b0b;
-  --ink-secondary: #52514e;
-  --ink-muted: #898781;
-  --border: rgba(11, 11, 11, 0.1);
-  --gridline: #e1e0d9;
+  /* 号外・スポーツ報知風：ニュースプリント地に黒罫線、見出し赤 */
+  --page: #eeece4;
+  --surface: #ffffff;
+  --ink: #161513;
+  --ink-secondary: #4a4945;
+  --ink-muted: #65635c;
+  --border: rgba(22, 21, 19, 0.14);
+  --border-strong: var(--ink);
+  --gridline: #d8d5c9;
 
-  --accent: #2a78d6;
-  --accent-track: #cde2fb;
+  --accent: #c31f2d;
+  --accent-deep: #7c1219;
+  --accent-track: #f7dee1;
   --good: #0ca30c;
   --good-soft: #d9f2d9;
   --critical: #d03b3b;

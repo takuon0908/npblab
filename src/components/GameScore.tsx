@@ -25,8 +25,8 @@ export function GameScore({
 
   return (
     <div
-      className="flex flex-col items-center justify-center gap-0.5 rounded px-2 py-1.5 text-sm tabular-nums"
-      style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
+      className="flex flex-col items-center justify-center gap-0.5 rounded-none px-2 py-1.5 text-sm tabular-nums"
+      style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
     >
       <div className="flex items-center gap-1.5">
         <Link
@@ -36,7 +36,7 @@ export function GameScore({
         >
           {teamAbbr(awayTeam.slug)}
         </Link>
-        <span className="font-semibold whitespace-nowrap">
+        <span className="font-bold whitespace-nowrap" style={{ color: "var(--accent)" }}>
           {awayScore}-{homeScore}
         </span>
         <Link

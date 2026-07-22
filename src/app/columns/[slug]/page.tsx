@@ -101,7 +101,7 @@ export default async function ColumnPage({
       </nav>
 
       <article>
-        <div className="aspect-[16/7] rounded-lg overflow-hidden mb-8">
+        <div className="aspect-[16/7] rounded-none overflow-hidden mb-8">
           <ArticleCoverImage
             slug={column.slug}
             text={`${column.title} ${column.body.replace(/<[^>]+>/g, "")}`}

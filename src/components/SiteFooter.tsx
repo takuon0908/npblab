@@ -17,7 +17,7 @@ export async function SiteFooter() {
   const updatedAt = latest._max.date ? formatDateJa(latest._max.date) : null;
 
   return (
-    <footer className="mt-auto" style={{ borderTop: "1px solid var(--border)" }}>
+    <footer className="mt-auto" style={{ borderTop: "2px solid var(--ink)" }}>
       <div className="mx-auto max-w-4xl px-4 py-6">
         <nav
           className="flex flex-wrap gap-x-4 gap-y-2 text-xs mb-4"

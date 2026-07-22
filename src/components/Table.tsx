@@ -4,10 +4,10 @@
 export function Table({ children }: { children: React.ReactNode }) {
   return (
     <div
-      className="relative rounded-lg min-w-0"
-      style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
+      className="relative rounded-none min-w-0"
+      style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
     >
-      <div className="overflow-x-auto rounded-lg">
+      <div className="overflow-x-auto rounded-none">
         <table className="w-full text-sm border-collapse">{children}</table>
       </div>
       <div

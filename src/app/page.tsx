@@ -23,7 +23,12 @@ export default async function Home() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
-      <h1 className="text-3xl font-bold mb-2">プロ野球LAB</h1>
+      <h1
+        className="text-4xl mb-2"
+        style={{ fontFamily: "var(--font-shippori-mincho)", fontWeight: 700, letterSpacing: "0.01em" }}
+      >
+        プロ野球LAB
+      </h1>
       <p className="text-sm mb-10" style={{ color: "var(--ink-secondary)" }}>
         野球を科学する。NPBのデータを独自に分析し、優勝確率・タイトル獲得確率を毎日更新します。
       </p>
@@ -31,7 +36,8 @@ export default async function Home() {
       {latestGames && latestGames.games.length > 0 && (
         <section className="mb-10">
           <div className="flex items-baseline justify-between mb-3">
-            <h2 className="font-semibold text-sm" style={{ color: "var(--ink-muted)" }}>
+            <h2 className="flex items-center gap-2 font-semibold text-sm" style={{ color: "var(--ink)" }}>
+              <span aria-hidden style={{ width: 9, height: 9, background: "var(--accent)", flex: "none" }} />
               {formatDateJa(latestGames.date)}の試合結果
             </h2>
             <Link href="/games" className="text-xs hover:underline" style={{ color: "var(--accent)" }}>
@@ -47,11 +53,14 @@ export default async function Home() {
           <Link
             key={s.href}
             href={s.href}
-            className="block rounded-lg p-5 transition-colors hover:opacity-80"
-            style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+            className="group block rounded-none p-5 transition-colors"
+            style={{ background: "var(--surface)", border: "1px solid var(--border-strong)" }}
           >
-            <div className="font-semibold">{s.label}</div>
-            <div className="text-sm mt-1" style={{ color: "var(--ink-secondary)" }}>
+            <div className="flex items-center gap-2 font-semibold">
+              <span aria-hidden style={{ width: 9, height: 9, background: "var(--accent)", flex: "none" }} />
+              <span className="group-hover:underline">{s.label}</span>
+            </div>
+            <div className="text-sm mt-1.5" style={{ color: "var(--ink-secondary)" }}>
               {s.desc}
             </div>
           </Link>

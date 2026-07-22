@@ -15,10 +15,14 @@ export async function SiteHeader() {
   const teams = await prisma.team.findMany({ select: { slug: true, name: true }, orderBy: { name: "asc" } });
 
   return (
-    <header style={{ borderBottom: "1px solid var(--border)" }}>
+    <header style={{ borderTop: "4px solid var(--ink)", borderBottom: "2px solid var(--ink)" }}>
       <div className="mx-auto max-w-4xl px-4 py-3 sm:py-4">
         <div className="flex items-center justify-between gap-3">
-          <Link href="/" className="font-semibold tracking-tight whitespace-nowrap">
+          <Link
+            href="/"
+            className="whitespace-nowrap"
+            style={{ fontFamily: "var(--font-shippori-mincho)", fontWeight: 700, fontSize: "1.35rem", letterSpacing: "0.01em" }}
+          >
             プロ野球LAB
           </Link>
           <FavoriteTeamPicker teams={teams} />

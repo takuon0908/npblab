@@ -156,7 +156,7 @@ export default async function TeamPage({
         <>
           {insight && (
             <div
-              className="rounded-lg p-5 mb-8"
+              className="rounded-none p-5 mb-8"
               style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
             >
               <div className="text-sm mb-2" style={{ color: "var(--ink-muted)" }}>
@@ -329,7 +329,7 @@ export default async function TeamPage({
 
           {championship && (
             <div
-              className="rounded-lg p-5 mb-8"
+              className="rounded-none p-5 mb-8"
               style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
             >
               <div className="text-sm mb-2" style={{ color: "var(--ink-muted)" }}>
@@ -358,7 +358,7 @@ export default async function TeamPage({
 
           {whatIf && championship && (
             <div
-              className="rounded-lg p-5"
+              className="rounded-none p-5"
               style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
             >
               <div className="text-sm mb-1" style={{ color: "var(--ink-muted)" }}>

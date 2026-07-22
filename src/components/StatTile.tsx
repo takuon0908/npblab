@@ -1,8 +1,8 @@
 export function StatTile({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div
-      className="rounded-lg p-4"
-      style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+      className="rounded-none p-4"
+      style={{ background: "var(--surface)", border: "1px solid var(--border-strong)" }}
     >
       <dt className="text-xs" style={{ color: "var(--ink-muted)" }}>
         {label}

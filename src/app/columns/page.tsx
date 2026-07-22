@@ -101,8 +101,8 @@ export default async function ColumnsPage({
         <>
           <Link
             href={`/columns/${hero.slug}`}
-            className="group grid gap-0 sm:grid-cols-2 mb-12 rounded-lg overflow-hidden"
-            style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
+            className="group grid gap-0 sm:grid-cols-2 mb-12 rounded-none overflow-hidden"
+            style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
           >
             <div className="aspect-video sm:aspect-auto sm:h-full">
               <ArticleCoverImage slug={hero.slug} text={`${hero.title} ${stripHtml(hero.body)}`} priority />
@@ -113,8 +113,8 @@ export default async function ColumnsPage({
                 {likeCounts[hero.slug] > 0 && ` ・ 👍 ${likeCounts[hero.slug]}`}
               </p>
               <h2
-                className="text-xl font-bold mb-2 leading-snug group-hover:underline sm:text-2xl"
-                style={{ fontFamily: "var(--font-shippori-mincho)", textWrap: "balance" }}
+                className="text-xl mb-2 leading-snug group-hover:underline sm:text-2xl"
+                style={{ fontFamily: "var(--font-shippori-mincho)", fontWeight: 700, textWrap: "balance" }}
               >
                 {hero.title}
               </h2>
@@ -131,7 +131,8 @@ export default async function ColumnsPage({
 
           {rest.length > 0 && (
             <section>
-              <h2 className="text-sm font-semibold mb-4" style={{ color: "var(--ink-muted)" }}>
+              <h2 className="flex items-center gap-2 text-sm font-semibold mb-4" style={{ color: "var(--ink)" }}>
+                <span aria-hidden style={{ width: 9, height: 9, background: "var(--accent)", flex: "none" }} />
                 新着記事
               </h2>
               <div className="grid gap-5 sm:grid-cols-2">
@@ -139,8 +140,8 @@ export default async function ColumnsPage({
                   <Link
                     key={c.id}
                     href={`/columns/${c.slug}`}
-                    className="group rounded-lg overflow-hidden"
-                    style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
+                    className="group rounded-none overflow-hidden"
+                    style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
                   >
                     <div className="aspect-video">
                       <ArticleCoverImage slug={c.slug} text={`${c.title} ${stripHtml(c.body)}`} />
@@ -151,8 +152,8 @@ export default async function ColumnsPage({
                         {likeCounts[c.slug] > 0 && ` ・ 👍 ${likeCounts[c.slug]}`}
                       </p>
                       <h3
-                        className="font-bold mb-1 leading-snug group-hover:underline"
-                        style={{ fontFamily: "var(--font-shippori-mincho)" }}
+                        className="mb-1 leading-snug group-hover:underline"
+                        style={{ fontFamily: "var(--font-shippori-mincho)", fontWeight: 700 }}
                       >
                         {c.title}
                       </h3>
