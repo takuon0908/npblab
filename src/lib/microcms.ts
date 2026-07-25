@@ -42,7 +42,7 @@ export function parseTags(tags?: string): string[] {
     .filter(Boolean);
 }
 
-export async function getColumns(limit = 20, category?: string, tag?: string) {
+export async function getColumns(limit = 20, category?: string, tag?: string, offset = 0) {
   const filters = [
     category ? `category[contains]${category}` : null,
     tag ? `tags[contains]${tag}` : null,
@@ -54,6 +54,7 @@ export async function getColumns(limit = 20, category?: string, tag?: string) {
     endpoint: "columns",
     queries: {
       limit,
+      offset,
       orders: "-publishedAt",
       ...(filters ? { filters } : {}),
     },

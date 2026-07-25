@@ -56,6 +56,14 @@ export default async function ColumnPage({
 
   const publishedDate = new Date(column.publishedAt);
 
+  // 同じカテゴリ(先頭の1件)の記事を関連記事として表示する。2本未満ならセクション自体を出さない
+  const relatedCategory = column.category?.[0];
+  const relatedColumns = relatedCategory
+    ? (await getColumns(4, relatedCategory)).contents
+        .filter((c) => c.slug !== column.slug)
+        .slice(0, 3)
+    : [];
+
   const articleJsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -179,7 +187,44 @@ export default async function ColumnPage({
         </div>
       </article>
 
-      <div className="mt-14 pt-6" style={{ borderTop: "1px solid var(--border)" }}>
+      {relatedColumns.length >= 2 && (
+        <section className="mt-14 pt-8" style={{ borderTop: "1px solid var(--border)" }}>
+          <h2 className="flex items-center gap-2 text-sm font-semibold mb-4" style={{ color: "var(--ink)" }}>
+            <span aria-hidden style={{ width: 9, height: 9, background: "var(--accent)", flex: "none" }} />
+            関連記事
+          </h2>
+          <div className="grid gap-5 sm:grid-cols-2">
+            {relatedColumns.map((c) => (
+              <Link
+                key={c.id}
+                href={`/columns/${c.slug}`}
+                className="group rounded-none overflow-hidden"
+                style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
+              >
+                <div className="aspect-video">
+                  <ArticleCoverImage slug={c.slug} text={`${c.title} ${c.body.replace(/<[^>]+>/g, "")}`} />
+                </div>
+                <div className="p-4">
+                  <p className="text-xs mb-1.5" style={{ color: "var(--ink-muted)" }}>
+                    {formatDateJa(new Date(c.publishedAt))}
+                  </p>
+                  <h3
+                    className="mb-1 leading-snug group-hover:underline"
+                    style={{ fontFamily: "var(--font-shippori-mincho)", fontWeight: 700 }}
+                  >
+                    {c.title}
+                  </h3>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <div
+        className="mt-14 pt-6"
+        style={relatedColumns.length >= 2 ? undefined : { borderTop: "1px solid var(--border)" }}
+      >
         <Link href="/columns" className="text-sm hover:underline" style={{ color: "var(--accent)" }}>
           ← コラム一覧へ戻る
         </Link>

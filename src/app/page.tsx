@@ -3,6 +3,12 @@ import Link from "next/link";
 import { formatDateJa } from "@/lib/date";
 import { getLatestDayGames } from "@/lib/games";
 import { FavoriteAwareGameGrid } from "@/components/FavoriteAwareGameGrid";
+import { getColumns } from "@/lib/microcms";
+import { ArticleCoverImage } from "@/components/ArticleCoverImage";
+
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]+>/g, "").trim();
+}
 
 export const revalidate = 300;
 
@@ -18,8 +24,18 @@ const sections = [
   { href: "/columns", label: "コラム", desc: "分析記事・考察" },
 ];
 
+async function getLatestColumnsSafely() {
+  try {
+    const { contents } = await getColumns(4);
+    return contents;
+  } catch {
+    // microCMS未設定のビルド環境でも失敗させない([slug]/page.tsxのgenerateStaticParamsと同じ考え方)
+    return [];
+  }
+}
+
 export default async function Home() {
-  const latestGames = await getLatestDayGames();
+  const [latestGames, latestColumns] = await Promise.all([getLatestDayGames(), getLatestColumnsSafely()]);
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
@@ -45,6 +61,46 @@ export default async function Home() {
             </Link>
           </div>
           <FavoriteAwareGameGrid games={latestGames.games} />
+        </section>
+      )}
+
+      {latestColumns.length > 0 && (
+        <section className="mb-10">
+          <div className="flex items-baseline justify-between mb-3">
+            <h2 className="flex items-center gap-2 font-semibold text-sm" style={{ color: "var(--ink)" }}>
+              <span aria-hidden style={{ width: 9, height: 9, background: "var(--accent)", flex: "none" }} />
+              最新コラム
+            </h2>
+            <Link href="/columns" className="text-xs hover:underline" style={{ color: "var(--accent)" }}>
+              もっと見る →
+            </Link>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {latestColumns.map((c) => (
+              <Link
+                key={c.id}
+                href={`/columns/${c.slug}`}
+                className="group flex gap-3 rounded-none overflow-hidden p-3"
+                style={{ background: "var(--surface)", border: "1px solid var(--border-strong)" }}
+              >
+                <div className="w-20 aspect-square flex-none">
+                  <ArticleCoverImage slug={c.slug} text={`${c.title} ${stripHtml(c.body)}`} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs mb-1" style={{ color: "var(--ink-muted)" }}>
+                    {formatDateJa(new Date(c.publishedAt))}
+                    {c.category && c.category.length > 0 && ` ・ ${c.category[0]}`}
+                  </p>
+                  <p
+                    className="text-sm leading-snug group-hover:underline"
+                    style={{ fontWeight: 700, textWrap: "balance" }}
+                  >
+                    {c.title}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
         </section>
       )}
 
