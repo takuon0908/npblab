@@ -8,6 +8,8 @@ import { GoodButton } from "@/components/GoodButton";
 import { getLikeCount } from "@/lib/columnLikes";
 import { ViewTracker } from "@/components/ViewTracker";
 import { RakutenWidget } from "@/components/RakutenWidget";
+import { AmazonProductCard } from "@/components/AmazonProductCard";
+import { AFFILIATE_PRODUCTS } from "@/lib/affiliateProducts";
 import { getViewCount } from "@/lib/columnViews";
 import { siteUrl } from "@/lib/siteUrl";
 
@@ -58,6 +60,8 @@ export default async function ColumnPage({
   const publishedDate = new Date(column.publishedAt);
 
   // 同じカテゴリ(先頭の1件)の記事を関連記事として表示する。2本未満ならセクション自体を出さない
+  const affiliateProduct = AFFILIATE_PRODUCTS[column.slug];
+
   const relatedCategory = column.category?.[0];
   const relatedColumns = relatedCategory
     ? (await getColumns(4, relatedCategory)).contents
@@ -131,6 +135,14 @@ export default async function ColumnPage({
           >
             {column.title}
           </h1>
+          {affiliateProduct && (
+            <p
+              className="inline-block text-xs px-2.5 py-1 mb-3"
+              style={{ color: "var(--ink-muted)", background: "var(--surface)", border: "1px solid var(--border-strong)" }}
+            >
+              PR：本記事はアフィリエイト広告を含みます
+            </p>
+          )}
           <p className="text-sm" style={{ color: "var(--ink-muted)" }}>
             {formatDateJa(publishedDate)}
             {viewCount > 0 && ` ・ ${viewCount}回閲覧`}
@@ -182,6 +194,12 @@ export default async function ColumnPage({
           }
           dangerouslySetInnerHTML={{ __html: column.body }}
         />
+
+        {affiliateProduct && (
+          <div className="mt-8 flex justify-center">
+            <AmazonProductCard product={affiliateProduct} />
+          </div>
+        )}
 
         <div className="mt-8 flex justify-center">
           <RakutenWidget pageUrl={`${siteUrl}/columns/${column.slug}`} />

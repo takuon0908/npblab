@@ -4,7 +4,6 @@ slug: gear-guide-glove-care
 writer: writer-goods
 ---
 
-<p class="pr-disclosure">PR：本記事はアフィリエイト広告を含みます</p>
 <p>
 子供に新しいグローブを買ってあげたものの、「箱から出したままの状態では硬くて開閉しづらい」「オイルはどのくらい塗ればいいのか」「雨で濡れてしまったらどうすればいいのか」と戸惑う保護者は多い。新品のグローブは革が硬く、ボールを収める「ポケット」の形もまだできていないため、購入後に自分の手・自分のプレースタイルに合わせて形を作る「型付け」という作業が必要になる。今回はプロ野球LABの「用具選びシリーズ」として、初心者・保護者向けに家庭でできる型付けの基本と、型付け後に長く気持ちよく使うための日々のお手入れ方法を、複数の野球用品専門サイトの解説を参照しながら整理する。特定のメーカーや商品を強く推す内容ではなく、あくまで一般的な手順・考え方の紹介であることをあらかじめお断りしておく。
 </p>
@@ -67,15 +66,6 @@ writer: writer-goods
 </p>
 <p>
 お手入れ用品を一つずつ揃えるのが面倒な場合は、<a href="https://www.amazon.co.jp/dp/B0C6QKLNCM?tag=npblab-22" target="_blank" rel="noopener noreferrer sponsored">ミズノのグラブお手入れセット(レザーローション&ストロングオイル)</a>のように、オイルがセットになった商品を1つ持っておくと迷いが減る。レザーローションで革全体を保湿しつつ、ストロングオイルで型付け・色付けもできる組み合わせで、価格も1,600円前後と手頃。星4.2(534件のレビュー)、直近1か月でも300点以上購入されている定番品で、初めてのお手入れセットとして選びやすい。
-</p>
-<p>
-<a href="https://www.amazon.co.jp/dp/B0C6QKLNCM?tag=npblab-22" target="_blank" rel="noopener noreferrer sponsored" class="amazon-product-card">
-<img src="https://m.media-amazon.com/images/I/51U6o4BK4LL._AC_SX569_.jpg" alt="ミズノ グラブお手入れセット(レザーローション&ストロングオイル)" loading="lazy" />
-<span>
-<span class="amazon-product-card-title">ミズノ グラブお手入れセット(レザーローション&ストロングオイル)</span>
-<span class="amazon-product-card-cta">Amazonで見る →</span>
-</span>
-</a>
 </p>
 
 <h2>まとめ ― 焦らず、様子を見ながら少しずつ</h2>

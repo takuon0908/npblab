@@ -4,7 +4,6 @@ slug: gear-guide-training-equipment
 writer: writer-goods
 ---
 
-<p class="pr-disclosure">PR：本記事はアフィリエイト広告を含みます</p>
 <p>
 チームの練習だけでなく、自宅や庭でも打撃練習をしたいという子供・保護者は多いだろう。バッティングティー、トスマシン、素振り用のバット、練習用ネットなど、自宅練習を支える道具は種類が豊富だが、それぞれ得意な練習内容や設置環境が異なる。今回はプロ野球LABの「用具選びシリーズ」として、自宅・庭で使う練習用品を選ぶ際の基本的な考え方を整理する。
 </p>
@@ -52,15 +51,6 @@ writer: writer-goods
 </p>
 <p>
 バッティングティーを初めて用意するなら、<a href="https://www.amazon.co.jp/dp/B0DKF3L7K1?tag=npblab-22" target="_blank" rel="noopener noreferrer sponsored">フィールドフォースのフォースティー</a>のような、高さを64〜107cmの範囲で無段階調整できるスプリング式のスタンドが使いやすい。硬式・軟式・ソフトボールいずれにも対応し、星4.5の評価。組み立てが簡単な点も、自宅で気軽に始めたい家庭には嬉しいポイントだ。
-</p>
-<p>
-<a href="https://www.amazon.co.jp/dp/B0DKF3L7K1?tag=npblab-22" target="_blank" rel="noopener noreferrer sponsored" class="amazon-product-card">
-<img src="https://m.media-amazon.com/images/I/51Pcce-tZYL._AC_UF480,480_SR480,480_.jpg" alt="フィールドフォース フォースティー" loading="lazy" />
-<span>
-<span class="amazon-product-card-title">フィールドフォース フォースティー</span>
-<span class="amazon-product-card-cta">Amazonで見る →</span>
-</span>
-</a>
 </p>
 
 <h2>この記事についてのお断り</h2>

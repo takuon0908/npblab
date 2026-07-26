@@ -4,7 +4,6 @@ slug: gear-guide-spikes
 writer: writer-goods
 ---
 
-<p class="pr-disclosure">PR：本記事はアフィリエイト広告を含みます</p>
 <p>
 グローブ・バットと並んで、少年野球を始める子供に必要になるのがスパイクだ。ただしスパイクは大人用と子供用でルール上の扱いが大きく異なり、「金具付き」と「ポイント」の違いや、グラウンドの種類による向き不向きなど、初めて選ぶ保護者には馴染みのない要素が多い。今回はプロ野球LAB用具選びシリーズとして、少年野球特有のルール上の制限を中心に、スパイク選びの基本を整理する。
 </p>
@@ -51,15 +50,6 @@ writer: writer-goods
 </p>
 <p>
 定番ブランドから選びたい場合は、<a href="https://www.amazon.co.jp/dp/B0F8VKX5D7?tag=npblab-22" target="_blank" rel="noopener noreferrer sponsored">アシックスのジュニア用ベースボールシューズ STAR SHINE S 3</a>が候補になる。世界的スポーツブランドの子供用モデルという安心感がありつつ価格は6,000円台からと手が届きやすく、星4.5(20件のレビュー)と評価も安定している。サイズ展開も18.0cmから幅広く揃っているため、成長段階に合わせて選びやすいのも助かるポイントだ。
-</p>
-<p>
-<a href="https://www.amazon.co.jp/dp/B0F8VKX5D7?tag=npblab-22" target="_blank" rel="noopener noreferrer sponsored" class="amazon-product-card">
-<img src="https://m.media-amazon.com/images/I/61eBPVRspCL._AC_SY695_.jpg" alt="アシックス ジュニア用ベースボールシューズ STAR SHINE S 3" loading="lazy" />
-<span>
-<span class="amazon-product-card-title">アシックス ジュニア用ベースボールシューズ STAR SHINE S 3</span>
-<span class="amazon-product-card-cta">Amazonで見る →</span>
-</span>
-</a>
 </p>
 
 <h2>この記事についてのお断り</h2>

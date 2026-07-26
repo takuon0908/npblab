@@ -4,7 +4,6 @@ slug: gear-guide-catcher-gear
 writer: writer-goods
 ---
 
-<p class="pr-disclosure">PR：本記事はアフィリエイト広告を含みます</p>
 <p>
 グローブ・バット・スパイクと違い、キャッチャー（捕手）を任されると急に必要になるのが「防具」だ。マスク、プロテクター、レガース（すね当て）、そしてキャッチャーミットと、一式そろえるだけでも保護者にとってはハードルが高い。今回はプロ野球LABの「用具選びシリーズ」として、キャッチャー防具の基本的な選び方と、少年野球で確認しておきたい安全に関するルールを整理する。
 </p>
@@ -52,15 +51,6 @@ writer: writer-goods
 </p>
 <p>
 安全基準を満たした一式をまとめて揃えたい場合は、<a href="https://www.amazon.co.jp/dp/B0DV9C1XZS?tag=npblab-22" target="_blank" rel="noopener noreferrer sponsored">ゼット(ZETT)の少年用軟式キャッチャー防具4点セット</a>のように、JSBB公認・SGマーク対応をうたう正規品から検討するのが安心だ。マスク・プロテクター・レガースなど必要な防具がまとめて揃うため、初めて防具を用意する家庭でも選びやすい。個別レビュー数はまだ少ないが、実店舗も持つ野球用品専門店（スワロースポーツ）が扱う正規ルートの商品である点は安心材料の一つだ。
-</p>
-<p>
-<a href="https://www.amazon.co.jp/dp/B0DV9C1XZS?tag=npblab-22" target="_blank" rel="noopener noreferrer sponsored" class="amazon-product-card">
-<img src="https://m.media-amazon.com/images/I/51O5OGe77QL._AC_SX569_.jpg" alt="ゼット(ZETT) 少年用軟式キャッチャー防具4点セット" loading="lazy" />
-<span>
-<span class="amazon-product-card-title">ゼット(ZETT) 少年用軟式キャッチャー防具4点セット</span>
-<span class="amazon-product-card-cta">Amazonで見る →</span>
-</span>
-</a>
 </p>
 
 <h2>この記事についてのお断り</h2>

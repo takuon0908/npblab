@@ -4,7 +4,6 @@ slug: gear-guide-bat
 writer: writer-goods
 ---
 
-<p class="pr-disclosure">PR：本記事はアフィリエイト広告を含みます</p>
 <p>
 グローブと並んで、野球を始める子供が最初に手にする道具の代表格がバットだ。ただしバットは素材だけでも金属・木製・複合（カーボンなど）の3種類があり、さらに長さと重さの組み合わせも幅広く、「結局どれを選べばいいのか」で迷う保護者は多い。今回はプロ野球LABの用具選びシリーズとして、バットの素材の違いと、体格に合わせた長さ・重さの基本的な考え方を整理する。
 </p>
@@ -48,15 +47,6 @@ writer: writer-goods
 </p>
 <p>
 最初の金属バットとして具体的に検討するなら、<a href="https://www.amazon.co.jp/dp/B0DXP4LDL1?tag=npblab-22" target="_blank" rel="noopener noreferrer sponsored">ゼット(ZETT)の少年軟式用バット スイングマックス</a>が候補に挙がる。60cmから78cmまで細かくサイズ展開があり、体格に合わせて選びやすい。星4.7(22件のレビュー)と評価も高く、価格も7,800円前後とまず1本目に検討しやすい水準に収まっている。
-</p>
-<p>
-<a href="https://www.amazon.co.jp/dp/B0DXP4LDL1?tag=npblab-22" target="_blank" rel="noopener noreferrer sponsored" class="amazon-product-card">
-<img src="https://m.media-amazon.com/images/I/51+iZW957BL._AC_SX569_.jpg" alt="ゼット(ZETT) 少年軟式用バット スイングマックス" loading="lazy" />
-<span>
-<span class="amazon-product-card-title">ゼット(ZETT) 少年軟式用バット スイングマックス</span>
-<span class="amazon-product-card-cta">Amazonで見る →</span>
-</span>
-</a>
 </p>
 
 <h2>この記事についてのお断り</h2>
