@@ -9,7 +9,9 @@ const FOOTER_LINKS = [
   { href: "/prospects", label: "2軍注目選手" },
   { href: "/analysis", label: "独自指標" },
   { href: "/columns", label: "コラム" },
+  { href: "/about", label: "このサイトについて" },
   { href: "/about/methodology", label: "算出方法について" },
+  { href: "/contact", label: "お問い合わせ" },
 ];
 
 export async function SiteFooter() {
@@ -35,7 +37,8 @@ export async function SiteFooter() {
             掲載の確率・指標は公開情報をもとにした独自の分析・試算であり、NPB公式の見解や予測ではありません。
           </p>
           <p className="mt-1">
-            当サイトは、Amazon.co.jpを宣伝しリンクすることによってサイトが紹介料を獲得できる手段を提供することを目的に設定されたアフィリエイトプログラムであるAmazonアソシエイト・プログラムの参加者です。
+            当サイトは、Amazon.co.jpを宣伝しリンクすることによってサイトが紹介料を獲得できる手段を提供することを目的に設定されたアフィリエイトプログラムであるAmazonアソシエイト・プログラムの参加者です。また、楽天アフィリエイトプログラムにも参加しており、Google
+            AdSenseによる広告配信もあわせて行っています。商品紹介記事にはプロモーション(アフィリエイトリンク)が含まれる場合があります。
           </p>
         </div>
       </div>

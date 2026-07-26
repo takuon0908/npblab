@@ -7,6 +7,7 @@ import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 import { GoodButton } from "@/components/GoodButton";
 import { getLikeCount } from "@/lib/columnLikes";
 import { ViewTracker } from "@/components/ViewTracker";
+import { RakutenWidget } from "@/components/RakutenWidget";
 import { getViewCount } from "@/lib/columnViews";
 import { siteUrl } from "@/lib/siteUrl";
 
@@ -182,7 +183,11 @@ export default async function ColumnPage({
           dangerouslySetInnerHTML={{ __html: column.body }}
         />
 
-        <div className="mt-10 flex justify-center">
+        <div className="mt-8 flex justify-center">
+          <RakutenWidget pageUrl={`${siteUrl}/columns/${column.slug}`} />
+        </div>
+
+        <div className="mt-6 flex justify-center">
           <GoodButton slug={column.slug} initialCount={likeCount} />
         </div>
       </article>
