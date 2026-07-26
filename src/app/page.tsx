@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { formatDateJa } from "@/lib/date";
-import { getLatestDayGames } from "@/lib/games";
+import { getLatestDayGames, pickClosestGame } from "@/lib/games";
 import { FavoriteAwareGameGrid } from "@/components/FavoriteAwareGameGrid";
 import { getColumns } from "@/lib/microcms";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
+import { TEAM_THEME } from "@/lib/teamTheme";
 
 function stripHtml(html: string): string {
   return html.replace(/<[^>]+>/g, "").trim();
@@ -34,8 +35,37 @@ async function getLatestColumnsSafely() {
   }
 }
 
+function HighlightGame({ game }: { game: NonNullable<Awaited<ReturnType<typeof getLatestDayGames>>>["games"][number] }) {
+  const margin = Math.abs(game.homeScore! - game.awayScore!);
+  const homeWin = game.homeScore! > game.awayScore!;
+  const winner = homeWin ? game.homeTeam : game.awayTeam;
+  const label = margin === 1 ? "1点差の大接戦" : `僅差の${margin}点差ゲーム`;
+
+  return (
+    <Link
+      href={`/teams/${winner.slug}`}
+      className="group block p-4 mb-4"
+      style={{ background: "var(--surface)", border: "1px solid var(--border-strong)", borderLeft: `4px solid ${TEAM_THEME[winner.slug]?.accent ?? "var(--accent)"}` }}
+    >
+      <p className="text-xs font-semibold mb-1.5" style={{ color: "var(--accent)" }}>
+        今日の一戦 ・ {label}
+      </p>
+      <p className="text-base font-bold group-hover:underline" style={{ fontFamily: "var(--font-shippori-mincho)" }}>
+        {game.awayTeam.name} {game.awayScore}-{game.homeScore} {game.homeTeam.name}
+      </p>
+      {game.winningPitcher && (
+        <p className="text-xs mt-1" style={{ color: "var(--ink-muted)" }}>
+          勝投手: {game.winningPitcher}
+          {game.savePitcher && ` ・ セーブ: ${game.savePitcher}`}
+        </p>
+      )}
+    </Link>
+  );
+}
+
 export default async function Home() {
   const [latestGames, latestColumns] = await Promise.all([getLatestDayGames(), getLatestColumnsSafely()]);
+  const highlightGame = latestGames ? pickClosestGame(latestGames.games) : null;
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
@@ -60,6 +90,7 @@ export default async function Home() {
               もっと見る →
             </Link>
           </div>
+          {highlightGame && <HighlightGame game={highlightGame} />}
           <FavoriteAwareGameGrid games={latestGames.games} />
         </section>
       )}

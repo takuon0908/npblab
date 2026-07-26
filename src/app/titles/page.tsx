@@ -5,6 +5,17 @@ import { TitleCategory, Level } from "@prisma/client";
 import { Table, Th, Td } from "@/components/Table";
 import { latestPerPlayer } from "@/lib/latestPerPlayer";
 import { teamAbbr } from "@/lib/teamAbbr";
+import { TEAM_THEME } from "@/lib/teamTheme";
+
+function TeamDot({ slug }: { slug: string }) {
+  return (
+    <span
+      aria-hidden
+      className="inline-block rounded-full mr-1"
+      style={{ width: 6, height: 6, background: TEAM_THEME[slug]?.accent ?? "var(--ink-muted)" }}
+    />
+  );
+}
 
 // NPBの規定打席・規定投球回の定義（チーム試合数を基準にした変動値）
 const QUALIFYING_PA_PER_GAME = 3.1;
@@ -146,10 +157,10 @@ export default async function TitlesPage() {
                             </Link>
                             <Link
                               href={`/teams/${row.team.slug}`}
-                              className="text-xs ml-1 hover:underline"
+                              className="text-xs ml-1 hover:underline inline-flex items-center"
                               style={{ color: "var(--ink-secondary)" }}
                             >
-                              ({teamAbbr(row.team.slug)})
+                              <TeamDot slug={row.team.slug} />({teamAbbr(row.team.slug)})
                             </Link>
                           </Td>
                           <Td align="right">
@@ -220,10 +231,10 @@ export default async function TitlesPage() {
                           </Link>
                           <Link
                             href={`/teams/${b.team.slug}`}
-                            className="text-xs ml-1 hover:underline"
+                            className="text-xs ml-1 hover:underline inline-flex items-center"
                             style={{ color: "var(--ink-secondary)" }}
                           >
-                            ({teamAbbr(b.team.slug)})
+                            <TeamDot slug={b.team.slug} />({teamAbbr(b.team.slug)})
                           </Link>
                         </Td>
                         <Td align="right">
@@ -264,10 +275,10 @@ export default async function TitlesPage() {
                           </Link>
                           <Link
                             href={`/teams/${p.team.slug}`}
-                            className="text-xs ml-1 hover:underline"
+                            className="text-xs ml-1 hover:underline inline-flex items-center"
                             style={{ color: "var(--ink-secondary)" }}
                           >
-                            ({teamAbbr(p.team.slug)})
+                            <TeamDot slug={p.team.slug} />({teamAbbr(p.team.slug)})
                           </Link>
                         </Td>
                         <Td align="right">
