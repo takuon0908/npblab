@@ -6,6 +6,7 @@ import { Meter } from "@/components/Meter";
 import { GamesAboveBelow500 } from "@/components/GamesAboveBelow500";
 import { Table, Th, Td } from "@/components/Table";
 import { calcMagicNumber } from "@/lib/baseball";
+import { TEAM_THEME } from "@/lib/teamTheme";
 
 export const revalidate = 3600;
 
@@ -120,7 +121,17 @@ function LeagueTable({
           {rows.map(({ team, standing, championship, probabilityDelta }) => (
             <tr key={team.id} className="hover:bg-black/[0.03]">
               <Td>
-                <Link href={`/teams/${team.slug}`} className="hover:underline">
+                <Link href={`/teams/${team.slug}`} className="hover:underline inline-flex items-center gap-2">
+                  <span
+                    aria-hidden
+                    className="rounded-full"
+                    style={{
+                      width: 9,
+                      height: 9,
+                      flex: "none",
+                      background: TEAM_THEME[team.slug]?.accent ?? "var(--ink-muted)",
+                    }}
+                  />
                   {team.name}
                 </Link>
               </Td>

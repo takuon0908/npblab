@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { teamAbbr } from "@/lib/teamAbbr";
+import { TEAM_THEME } from "@/lib/teamTheme";
 
 interface TeamRef {
   slug: string;
@@ -31,9 +32,14 @@ export function GameScore({
       <div className="flex items-center gap-1.5">
         <Link
           href={`/teams/${awayTeam.slug}`}
-          className="hover:underline"
+          className="hover:underline inline-flex items-center gap-1"
           style={{ color: awayWin ? "var(--ink)" : "var(--ink-muted)", fontWeight: awayWin ? 700 : 400 }}
         >
+          <span
+            aria-hidden
+            className="rounded-full"
+            style={{ width: 6, height: 6, flex: "none", background: TEAM_THEME[awayTeam.slug]?.accent ?? "var(--ink-muted)" }}
+          />
           {teamAbbr(awayTeam.slug)}
         </Link>
         <span className="font-bold whitespace-nowrap" style={{ color: "var(--accent)" }}>
@@ -41,10 +47,15 @@ export function GameScore({
         </span>
         <Link
           href={`/teams/${homeTeam.slug}`}
-          className="hover:underline"
+          className="hover:underline inline-flex items-center gap-1"
           style={{ color: homeWin ? "var(--ink)" : "var(--ink-muted)", fontWeight: homeWin ? 700 : 400 }}
         >
           {teamAbbr(homeTeam.slug)}
+          <span
+            aria-hidden
+            className="rounded-full"
+            style={{ width: 6, height: 6, flex: "none", background: TEAM_THEME[homeTeam.slug]?.accent ?? "var(--ink-muted)" }}
+          />
         </Link>
       </div>
       {winningPitcher && (
