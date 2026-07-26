@@ -4,6 +4,7 @@ slug: gear-guide-batting-gloves
 writer: writer-goods
 ---
 
+<p class="pr-disclosure">PR：本記事はアフィリエイト広告を含みます</p>
 <p>
 バットを握る手にはめる「バッティンググローブ」は、グローブやバットほど注目されにくいが、打席での握りやすさや手の保護に関わる用具だ。今回はプロ野球LABの「用具選びシリーズ」として、バッティンググローブとリストバンドについて、役割の基本とサイズ・素材の選び方を整理する。
 </p>
@@ -50,7 +51,16 @@ writer: writer-goods
 バッティンググローブ選びのポイントを整理すると、（1）グリップ力と手の保護という役割を理解する、（2）迷ったら小さめのサイズを選ぶ、（3）練習用と試合用で素材を使い分ける、の3点に集約される。派手な機能をうたう製品も多いが、初心者のうちはまず「握りやすいサイズ感」を最優先に選ぶのが、バッティング練習を快適に続けるための近道と言えるだろう。
 </p>
 <p>
-具体的な1つとしては、<a href="https://www.amazon.co.jp/dp/B0DPHDFWCL?tag=npblab-22" target="_blank" rel="noopener noreferrer">ゼット(ZETT)のジュニア用バッティンググローブ ゼロワンステージ</a>が挙げやすい。JS・JM・JLとサイズ展開があり手の大きさに合わせて選びやすく、星4.6(50件のレビュー)と評価も高い。価格も2,500円前後からと、最初の1双として試しやすい水準だ。
+具体的な1つとしては、<a href="https://www.amazon.co.jp/dp/B0DPHDFWCL?tag=npblab-22" target="_blank" rel="noopener noreferrer sponsored">ゼット(ZETT)のジュニア用バッティンググローブ ゼロワンステージ</a>が挙げやすい。JS・JM・JLとサイズ展開があり手の大きさに合わせて選びやすく、星4.6(50件のレビュー)と評価も高い。価格も2,500円前後からと、最初の1双として試しやすい水準だ。
+</p>
+<p>
+<a href="https://www.amazon.co.jp/dp/B0DPHDFWCL?tag=npblab-22" target="_blank" rel="noopener noreferrer sponsored" class="amazon-product-card">
+<img src="https://m.media-amazon.com/images/I/71sRLdW+q1L._AC_SX569_.jpg" alt="ゼット(ZETT) ジュニア用バッティンググローブ ゼロワンステージ" loading="lazy" />
+<span>
+<span class="amazon-product-card-title">ゼット(ZETT) ジュニア用バッティンググローブ ゼロワンステージ</span>
+<span class="amazon-product-card-cta">Amazonで見る →</span>
+</span>
+</a>
 </p>
 
 <h2>この記事についてのお断り</h2>

@@ -4,6 +4,7 @@ slug: gear-guide-bat
 writer: writer-goods
 ---
 
+<p class="pr-disclosure">PR：本記事はアフィリエイト広告を含みます</p>
 <p>
 グローブと並んで、野球を始める子供が最初に手にする道具の代表格がバットだ。ただしバットは素材だけでも金属・木製・複合（カーボンなど）の3種類があり、さらに長さと重さの組み合わせも幅広く、「結局どれを選べばいいのか」で迷う保護者は多い。今回はプロ野球LABの用具選びシリーズとして、バットの素材の違いと、体格に合わせた長さ・重さの基本的な考え方を整理する。
 </p>
@@ -46,7 +47,16 @@ writer: writer-goods
 少年用バットの価格帯は、執筆時点（2026年7月）で確認できた範囲では、金属バットがおおむね5,000円台から、複合素材バットは技術的な工夫が加わる分やや高めで、上位モデルでは3万円台から4万円台に達するものもあるとされている（出典：複数の野球用品専門サイトの価格情報を基にした目安。価格・ラインナップは変動するため購入前に最新情報を要確認）。最初の1本としては、まず扱いやすい金属バットから検討し、続けていく中で必要に応じて複合素材バットへのステップアップを検討する、という進め方も一つの考え方だろう。
 </p>
 <p>
-最初の金属バットとして具体的に検討するなら、<a href="https://www.amazon.co.jp/dp/B0DXP4LDL1?tag=npblab-22" target="_blank" rel="noopener noreferrer">ゼット(ZETT)の少年軟式用バット スイングマックス</a>が候補に挙がる。60cmから78cmまで細かくサイズ展開があり、体格に合わせて選びやすい。星4.7(22件のレビュー)と評価も高く、価格も7,800円前後とまず1本目に検討しやすい水準に収まっている。
+最初の金属バットとして具体的に検討するなら、<a href="https://www.amazon.co.jp/dp/B0DXP4LDL1?tag=npblab-22" target="_blank" rel="noopener noreferrer sponsored">ゼット(ZETT)の少年軟式用バット スイングマックス</a>が候補に挙がる。60cmから78cmまで細かくサイズ展開があり、体格に合わせて選びやすい。星4.7(22件のレビュー)と評価も高く、価格も7,800円前後とまず1本目に検討しやすい水準に収まっている。
+</p>
+<p>
+<a href="https://www.amazon.co.jp/dp/B0DXP4LDL1?tag=npblab-22" target="_blank" rel="noopener noreferrer sponsored" class="amazon-product-card">
+<img src="https://m.media-amazon.com/images/I/51+iZW957BL._AC_SX569_.jpg" alt="ゼット(ZETT) 少年軟式用バット スイングマックス" loading="lazy" />
+<span>
+<span class="amazon-product-card-title">ゼット(ZETT) 少年軟式用バット スイングマックス</span>
+<span class="amazon-product-card-cta">Amazonで見る →</span>
+</span>
+</a>
 </p>
 
 <h2>この記事についてのお断り</h2>

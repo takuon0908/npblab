@@ -4,6 +4,7 @@ slug: gear-guide-starter-kit
 writer: writer-goods
 ---
 
+<p class="pr-disclosure">PR：本記事はアフィリエイト広告を含みます</p>
 <p>
 「子供が野球を始めたいと言っている。何を、どの順番で買えばいいのか」。少年野球チームへの入団を検討し始めた保護者が最初にぶつかる悩みがこれだ。野球はグローブやバットだけでなく、スパイクやヘルメット、ユニフォームなど揃えるべき道具の種類が多く、初めてだと何を優先すべきか判断しづらい。今回はプロ野球LABの「用具選びシリーズ」として、少年野球（学童軟式野球）を始めるにあたって最低限揃えたい道具を、優先順位と大まかな予算感つきで整理する。細かい選び方の基準は道具ごとに別記事で詳しく扱っているので、まずは全体像をつかむための一覧として読んでほしい。
 </p>
@@ -46,7 +47,16 @@ writer: writer-goods
 なお、費用を抑える工夫として、体が大きくなるまでの間はお下がりや中古品、チームの貸出品を活用する家庭も多い。特にヘルメットやバットのように成長に伴って短いサイクルで買い替えが必要になる道具は、無理に新品にこだわらず、状態の良い中古品やチーム内での譲り合いを検討する余地がある。一方でグローブやスパイクのように足や手にじかに触れる道具は、サイズやフィット感が上達や怪我の防止に関わるため、できるだけ試着・試用してから選びたい。
 </p>
 <p>
-グローブ・バット・スパイク以外で、意外と後回しにされがちなのが道具をまとめて運ぶバッグだ。<a href="https://www.amazon.co.jp/dp/B09NXBL581?tag=npblab-22" target="_blank" rel="noopener noreferrer">ゼット(ZETT)のジュニア用デイパック(約20L)</a>は、少年野球の道具一式がひとまとめに収まるサイズで、星4.6(92件のレビュー)、直近1か月でも200点以上購入されている定番品。価格も4,500円前後と、最初に揃える道具の中では手を出しやすい部類に入る。
+グローブ・バット・スパイク以外で、意外と後回しにされがちなのが道具をまとめて運ぶバッグだ。<a href="https://www.amazon.co.jp/dp/B09NXBL581?tag=npblab-22" target="_blank" rel="noopener noreferrer sponsored">ゼット(ZETT)のジュニア用デイパック(約20L)</a>は、少年野球の道具一式がひとまとめに収まるサイズで、星4.6(92件のレビュー)、直近1か月でも200点以上購入されている定番品。価格も4,500円前後と、最初に揃える道具の中では手を出しやすい部類に入る。
+</p>
+<p>
+<a href="https://www.amazon.co.jp/dp/B09NXBL581?tag=npblab-22" target="_blank" rel="noopener noreferrer sponsored" class="amazon-product-card">
+<img src="https://m.media-amazon.com/images/I/51XfYnph4VL._AC_SY695_.jpg" alt="ゼット(ZETT) ジュニア用デイパック(約20L)" loading="lazy" />
+<span>
+<span class="amazon-product-card-title">ゼット(ZETT) ジュニア用デイパック(約20L)</span>
+<span class="amazon-product-card-cta">Amazonで見る →</span>
+</span>
+</a>
 </p>
 
 <h2>まとめ ― まずは「グローブ・バット・スパイク」の3点から</h2>
