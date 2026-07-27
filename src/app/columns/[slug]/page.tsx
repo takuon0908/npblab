@@ -118,6 +118,7 @@ export default async function ColumnPage({
           <ArticleCoverImage
             slug={column.slug}
             text={`${column.title} ${column.body.replace(/<[^>]+>/g, "")}`}
+            title={column.title}
             priority
           />
         </div>

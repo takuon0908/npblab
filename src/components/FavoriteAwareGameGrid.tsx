@@ -12,6 +12,12 @@ interface GameData {
   awayScore: number | null;
   winningPitcher?: string | null;
   savePitcher?: string | null;
+  homeInnings?: number[];
+  awayInnings?: number[];
+  homeHits?: number | null;
+  homeErrors?: number | null;
+  awayHits?: number | null;
+  awayErrors?: number | null;
 }
 
 export function FavoriteAwareGameGrid({ games, className }: { games: GameData[]; className?: string }) {
@@ -45,6 +51,12 @@ export function FavoriteAwareGameGrid({ games, className }: { games: GameData[];
             awayScore={g.awayScore}
             winningPitcher={g.winningPitcher}
             savePitcher={g.savePitcher}
+            homeInnings={g.homeInnings}
+            awayInnings={g.awayInnings}
+            homeHits={g.homeHits}
+            homeErrors={g.homeErrors}
+            awayHits={g.awayHits}
+            awayErrors={g.awayErrors}
           />
         </div>
       ))}

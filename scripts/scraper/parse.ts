@@ -310,6 +310,73 @@ export function parseBoxScoreDecision(html: string): ParsedDecision {
   };
 }
 
+export interface ParsedLineScore {
+  homeInnings: number[];
+  awayInnings: number[];
+  homeHits: number | null;
+  homeErrors: number | null;
+  awayHits: number | null;
+  awayErrors: number | null;
+}
+
+// npb.jp/scores/{year}/{MMDD}/{away}-{home}-{seriesNo}/ の回ごとの得点表(#tablefix_ls)。
+// tr.top=先攻(ビジター)、tr.bottom=後攻(ホーム)。最終回に攻撃が発生しなかった場合は"x"、
+// 得点した上でサヨナラ等により終了した場合は"1x"のように数字+xの表記になる
+export function parseLineScore(html: string): ParsedLineScore | null {
+  const $ = cheerio.load(html);
+  const table = $("#tablefix_ls");
+  if (table.length === 0) return null;
+
+  function parseRow(row: cheerio.Cheerio<never>): { innings: number[]; hits: number | null; errors: number | null } {
+    const cells = row.find("td");
+    const innings: number[] = [];
+    let hits: number | null = null;
+    let errors: number | null = null;
+    let totalSeen = 0;
+    cells.each((_, cell) => {
+      const $cell = $(cell);
+      const cls = $cell.attr("class") ?? "";
+      const value = $cell.text().trim();
+      if (cls.includes("total-1")) {
+        totalSeen = 1;
+        return;
+      }
+      if (cls.includes("total-2")) {
+        if (totalSeen === 1) {
+          hits = value === "" ? null : Number(value);
+          totalSeen = 2;
+        } else {
+          errors = value === "" ? null : Number(value);
+        }
+        return;
+      }
+      if (value === "" || value === "-") return;
+      if (value === "x") return; // 攻撃なし(得点0で終了)
+      const withoutTrailingX = value.replace(/x$/, ""); // 例: "1x" = 1点入れた上でサヨナラ等により終了
+      const runs = Number(withoutTrailingX);
+      if (Number.isNaN(runs)) return; // 想定外の表記は安全側に倒して無視する
+      innings.push(runs);
+    });
+    return { innings, hits, errors };
+  }
+
+  const topRow = table.find("tbody tr.top");
+  const bottomRow = table.find("tbody tr.bottom");
+  if (topRow.length === 0 || bottomRow.length === 0) return null;
+
+  const away = parseRow(topRow as unknown as cheerio.Cheerio<never>);
+  const home = parseRow(bottomRow as unknown as cheerio.Cheerio<never>);
+
+  return {
+    homeInnings: home.innings,
+    awayInnings: away.innings,
+    homeHits: home.hits,
+    homeErrors: home.errors,
+    awayHits: away.hits,
+    awayErrors: away.errors,
+  };
+}
+
 export interface ParsedProbableStarter {
   date: string; // ISO
   homeTeamSlug: string;

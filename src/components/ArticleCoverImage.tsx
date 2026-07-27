@@ -22,12 +22,15 @@ export function ArticleCoverImage({
   text,
   className,
   priority,
+  title,
 }: {
   slug: string;
   text: string;
   className?: string;
   // ファーストビューに表示される画像(記事ヘッダー・一覧のトップ記事)ではtrueにし、LCPを改善する
   priority?: boolean;
+  // 指定するとAI生成カバー画像の上に見出しを重ねて表示する(サムネイル用途では文字が潰れるため指定しない)
+  title?: string;
 }) {
   const customSrc = findCustomCover(slug);
   if (!customSrc) {
@@ -44,6 +47,32 @@ export function ArticleCoverImage({
         style={{ objectFit: "cover" }}
         priority={priority}
       />
+      {title && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            alignItems: "flex-end",
+            background: "linear-gradient(to top, rgba(22,21,19,0.85) 0%, rgba(22,21,19,0.35) 45%, rgba(22,21,19,0) 70%)",
+          }}
+        >
+          <p
+            style={{
+              margin: 0,
+              padding: "20px",
+              color: "#f5f0e6",
+              fontFamily: "var(--font-shippori-mincho)",
+              fontWeight: 700,
+              fontSize: "clamp(1rem, 2.2vw, 1.5rem)",
+              lineHeight: 1.5,
+              textWrap: "balance",
+            }}
+          >
+            {title}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

@@ -11,6 +11,7 @@ import {
   parseIndividualBatting,
   parseIndividualPitching,
   parseBoxScoreDecision,
+  parseLineScore,
   parseProbableStarters,
 } from "./parse";
 import { fetchHtml } from "../shared/fetchHtml";
@@ -185,8 +186,12 @@ async function fetchGameDecision(game: { id: string; boxScoreUrl: string | null 
   try {
     const html = await fetchHtml(game.boxScoreUrl);
     const decision = parseBoxScoreDecision(html);
+    const lineScore = parseLineScore(html);
     if (decision.winningPitcher) {
-      await prisma.game.update({ where: { id: game.id }, data: decision });
+      await prisma.game.update({
+        where: { id: game.id },
+        data: { ...decision, ...(lineScore ?? {}) },
+      });
       return true;
     }
   } catch (err) {

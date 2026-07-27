@@ -70,6 +70,15 @@ model Game {
   probableHomePitcher String?
   probableAwayPitcher String?
 
+  // ボックススコアの回ごとの得点（例: [1,2,0,0,0,3,0,0,0]）。攻撃が発生しなかった回（サヨナラ等の「x」）は
+  // それ以降を配列に含めない。取得できていない試合はnull
+  homeInnings Int[]
+  awayInnings Int[]
+  homeHits    Int?
+  homeErrors  Int?
+  awayHits    Int?
+  awayErrors  Int?
+
   homeTeam Team @relation("HomeTeam", fields: [homeTeamId], references: [id])
   awayTeam Team @relation("AwayTeam", fields: [awayTeamId], references: [id])
 

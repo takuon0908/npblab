@@ -107,6 +107,11 @@ export default async function AnalysisPage() {
         </Link>
         をご覧ください。打席数100・投球回30未満の選手は対象外です。
       </p>
+      <p className="text-sm mb-10">
+        <Link href="/analysis/innings" className="hover:underline" style={{ color: "var(--accent)" }}>
+          イニング別 得点・失点傾向を見る →
+        </Link>
+      </p>
 
       {!rows ? (
         <p className="text-sm" style={{ color: "var(--ink-secondary)" }}>

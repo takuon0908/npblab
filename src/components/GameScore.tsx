@@ -13,6 +13,12 @@ export function GameScore({
   awayScore,
   winningPitcher,
   savePitcher,
+  homeInnings,
+  awayInnings,
+  homeHits,
+  homeErrors,
+  awayHits,
+  awayErrors,
 }: {
   homeTeam: TeamRef;
   awayTeam: TeamRef;
@@ -20,6 +26,12 @@ export function GameScore({
   awayScore: number | null;
   winningPitcher?: string | null;
   savePitcher?: string | null;
+  homeInnings?: number[];
+  awayInnings?: number[];
+  homeHits?: number | null;
+  homeErrors?: number | null;
+  awayHits?: number | null;
+  awayErrors?: number | null;
 }) {
   const homeWin = (homeScore ?? 0) > (awayScore ?? 0);
   const awayWin = (awayScore ?? 0) > (homeScore ?? 0);
@@ -63,6 +75,67 @@ export function GameScore({
           (勝){winningPitcher}
           {savePitcher && <>　(Ｓ){savePitcher}</>}
         </div>
+      )}
+      {homeInnings && homeInnings.length > 0 && awayInnings && awayInnings.length > 0 && (
+        <details className="mt-1 w-full">
+          <summary
+            className="text-[11px] text-center cursor-pointer select-none"
+            style={{ color: "var(--accent)" }}
+          >
+            回ごとのスコア
+          </summary>
+          <table className="mt-1 w-full text-[10px] tabular-nums" style={{ borderCollapse: "collapse" }}>
+            <thead>
+              <tr>
+                <th />
+                {Array.from({ length: Math.max(homeInnings.length, awayInnings.length) }).map((_, i) => (
+                  <th key={i} className="px-1 font-normal" style={{ color: "var(--ink-muted)" }}>
+                    {i + 1}
+                  </th>
+                ))}
+                <th className="px-1 font-semibold">計</th>
+                <th className="px-1 font-normal" style={{ color: "var(--ink-muted)" }}>
+                  H
+                </th>
+                <th className="px-1 font-normal" style={{ color: "var(--ink-muted)" }}>
+                  E
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th className="text-left pr-1 font-normal">{teamAbbr(awayTeam.slug)}</th>
+                {Array.from({ length: Math.max(homeInnings.length, awayInnings.length) }).map((_, i) => (
+                  <td key={i} className="px-1 text-center">
+                    {awayInnings[i] ?? "x"}
+                  </td>
+                ))}
+                <td className="px-1 text-center font-semibold">{awayScore}</td>
+                <td className="px-1 text-center" style={{ color: "var(--ink-muted)" }}>
+                  {awayHits ?? "-"}
+                </td>
+                <td className="px-1 text-center" style={{ color: "var(--ink-muted)" }}>
+                  {awayErrors ?? "-"}
+                </td>
+              </tr>
+              <tr>
+                <th className="text-left pr-1 font-normal">{teamAbbr(homeTeam.slug)}</th>
+                {Array.from({ length: Math.max(homeInnings.length, awayInnings.length) }).map((_, i) => (
+                  <td key={i} className="px-1 text-center">
+                    {homeInnings[i] ?? "x"}
+                  </td>
+                ))}
+                <td className="px-1 text-center font-semibold">{homeScore}</td>
+                <td className="px-1 text-center" style={{ color: "var(--ink-muted)" }}>
+                  {homeHits ?? "-"}
+                </td>
+                <td className="px-1 text-center" style={{ color: "var(--ink-muted)" }}>
+                  {homeErrors ?? "-"}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </details>
       )}
     </div>
   );
