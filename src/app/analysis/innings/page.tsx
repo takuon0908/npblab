@@ -23,19 +23,63 @@ interface TeamInningStats {
   games: number;
   scored: number[]; // index 0-9(延長)
   allowed: number[];
+  // 先制した試合の数・そのうち勝った数
+  scoredFirstGames: number;
+  scoredFirstWins: number;
+  // 6回終了時点でリードしていた試合の数・そのうち逃げ切った(勝った)数
+  ledAfter6Games: number;
+  ledAfter6Wins: number;
+}
+
+// 先攻(away)は各回の表、後攻(home)は各回の裏に攻撃するため、
+// 回を追って先に得点した方が「先制」チーム
+function whoScoredFirst(homeInnings: number[], awayInnings: number[]): "home" | "away" | null {
+  const len = Math.max(homeInnings.length, awayInnings.length);
+  for (let i = 0; i < len; i++) {
+    if ((awayInnings[i] ?? 0) > 0) return "away";
+    if ((homeInnings[i] ?? 0) > 0) return "home";
+  }
+  return null;
+}
+
+function leaderAfter6(homeInnings: number[], awayInnings: number[]): "home" | "away" | "tie" | null {
+  if (homeInnings.length < 6 || awayInnings.length < 6) return null; // 6回に達していない試合は対象外
+  const homeSum = homeInnings.slice(0, 6).reduce((a, b) => a + b, 0);
+  const awaySum = awayInnings.slice(0, 6).reduce((a, b) => a + b, 0);
+  if (homeSum > awaySum) return "home";
+  if (awaySum > homeSum) return "away";
+  return "tie";
 }
 
 async function getInningTendency(): Promise<TeamInningStats[]> {
   const teams = await prisma.team.findMany();
   const games = await prisma.game.findMany({
     where: { isFinished: true, homeInnings: { isEmpty: false } },
-    select: { homeTeamId: true, awayTeamId: true, homeInnings: true, awayInnings: true },
+    select: {
+      homeTeamId: true,
+      awayTeamId: true,
+      homeInnings: true,
+      awayInnings: true,
+      homeScore: true,
+      awayScore: true,
+    },
   });
 
   const statsByTeam = new Map<string, TeamInningStats>(
     teams.map((t) => [
       t.id,
-      { teamId: t.id, teamName: t.name, teamSlug: t.slug, games: 0, scored: new Array(10).fill(0), allowed: new Array(10).fill(0) },
+      {
+        teamId: t.id,
+        teamName: t.name,
+        teamSlug: t.slug,
+        games: 0,
+        scored: new Array(10).fill(0),
+        allowed: new Array(10).fill(0),
+        scoredFirstGames: 0,
+        scoredFirstWins: 0,
+        ledAfter6Games: 0,
+        ledAfter6Wins: 0,
+      },
     ])
   );
 
@@ -49,6 +93,9 @@ async function getInningTendency(): Promise<TeamInningStats[]> {
   for (const g of games) {
     const home = statsByTeam.get(g.homeTeamId);
     const away = statsByTeam.get(g.awayTeamId);
+    const homeWon = (g.homeScore ?? 0) > (g.awayScore ?? 0);
+    const awayWon = (g.awayScore ?? 0) > (g.homeScore ?? 0);
+
     if (home) {
       home.games++;
       addInnings(home.scored, g.homeInnings);
@@ -58,6 +105,24 @@ async function getInningTendency(): Promise<TeamInningStats[]> {
       away.games++;
       addInnings(away.scored, g.awayInnings);
       addInnings(away.allowed, g.homeInnings);
+    }
+
+    const firstScorer = whoScoredFirst(g.homeInnings, g.awayInnings);
+    if (firstScorer === "home" && home) {
+      home.scoredFirstGames++;
+      if (homeWon) home.scoredFirstWins++;
+    } else if (firstScorer === "away" && away) {
+      away.scoredFirstGames++;
+      if (awayWon) away.scoredFirstWins++;
+    }
+
+    const leader6 = leaderAfter6(g.homeInnings, g.awayInnings);
+    if (leader6 === "home" && home) {
+      home.ledAfter6Games++;
+      if (homeWon) home.ledAfter6Wins++;
+    } else if (leader6 === "away" && away) {
+      away.ledAfter6Games++;
+      if (awayWon) away.ledAfter6Wins++;
     }
   }
 
@@ -184,8 +249,96 @@ export default async function InningsAnalysisPage() {
         </div>
       </section>
 
+      <section className="mb-12">
+        <h2 className="font-semibold mb-3">先制した試合の勝率</h2>
+        <p className="text-xs mb-3" style={{ color: "var(--ink-secondary)" }}>
+          その試合で先に得点したチームが、最終的に勝ったかどうかの割合。
+        </p>
+        <div className="overflow-x-auto">
+          <Table>
+            <thead>
+              <tr>
+                <Th>球団</Th>
+                <Th align="right">先制試合数</Th>
+                <Th align="right">うち勝利</Th>
+                <Th align="right">先制勝率</Th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...sorted]
+                .sort((a, b) => average(b.scoredFirstWins, b.scoredFirstGames) - average(a.scoredFirstWins, a.scoredFirstGames))
+                .map((t) => (
+                  <tr key={t.teamId}>
+                    <Td>
+                      <Link href={`/teams/${t.teamSlug}`} className="hover:underline inline-flex items-center gap-1.5">
+                        <span
+                          aria-hidden
+                          className="rounded-full"
+                          style={{ width: 8, height: 8, flex: "none", background: TEAM_THEME[t.teamSlug]?.accent ?? "var(--ink-muted)" }}
+                        />
+                        {t.teamName}
+                      </Link>
+                    </Td>
+                    <Td align="right">{t.scoredFirstGames}</Td>
+                    <Td align="right">{t.scoredFirstWins}</Td>
+                    <Td align="right">
+                      <span className="font-semibold">
+                        {(average(t.scoredFirstWins, t.scoredFirstGames) * 100).toFixed(1)}%
+                      </span>
+                    </Td>
+                  </tr>
+                ))}
+            </tbody>
+          </Table>
+        </div>
+      </section>
+
+      <section className="mb-12">
+        <h2 className="font-semibold mb-3">6回終了時にリードしていた試合の逃げ切り率</h2>
+        <p className="text-xs mb-3" style={{ color: "var(--ink-secondary)" }}>
+          6回終了時点でリードしていた試合を、最後まで守り切って勝てた割合。低いほど終盤(継投)で崩れやすい傾向がある。
+        </p>
+        <div className="overflow-x-auto">
+          <Table>
+            <thead>
+              <tr>
+                <Th>球団</Th>
+                <Th align="right">6回リード試合数</Th>
+                <Th align="right">うち逃げ切り</Th>
+                <Th align="right">逃げ切り率</Th>
+              </tr>
+            </thead>
+            <tbody>
+              {[...sorted]
+                .sort((a, b) => average(b.ledAfter6Wins, b.ledAfter6Games) - average(a.ledAfter6Wins, a.ledAfter6Games))
+                .map((t) => (
+                  <tr key={t.teamId}>
+                    <Td>
+                      <Link href={`/teams/${t.teamSlug}`} className="hover:underline inline-flex items-center gap-1.5">
+                        <span
+                          aria-hidden
+                          className="rounded-full"
+                          style={{ width: 8, height: 8, flex: "none", background: TEAM_THEME[t.teamSlug]?.accent ?? "var(--ink-muted)" }}
+                        />
+                        {t.teamName}
+                      </Link>
+                    </Td>
+                    <Td align="right">{t.ledAfter6Games}</Td>
+                    <Td align="right">{t.ledAfter6Wins}</Td>
+                    <Td align="right">
+                      <span className="font-semibold">
+                        {(average(t.ledAfter6Wins, t.ledAfter6Games) * 100).toFixed(1)}%
+                      </span>
+                    </Td>
+                  </tr>
+                ))}
+            </tbody>
+          </Table>
+        </div>
+      </section>
+
       <p className="text-xs" style={{ color: "var(--ink-muted)" }}>
-        本ページの数値は当サイトが試合ごとの回別得点をnpb.jp公式のボックススコアから集計した独自試算であり、NPB公式の発表数値ではない。ホームチームが9回裏の攻撃を行わずに勝利した試合(サヨナラ等)は、その回の得点を「0」として扱っているため、特にホームゲームが多い/接戦に強い球団は9回の平均得点がやや低めに出る傾向がある点に留意されたい。
+        本ページの数値は当サイトが試合ごとの回別得点をnpb.jp公式のボックススコアから集計した独自試算であり、NPB公式の発表数値ではない。ホームチームが9回裏の攻撃を行わずに勝利した試合(サヨナラ等)は、その回の得点を「0」として扱っているため、特にホームゲームが多い/接戦に強い球団は9回の平均得点がやや低めに出る傾向がある点に留意されたい。「6回終了時にリードしていた試合」は、6回まで完了した試合のみを対象としている。
       </p>
     </main>
   );
