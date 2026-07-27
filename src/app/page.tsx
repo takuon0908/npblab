@@ -111,11 +111,11 @@ export default async function Home() {
               <Link
                 key={c.id}
                 href={`/columns/${c.slug}`}
-                className="group flex gap-3 rounded-none overflow-hidden p-3"
+                className="hover-lift group flex gap-3 rounded-none overflow-hidden p-3"
                 style={{ background: "var(--surface)", border: "1px solid var(--border-strong)" }}
               >
                 <div className="w-20 aspect-square flex-none">
-                  <ArticleCoverImage slug={c.slug} text={`${c.title} ${stripHtml(c.body)}`} />
+                  <ArticleCoverImage slug={c.slug} text={`${c.title} ${stripHtml(c.body)}`} category={c.category} tags={c.tags} />
                 </div>
                 <div className="min-w-0">
                   <p className="text-xs mb-1" style={{ color: "var(--ink-muted)" }}>

@@ -23,6 +23,8 @@ export function ArticleCoverImage({
   className,
   priority,
   title,
+  category,
+  tags,
 }: {
   slug: string;
   text: string;
@@ -31,10 +33,13 @@ export function ArticleCoverImage({
   priority?: boolean;
   // 指定するとAI生成カバー画像の上に見出しを重ねて表示する(サムネイル用途では文字が潰れるため指定しない)
   title?: string;
+  // 記事のcategory/tags。指定すると本文中の言及より優先して球団カラーの判定に使う
+  category?: string[];
+  tags?: string;
 }) {
   const customSrc = findCustomCover(slug);
   if (!customSrc) {
-    return <ArticleCover slug={slug} text={text} className={className} />;
+    return <ArticleCover slug={slug} text={text} className={className} category={category} tags={tags} />;
   }
 
   return (

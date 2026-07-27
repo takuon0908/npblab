@@ -36,10 +36,23 @@ export function GameScore({
   const homeWin = (homeScore ?? 0) > (awayScore ?? 0);
   const awayWin = (awayScore ?? 0) > (homeScore ?? 0);
 
+  // 点差の強弱を視覚化する: 僅差(1点差)はアクセントカラー寄りのボーダーで目立たせ、
+  // 大差(5点差以上)は逆に控えめな配色にして、通常カード同士でも一目で分かるようにする
+  const margin = homeScore !== null && awayScore !== null ? Math.abs(homeScore - awayScore) : null;
+  const isClose = margin !== null && margin <= 1;
+  const isBlowout = margin !== null && margin >= 5;
+
+  const cardBorder = isClose
+    ? "1.5px solid color-mix(in srgb, var(--accent) 55%, var(--border-strong))"
+    : isBlowout
+      ? "1px solid var(--border)"
+      : "1px solid var(--border-strong)";
+  const cardBackground = isClose ? "color-mix(in srgb, var(--accent-track) 30%, var(--surface))" : "var(--surface)";
+
   return (
     <div
-      className="flex flex-col items-center justify-center gap-0.5 rounded-none px-2 py-1.5 text-sm tabular-nums"
-      style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
+      className="hover-lift flex flex-col items-center justify-center gap-0.5 rounded-none px-2 py-1.5 text-sm tabular-nums"
+      style={{ border: cardBorder, background: cardBackground }}
     >
       <div className="flex items-center gap-1.5">
         <Link

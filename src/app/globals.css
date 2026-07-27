@@ -47,6 +47,18 @@ input:focus-visible {
   outline-offset: 2px;
 }
 
+/* カード型要素(試合結果・コラムサムネイル等)共通のホバーモーション。
+   枠線の色は各コンポーネント側のinline styleが優先されるため上書きせず、
+   わずかな浮き上がり(box-shadow・transform)のみで強弱をつける */
+.hover-lift {
+  transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px var(--border);
+}
+
 /* コラム記事内のAmazon商品カード（アフィリエイトリンク） */
 .amazon-product-card {
   display: flex;

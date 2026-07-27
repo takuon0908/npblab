@@ -128,6 +128,8 @@ export default async function ColumnPage({
             slug={column.slug}
             text={`${column.title} ${column.body.replace(/<[^>]+>/g, "")}`}
             title={column.title}
+            category={column.category}
+            tags={column.tags}
             priority
           />
         </div>
@@ -258,11 +260,11 @@ export default async function ColumnPage({
               <Link
                 key={c.id}
                 href={`/columns/${c.slug}`}
-                className="group rounded-none overflow-hidden"
+                className="hover-lift group rounded-none overflow-hidden"
                 style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
               >
                 <div className="aspect-video">
-                  <ArticleCoverImage slug={c.slug} text={`${c.title} ${c.body.replace(/<[^>]+>/g, "")}`} />
+                  <ArticleCoverImage slug={c.slug} text={`${c.title} ${c.body.replace(/<[^>]+>/g, "")}`} category={c.category} tags={c.tags} />
                 </div>
                 <div className="p-4">
                   <p className="text-xs mb-1.5" style={{ color: "var(--ink-muted)" }}>

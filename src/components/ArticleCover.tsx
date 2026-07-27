@@ -77,12 +77,16 @@ export function ArticleCover({
   slug,
   text,
   className,
+  category,
+  tags,
 }: {
   slug: string;
   text: string;
   className?: string;
+  category?: string[];
+  tags?: string;
 }) {
-  const { bg, accent } = themeForArticle(slug, text);
+  const { bg, accent } = themeForArticle(slug, text, { category, tags });
   const gradId = `cover-fade-${slug}`;
   const dotId = `cover-dots-${slug}`;
 

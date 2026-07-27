@@ -84,9 +84,15 @@ function hashString(s: string): number {
   return hash;
 }
 
-// 記事内容(タイトル+本文)から、言及されている球団のチームカラー、無ければハッシュベースの配色を返す
-export function themeForArticle(slug: string, text: string): { bg: string; accent: string } {
-  const teamSlug = detectTeamSlug(text);
+// 記事内容(タイトル+本文)から、言及されている球団のチームカラー、無ければハッシュベースの配色を返す。
+// category/tagsが分かる場合はdetectColumnTeamSlugを使い、本文中の一言だけの言及より
+// カテゴリ・タグの球団指定を優先して判定精度を上げる
+export function themeForArticle(
+  slug: string,
+  text: string,
+  meta?: { category?: string[]; tags?: string }
+): { bg: string; accent: string } {
+  const teamSlug = detectColumnTeamSlug({ title: "", body: text, category: meta?.category, tags: meta?.tags });
   if (teamSlug) return TEAM_THEME[teamSlug];
   return FALLBACK_THEME[hashString(slug) % FALLBACK_THEME.length];
 }

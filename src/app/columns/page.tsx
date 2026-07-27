@@ -119,11 +119,11 @@ export default async function ColumnsPage({
           {hero && (
             <Link
               href={`/columns/${hero.slug}`}
-              className="group grid gap-0 sm:grid-cols-2 mb-12 rounded-none overflow-hidden"
+              className="hover-lift group grid gap-0 sm:grid-cols-2 mb-12 rounded-none overflow-hidden"
               style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
             >
               <div className="aspect-video sm:aspect-auto sm:h-full">
-                <ArticleCoverImage slug={hero.slug} text={`${hero.title} ${stripHtml(hero.body)}`} priority />
+                <ArticleCoverImage slug={hero.slug} text={`${hero.title} ${stripHtml(hero.body)}`} category={hero.category} tags={hero.tags} priority />
               </div>
               <div className="p-6 flex flex-col justify-center">
                 <p className="text-xs mb-2" style={{ color: "var(--ink-muted)" }}>
@@ -159,11 +159,11 @@ export default async function ColumnsPage({
                   <Link
                     key={c.id}
                     href={`/columns/${c.slug}`}
-                    className="group rounded-none overflow-hidden"
+                    className="hover-lift group rounded-none overflow-hidden"
                     style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
                   >
                     <div className="aspect-video">
-                      <ArticleCoverImage slug={c.slug} text={`${c.title} ${stripHtml(c.body)}`} />
+                      <ArticleCoverImage slug={c.slug} text={`${c.title} ${stripHtml(c.body)}`} category={c.category} tags={c.tags} />
                     </div>
                     <div className="p-4">
                       <p className="text-xs mb-1.5" style={{ color: "var(--ink-muted)" }}>
