@@ -7,9 +7,13 @@ import { StatTile } from "@/components/StatTile";
 import { Meter } from "@/components/Meter";
 import { GamesAboveBelow500 } from "@/components/GamesAboveBelow500";
 import { Table, Th, Td } from "@/components/Table";
+import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 import { computeWhatIf } from "@/lib/whatif";
 import { calcMagicNumber } from "@/lib/baseball";
 import { latestPerPlayer } from "@/lib/latestPerPlayer";
+import { getColumns } from "@/lib/microcms";
+import { formatDateJa } from "@/lib/date";
+import { detectColumnTeamSlug, TEAM_THEME } from "@/lib/teamTheme";
 
 const MIN_AT_BATS_FOR_AVG_LEADER = 10;
 const MIN_INNINGS_FOR_ERA_LEADER = 10;
@@ -46,6 +50,17 @@ async function getTeamLeaders(teamId: string) {
     strikeouts: topBy(pitchers, (p) => p.strikeouts),
     saves: topBy(pitchers, (p) => p.saves),
   };
+}
+
+// コラム記事のうち、この球団を扱っている(タイトル/本文から検出できる)ものを最新3件まで拾う。
+// microCMS未設定のビルド環境でも失敗させない
+async function getRelatedColumns(teamSlug: string) {
+  try {
+    const { contents } = await getColumns(100);
+    return contents.filter((c) => detectColumnTeamSlug(c) === teamSlug).slice(0, 3);
+  } catch {
+    return [];
+  }
 }
 
 // 年ごとに最新のスナップショット（完結済みシーズンはseason-end代表日、当年は最新日）を1件ずつ拾う
@@ -90,28 +105,30 @@ export default async function TeamPage({
   const team = await prisma.team.findUnique({ where: { slug: teamSlug } });
   if (!team) notFound();
 
-  const [standing, championshipHistory, remainingGames, insight, leagueInsights, allStandings] = await Promise.all([
-    prisma.standingsSnapshot.findFirst({ where: { teamId: team.id }, orderBy: { date: "desc" } }),
-    prisma.championshipProbability.findMany({
-      where: { teamId: team.id },
-      orderBy: { date: "desc" },
-      take: 2,
-    }),
-    prisma.game.count({
-      where: {
-        isFinished: false,
-        date: { gte: new Date(new Date().toISOString().slice(0, 10)) },
-        OR: [{ homeTeamId: team.id }, { awayTeamId: team.id }],
-      },
-    }),
-    prisma.teamInsight.findFirst({ where: { teamId: team.id }, orderBy: { date: "desc" } }),
-    prisma.teamInsight.findMany({
-      where: { team: { league: team.league } },
-      orderBy: { date: "desc" },
-      distinct: ["teamId"],
-    }),
-    prisma.standingsSnapshot.findMany({ where: { teamId: team.id }, orderBy: { date: "desc" } }),
-  ]);
+  const [standing, championshipHistory, remainingGames, insight, leagueInsights, allStandings, relatedColumns] =
+    await Promise.all([
+      prisma.standingsSnapshot.findFirst({ where: { teamId: team.id }, orderBy: { date: "desc" } }),
+      prisma.championshipProbability.findMany({
+        where: { teamId: team.id },
+        orderBy: { date: "desc" },
+        take: 2,
+      }),
+      prisma.game.count({
+        where: {
+          isFinished: false,
+          date: { gte: new Date(new Date().toISOString().slice(0, 10)) },
+          OR: [{ homeTeamId: team.id }, { awayTeamId: team.id }],
+        },
+      }),
+      prisma.teamInsight.findFirst({ where: { teamId: team.id }, orderBy: { date: "desc" } }),
+      prisma.teamInsight.findMany({
+        where: { team: { league: team.league } },
+        orderBy: { date: "desc" },
+        distinct: ["teamId"],
+      }),
+      prisma.standingsSnapshot.findMany({ where: { teamId: team.id }, orderBy: { date: "desc" } }),
+      getRelatedColumns(team.slug),
+    ]);
 
   const yearlyStandings = summarizeByYear(allStandings);
 
@@ -418,6 +435,43 @@ export default async function TeamPage({
             </div>
           )}
         </>
+      )}
+
+      {relatedColumns.length > 0 && (
+        <section className="mt-10 pt-8" style={{ borderTop: "1px solid var(--border)" }}>
+          <h2 className="flex items-center gap-2 text-sm font-semibold mb-4" style={{ color: "var(--ink)" }}>
+            <span
+              aria-hidden
+              style={{ width: 9, height: 9, background: TEAM_THEME[team.slug]?.accent ?? "var(--accent)", flex: "none" }}
+            />
+            {team.name}に関連するコラム
+          </h2>
+          <div className="grid gap-5 sm:grid-cols-3">
+            {relatedColumns.map((c) => (
+              <Link
+                key={c.id}
+                href={`/columns/${c.slug}`}
+                className="group rounded-none overflow-hidden"
+                style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
+              >
+                <div className="aspect-video">
+                  <ArticleCoverImage slug={c.slug} text={`${c.title} ${c.body.replace(/<[^>]+>/g, "")}`} />
+                </div>
+                <div className="p-4">
+                  <p className="text-xs mb-1.5" style={{ color: "var(--ink-muted)" }}>
+                    {formatDateJa(new Date(c.publishedAt))}
+                  </p>
+                  <h3
+                    className="mb-1 leading-snug group-hover:underline"
+                    style={{ fontFamily: "var(--font-shippori-mincho)", fontWeight: 700 }}
+                  >
+                    {c.title}
+                  </h3>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
       )}
     </main>
   );

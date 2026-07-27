@@ -5,6 +5,7 @@ import { getColumnBySlug, getColumns, parseTags } from "@/lib/microcms";
 import { formatDateJa } from "@/lib/date";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 import { GoodButton } from "@/components/GoodButton";
+import { ShareButton } from "@/components/ShareButton";
 import { getLikeCount } from "@/lib/columnLikes";
 import { ViewTracker } from "@/components/ViewTracker";
 import { RakutenWidget } from "@/components/RakutenWidget";
@@ -12,6 +13,8 @@ import { AmazonProductCard } from "@/components/AmazonProductCard";
 import { getAffiliateProduct } from "@/lib/affiliateProducts";
 import { getViewCount } from "@/lib/columnViews";
 import { siteUrl } from "@/lib/siteUrl";
+import { prisma } from "@/lib/prisma";
+import { detectColumnTeamSlug, TEAM_THEME } from "@/lib/teamTheme";
 
 export const revalidate = 60;
 
@@ -68,6 +71,12 @@ export default async function ColumnPage({
         .filter((c) => c.slug !== column.slug)
         .slice(0, 3)
     : [];
+
+  const relatedTeamSlug = detectColumnTeamSlug(column);
+  const relatedTeam = relatedTeamSlug
+    ? await prisma.team.findUnique({ where: { slug: relatedTeamSlug } })
+    : null;
+  const relatedTeamTheme = relatedTeamSlug ? TEAM_THEME[relatedTeamSlug] : null;
 
   const articleJsonLd = {
     "@context": "https://schema.org",
@@ -206,10 +215,37 @@ export default async function ColumnPage({
           <RakutenWidget pageUrl={`${siteUrl}/columns/${column.slug}`} />
         </div>
 
-        <div className="mt-6 flex justify-center">
+        <div className="mt-6 flex justify-center gap-3">
           <GoodButton slug={column.slug} initialCount={likeCount} />
+          <ShareButton title={column.title} url={`${siteUrl}/columns/${column.slug}`} />
         </div>
       </article>
+
+      {relatedTeam && relatedTeamTheme && (
+        <Link
+          href={`/teams/${relatedTeam.slug}`}
+          className="group mt-10 flex items-center justify-between gap-3 rounded-none px-4 py-3 transition-colors hover:bg-black/[0.02]"
+          style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
+        >
+          <div className="flex items-center gap-3">
+            <span aria-hidden style={{ width: 8, height: 32, background: relatedTeamTheme.accent, flex: "none" }} />
+            <div>
+              <p className="text-xs" style={{ color: "var(--ink-muted)" }}>
+                この記事に関連する球団
+              </p>
+              <p className="font-semibold" style={{ fontFamily: "var(--font-shippori-mincho)" }}>
+                {relatedTeam.name}
+              </p>
+            </div>
+          </div>
+          <span
+            className="whitespace-nowrap text-sm font-medium group-hover:underline"
+            style={{ color: "var(--accent)" }}
+          >
+            球団ページを見る →
+          </span>
+        </Link>
+      )}
 
       {relatedColumns.length >= 2 && (
         <section className="mt-14 pt-8" style={{ borderTop: "1px solid var(--border)" }}>

@@ -60,6 +60,22 @@ export function detectTeamSlug(text: string): string | null {
   return bestSlug;
 }
 
+// コラム記事が扱っている球団を判定する。category/tagsに球団名が入っていればそれを優先し、
+// 無ければ本文(タイトル+本文プレーンテキスト)からdetectTeamSlugと同じロジックで検出する
+export function detectColumnTeamSlug(column: {
+  title: string;
+  body: string;
+  category?: string[];
+  tags?: string;
+}): string | null {
+  const metaText = [...(column.category ?? []), column.tags ?? ""].join(" ");
+  const metaHit = detectTeamSlug(metaText);
+  if (metaHit) return metaHit;
+
+  const plainBody = column.body.replace(/<[^>]+>/g, "");
+  return detectTeamSlug(`${column.title} ${plainBody}`);
+}
+
 function hashString(s: string): number {
   let hash = 0;
   for (let i = 0; i < s.length; i++) {
