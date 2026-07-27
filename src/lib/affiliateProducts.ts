@@ -49,3 +49,23 @@ export const AFFILIATE_PRODUCTS: Record<string, AffiliateProduct> = {
     imageUrl: "https://m.media-amazon.com/images/I/51Pcce-tZYL._AC_UF480,480_SR480,480_.jpg",
   },
 };
+
+// スラッグの完全一致が無い場合に、プレフィックスから当てはめるフォールバック商品
+const PREFIX_FALLBACK_PRODUCTS: [RegExp, AffiliateProduct][] = [
+  [
+    /^rules-basics-/,
+    {
+      asin: "4583118015",
+      title: "公認野球規則2026(日本プロフェッショナル野球組織・全日本野球協会 編)",
+      imageUrl: "https://m.media-amazon.com/images/I/717rEWPgggL._AC_SF480,480_.jpg",
+    },
+  ],
+];
+
+export function getAffiliateProduct(slug: string): AffiliateProduct | null {
+  if (AFFILIATE_PRODUCTS[slug]) return AFFILIATE_PRODUCTS[slug];
+  for (const [pattern, product] of PREFIX_FALLBACK_PRODUCTS) {
+    if (pattern.test(slug)) return product;
+  }
+  return null;
+}

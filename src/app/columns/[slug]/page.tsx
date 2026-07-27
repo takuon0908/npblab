@@ -9,7 +9,7 @@ import { getLikeCount } from "@/lib/columnLikes";
 import { ViewTracker } from "@/components/ViewTracker";
 import { RakutenWidget } from "@/components/RakutenWidget";
 import { AmazonProductCard } from "@/components/AmazonProductCard";
-import { AFFILIATE_PRODUCTS } from "@/lib/affiliateProducts";
+import { getAffiliateProduct } from "@/lib/affiliateProducts";
 import { getViewCount } from "@/lib/columnViews";
 import { siteUrl } from "@/lib/siteUrl";
 
@@ -60,7 +60,7 @@ export default async function ColumnPage({
   const publishedDate = new Date(column.publishedAt);
 
   // 同じカテゴリ(先頭の1件)の記事を関連記事として表示する。2本未満ならセクション自体を出さない
-  const affiliateProduct = AFFILIATE_PRODUCTS[column.slug];
+  const affiliateProduct = getAffiliateProduct(column.slug);
 
   const relatedCategory = column.category?.[0];
   const relatedColumns = relatedCategory
