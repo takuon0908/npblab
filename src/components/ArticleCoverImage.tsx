@@ -46,7 +46,7 @@ export function ArticleCoverImage({
     <div className={className} style={{ position: "relative", width: "100%", height: "100%" }}>
       <Image
         src={customSrc}
-        alt=""
+        alt={title ?? "記事のカバー画像"}
         fill
         sizes="(max-width: 640px) 100vw, 700px"
         style={{ objectFit: "cover" }}

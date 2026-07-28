@@ -10,11 +10,22 @@ export const revalidate = 60;
 
 const PAGE_SIZE = 20;
 
-export const metadata: Metadata = {
-  title: "コラム",
-  description: "NPBのデータ分析コラム。独自指標や優勝確率・タイトルレースの考察記事一覧。",
-  alternates: { canonical: "/columns" },
-};
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}): Promise<Metadata> {
+  const { page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
+  // ページネーションは自身を正規URLとして宣言する(常にpage1へ丸め込むとGoogleが2ページ目以降を
+  // 正規ページと認識できず、そこにしか出てこない記事一覧がインデックスされなくなるため)
+  const canonical = page > 1 ? `/columns?page=${page}` : "/columns";
+  return {
+    title: page > 1 ? `コラム(${page}ページ目)` : "コラム",
+    description: "NPBのデータ分析コラム。独自指標や優勝確率・タイトルレースの考察記事一覧。",
+    alternates: { canonical },
+  };
+}
 
 function stripHtml(html: string): string {
   return html.replace(/<[^>]+>/g, "").trim();

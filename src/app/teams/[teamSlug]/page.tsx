@@ -105,6 +105,8 @@ export default async function TeamPage({
   const team = await prisma.team.findUnique({ where: { slug: teamSlug } });
   if (!team) notFound();
 
+  const teamAccent = TEAM_THEME[team.slug]?.accent ?? "var(--accent)";
+
   const [standing, championshipHistory, remainingGames, insight, leagueInsights, allStandings, relatedColumns] =
     await Promise.all([
       prisma.standingsSnapshot.findFirst({ where: { teamId: team.id }, orderBy: { date: "desc" } }),
@@ -163,7 +165,16 @@ export default async function TeamPage({
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
-      <h1 className="text-2xl font-bold mb-6">{team.name}</h1>
+      <div
+        className="rounded-none p-5 mb-6"
+        style={{
+          background: `linear-gradient(120deg, color-mix(in srgb, ${teamAccent} 14%, var(--surface)) 0%, var(--surface) 75%)`,
+          border: "1px solid var(--border)",
+          borderLeft: `5px solid ${teamAccent}`,
+        }}
+      >
+        <h1 className="text-2xl font-bold">{team.name}</h1>
+      </div>
 
       {!standing ? (
         <p className="text-sm" style={{ color: "var(--ink-secondary)" }}>

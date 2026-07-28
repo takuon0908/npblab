@@ -31,16 +31,24 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ categorySlug: string }>;
+  searchParams: Promise<{ page?: string }>;
 }): Promise<Metadata> {
   const { categorySlug } = await params;
   const category = slugToCategory(categorySlug);
   if (!category) return {};
+  const { page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
+  // ページネーションは自身を正規URLとして宣言する(常に1ページ目へ丸め込むと、
+  // 2ページ目以降にしか出てこない記事一覧がインデックスされなくなるため)
+  const canonical =
+    page > 1 ? `/columns/category/${categorySlug}?page=${page}` : `/columns/category/${categorySlug}`;
   return {
-    title: `${category}のコラム`,
+    title: page > 1 ? `${category}のコラム(${page}ページ目)` : `${category}のコラム`,
     description: `NPBのコラムから「${category}」カテゴリの記事一覧。独自指標や優勝確率・タイトルレースの考察記事。`,
-    alternates: { canonical: `/columns/category/${categorySlug}` },
+    alternates: { canonical },
   };
 }
 

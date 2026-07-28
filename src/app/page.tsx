@@ -44,7 +44,7 @@ function HighlightGame({ game }: { game: NonNullable<Awaited<ReturnType<typeof g
   return (
     <Link
       href={`/teams/${winner.slug}`}
-      className="group block p-4 mb-4"
+      className="hover-lift group block p-4 mb-4"
       style={{ background: "var(--surface)", border: "1px solid var(--border-strong)", borderLeft: `4px solid ${TEAM_THEME[winner.slug]?.accent ?? "var(--accent)"}` }}
     >
       <p className="text-xs font-semibold mb-1.5" style={{ color: "var(--accent)" }}>
@@ -140,7 +140,7 @@ export default async function Home() {
           <Link
             key={s.href}
             href={s.href}
-            className="group block rounded-none p-5 transition-colors"
+            className="hover-lift group block rounded-none p-5"
             style={{ background: "var(--surface)", border: "1px solid var(--border-strong)" }}
           >
             <div className="flex items-center gap-2 font-semibold">
