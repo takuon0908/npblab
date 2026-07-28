@@ -101,11 +101,7 @@ export default async function ColumnsPage({
       {tag && (
         <p className="text-sm mb-8">
           タグ「#{tag}」で絞り込み中 ・{" "}
-          <Link
-            href={category ? `/columns?category=${encodeURIComponent(category)}` : "/columns"}
-            className="hover:underline"
-            style={{ color: "var(--accent)" }}
-          >
+          <Link href="/columns" className="hover:underline" style={{ color: "var(--accent)" }}>
             解除する
           </Link>
         </p>

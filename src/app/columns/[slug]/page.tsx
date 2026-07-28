@@ -15,6 +15,7 @@ import { getViewCount } from "@/lib/columnViews";
 import { siteUrl } from "@/lib/siteUrl";
 import { prisma } from "@/lib/prisma";
 import { detectColumnTeamSlug, TEAM_THEME } from "@/lib/teamTheme";
+import { categoryToSlug } from "@/lib/categorySlug";
 
 export const revalidate = 60;
 
@@ -161,16 +162,19 @@ export default async function ColumnPage({
           </p>
           {column.category && column.category.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-3">
-              {column.category.map((c) => (
-                <Link
-                  key={c}
-                  href={`/columns?category=${encodeURIComponent(c)}`}
-                  className="rounded-full px-2.5 py-0.5 text-xs hover:underline"
-                  style={{ background: "var(--accent-track)", color: "var(--accent)" }}
-                >
-                  {c}
-                </Link>
-              ))}
+              {column.category.map((c) => {
+                const slug = categoryToSlug(c);
+                return (
+                  <Link
+                    key={c}
+                    href={slug ? `/columns/category/${slug}` : "/columns"}
+                    className="rounded-full px-2.5 py-0.5 text-xs hover:underline"
+                    style={{ background: "var(--accent-track)", color: "var(--accent)" }}
+                  >
+                    {c}
+                  </Link>
+                );
+              })}
             </div>
           )}
           {parseTags(column.tags).length > 0 && (
