@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { Level } from "@prisma/client";
 import { StatTile } from "@/components/StatTile";
 import { Meter } from "@/components/Meter";
+import { CountUpNumber } from "@/components/CountUpNumber";
+import { ChampionshipTrendChart } from "@/components/ChampionshipTrendChart";
 import { GamesAboveBelow500 } from "@/components/GamesAboveBelow500";
 import { Table, Th, Td } from "@/components/Table";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
@@ -107,13 +109,17 @@ export default async function TeamPage({
 
   const teamAccent = TEAM_THEME[team.slug]?.accent ?? "var(--accent)";
 
-  const [standing, championshipHistory, remainingGames, insight, leagueInsights, allStandings, relatedColumns] =
+  const [standing, championshipHistory, championshipTrend, remainingGames, insight, leagueInsights, allStandings, relatedColumns] =
     await Promise.all([
       prisma.standingsSnapshot.findFirst({ where: { teamId: team.id }, orderBy: { date: "desc" } }),
       prisma.championshipProbability.findMany({
         where: { teamId: team.id },
         orderBy: { date: "desc" },
         take: 2,
+      }),
+      prisma.championshipProbability.findMany({
+        where: { teamId: team.id },
+        orderBy: { date: "asc" },
       }),
       prisma.game.count({
         where: {
@@ -133,6 +139,10 @@ export default async function TeamPage({
     ]);
 
   const yearlyStandings = summarizeByYear(allStandings);
+  const trendData = championshipTrend.map((c) => ({
+    date: c.date.toISOString().slice(0, 10),
+    probability: c.probability,
+  }));
 
   const championship = championshipHistory[0] ?? null;
   const probabilityDelta =
@@ -175,6 +185,25 @@ export default async function TeamPage({
       >
         <h1 className="text-2xl font-bold">{team.name}</h1>
       </div>
+
+      {trendData.length >= 2 && (
+        <div
+          className="rounded-none p-5 mb-8"
+          style={{
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+            borderLeft: `5px solid ${teamAccent}`,
+          }}
+        >
+          <h2
+            className="text-lg font-bold mb-4"
+            style={{ fontFamily: "var(--font-shippori-mincho)", color: "var(--ink)" }}
+          >
+            優勝確率の推移
+          </h2>
+          <ChampionshipTrendChart data={trendData} accentColor={teamAccent} />
+        </div>
+      )}
 
       {!standing ? (
         <p className="text-sm" style={{ color: "var(--ink-secondary)" }}>
@@ -365,7 +394,10 @@ export default async function TeamPage({
               </div>
               <div className="flex items-center gap-2">
                 <div className="flex-1">
-                  <Meter value={championship.probability} />
+                  <Meter
+                    value={championship.probability}
+                    label={<CountUpNumber value={championship.probability * 100} decimals={1} suffix="%" />}
+                  />
                 </div>
                 {probabilityDelta !== null && Math.abs(probabilityDelta) >= 0.001 && (
                   <span

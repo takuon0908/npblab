@@ -1,5 +1,5 @@
 // 確率のような「上限に対する比率」を表す単一指標。palette.mdのsequential blueをtrack/fillに使う
-export function Meter({ value, label }: { value: number; label?: string }) {
+export function Meter({ value, label }: { value: number; label?: React.ReactNode }) {
   const pct = Math.max(0, Math.min(1, value));
   return (
     <div className="flex items-center gap-2">
