@@ -13,10 +13,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]);
   const playerIds = [...new Set([...battingPlayers, ...pitchingPlayers].map((p) => p.playerId))];
 
+  // getColumnsは1回のリクエストにつき最大100件までしか返さないため、
+  // 公開済みコラムが100本を超えた場合に漏れが出ないようoffsetでページングして全件取得する
   let columnSlugs: string[] = [];
   try {
-    const { contents } = await getColumns(100);
-    columnSlugs = contents.map((c) => c.slug);
+    const pageSize = 100;
+    let offset = 0;
+    for (;;) {
+      const { contents, totalCount } = await getColumns(pageSize, undefined, undefined, offset);
+      columnSlugs.push(...contents.map((c) => c.slug));
+      offset += pageSize;
+      if (offset >= totalCount || contents.length === 0) break;
+    }
   } catch {
     // microCMS未設定の段階ではコラムのURLは含めない
   }
