@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
-import { getColumns } from "@/lib/microcms";
+import { getColumns, CATEGORIES } from "@/lib/microcms";
+import { categoryToSlug } from "@/lib/categorySlug";
 import { siteUrl } from "@/lib/siteUrl";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -60,5 +61,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...staticRoutes, ...teamRoutes, ...playerRoutes, ...columnRoutes];
+  const columnCategoryRoutes: MetadataRoute.Sitemap = CATEGORIES.map((c) => ({
+    url: `${siteUrl}/columns/category/${categoryToSlug(c)}`,
+    changeFrequency: "daily",
+    priority: 0.6,
+  }));
+
+  return [...staticRoutes, ...teamRoutes, ...playerRoutes, ...columnRoutes, ...columnCategoryRoutes];
 }

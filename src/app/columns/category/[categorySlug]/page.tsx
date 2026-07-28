@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getColumns, parseTags, CATEGORIES } from "@/lib/microcms";
-import { categoryToSlug } from "@/lib/categorySlug";
+import { notFound } from "next/navigation";
+import { getColumns, parseTags } from "@/lib/microcms";
+import { slugToCategory, categoryToSlug } from "@/lib/categorySlug";
+import { CATEGORIES } from "@/lib/microcms";
 import { formatDateJa } from "@/lib/date";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 import { getLikeCounts } from "@/lib/columnLikes";
@@ -9,12 +11,6 @@ import { getLikeCounts } from "@/lib/columnLikes";
 export const revalidate = 60;
 
 const PAGE_SIZE = 20;
-
-export const metadata: Metadata = {
-  title: "コラム",
-  description: "NPBのデータ分析コラム。独自指標や優勝確率・タイトルレースの考察記事一覧。",
-  alternates: { canonical: "/columns" },
-};
 
 function stripHtml(html: string): string {
   return html.replace(/<[^>]+>/g, "").trim();
@@ -25,24 +21,44 @@ function excerpt(html: string, length = 88): string {
   return text.length > length ? `${text.slice(0, length)}…` : text;
 }
 
-function buildPageHref(page: number, category?: string, tag?: string): string {
-  const params = new URLSearchParams();
-  if (category) params.set("category", category);
-  if (tag) params.set("tag", tag);
-  if (page > 1) params.set("page", String(page));
-  const qs = params.toString();
-  return qs ? `/columns?${qs}` : "/columns";
+function buildPageHref(categorySlug: string, page: number): string {
+  return page > 1 ? `/columns/category/${categorySlug}?page=${page}` : `/columns/category/${categorySlug}`;
 }
 
-export default async function ColumnsPage({
+export async function generateStaticParams() {
+  return CATEGORIES.map((c) => ({ categorySlug: categoryToSlug(c)! }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ categorySlug: string }>;
+}): Promise<Metadata> {
+  const { categorySlug } = await params;
+  const category = slugToCategory(categorySlug);
+  if (!category) return {};
+  return {
+    title: `${category}のコラム`,
+    description: `NPBのコラムから「${category}」カテゴリの記事一覧。独自指標や優勝確率・タイトルレースの考察記事。`,
+    alternates: { canonical: `/columns/category/${categorySlug}` },
+  };
+}
+
+export default async function ColumnsCategoryPage({
+  params,
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; tag?: string; page?: string }>;
+  params: Promise<{ categorySlug: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) {
-  const { category, tag, page: pageParam } = await searchParams;
+  const { categorySlug } = await params;
+  const category = slugToCategory(categorySlug);
+  if (!category) notFound();
+
+  const { page: pageParam } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
   const offset = (page - 1) * PAGE_SIZE;
-  const { contents, totalCount } = await getColumns(PAGE_SIZE, category, tag, offset);
+  const { contents, totalCount } = await getColumns(PAGE_SIZE, category, undefined, offset);
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
   // 2ページ目以降は「新着1本を大きく見せる」ヒーロー表示をせず、フラットなグリッドにする
   const showHero = page === 1;
@@ -59,7 +75,7 @@ export default async function ColumnsPage({
         className="text-2xl font-bold mb-3 sm:text-3xl"
         style={{ fontFamily: "var(--font-shippori-mincho)" }}
       >
-        コラム
+        {category}
       </h1>
       <p className="text-sm mb-4" style={{ color: "var(--ink-secondary)" }}>
         優勝確率シミュレーションやタイトルレースの数字から、当サイトのライター陣が読み解く考察記事です。
@@ -74,11 +90,7 @@ export default async function ColumnsPage({
         <Link
           href="/columns"
           className="rounded-full px-3 py-1 text-xs font-medium"
-          style={
-            !category
-              ? { background: "var(--accent)", color: "#fff" }
-              : { border: "1px solid var(--border)", color: "var(--ink-secondary)" }
-          }
+          style={{ border: "1px solid var(--border)", color: "var(--ink-secondary)" }}
         >
           すべて
         </Link>
@@ -97,19 +109,6 @@ export default async function ColumnsPage({
           </Link>
         ))}
       </div>
-
-      {tag && (
-        <p className="text-sm mb-8">
-          タグ「#{tag}」で絞り込み中 ・{" "}
-          <Link
-            href={category ? `/columns?category=${encodeURIComponent(category)}` : "/columns"}
-            className="hover:underline"
-            style={{ color: "var(--accent)" }}
-          >
-            解除する
-          </Link>
-        </p>
-      )}
 
       {contents.length === 0 ? (
         <p className="text-sm" style={{ color: "var(--ink-secondary)" }}>
@@ -197,7 +196,7 @@ export default async function ColumnsPage({
       {totalPages > 1 && (
         <nav className="mt-12 flex items-center justify-center gap-4 text-sm" aria-label="ページネーション">
           {page > 1 ? (
-            <Link href={buildPageHref(page - 1, category, tag)} className="hover:underline" style={{ color: "var(--accent)" }}>
+            <Link href={buildPageHref(categorySlug, page - 1)} className="hover:underline" style={{ color: "var(--accent)" }}>
               ← 前へ
             </Link>
           ) : (
@@ -207,7 +206,7 @@ export default async function ColumnsPage({
             {page} / {totalPages}
           </span>
           {page < totalPages ? (
-            <Link href={buildPageHref(page + 1, category, tag)} className="hover:underline" style={{ color: "var(--accent)" }}>
+            <Link href={buildPageHref(categorySlug, page + 1)} className="hover:underline" style={{ color: "var(--accent)" }}>
               次へ →
             </Link>
           ) : (
