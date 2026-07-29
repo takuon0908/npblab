@@ -17,6 +17,29 @@ function findCustomCover(slug: string): string | null {
   return null;
 }
 
+function CategoryBadge({ label }: { label: string }) {
+  return (
+    <span
+      style={{
+        position: "absolute",
+        top: 10,
+        left: 10,
+        zIndex: 2,
+        background: "rgba(0,0,0,0.6)",
+        color: "#f5f0e6",
+        fontSize: "0.7rem",
+        fontWeight: 700,
+        lineHeight: 1,
+        padding: "5px 11px",
+        borderRadius: 9999,
+        letterSpacing: "0.02em",
+      }}
+    >
+      {label}
+    </span>
+  );
+}
+
 export function ArticleCoverImage({
   slug,
   text,
@@ -25,6 +48,7 @@ export function ArticleCoverImage({
   title,
   category,
   tags,
+  showCategoryBadge,
 }: {
   slug: string;
   text: string;
@@ -36,10 +60,18 @@ export function ArticleCoverImage({
   // 記事のcategory/tags。指定すると本文中の言及より優先して球団カラーの判定に使う
   category?: string[];
   tags?: string;
+  // 一覧カードのサムネイルではtrueにし、カバー画像左上にカテゴリバッジを重ねる(記事ページ本体のヒーローでは指定しない)
+  showCategoryBadge?: boolean;
 }) {
+  const badgeLabel = showCategoryBadge && category && category.length > 0 ? category[0] : null;
   const customSrc = findCustomCover(slug);
   if (!customSrc) {
-    return <ArticleCover slug={slug} text={text} className={className} category={category} tags={tags} />;
+    return (
+      <div className={className} style={{ position: "relative", width: "100%", height: "100%" }}>
+        <ArticleCover slug={slug} text={text} category={category} tags={tags} />
+        {badgeLabel && <CategoryBadge label={badgeLabel} />}
+      </div>
+    );
   }
 
   return (
@@ -52,6 +84,7 @@ export function ArticleCoverImage({
         style={{ objectFit: "cover" }}
         priority={priority}
       />
+      {badgeLabel && <CategoryBadge label={badgeLabel} />}
       {title && (
         <div
           style={{

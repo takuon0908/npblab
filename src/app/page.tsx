@@ -66,6 +66,7 @@ function HighlightGame({ game }: { game: NonNullable<Awaited<ReturnType<typeof g
 export default async function Home() {
   const [latestGames, latestColumns] = await Promise.all([getLatestDayGames(), getLatestColumnsSafely()]);
   const highlightGame = latestGames ? pickClosestGame(latestGames.games) : null;
+  const [heroColumn, ...restColumns] = latestColumns;
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
@@ -106,32 +107,64 @@ export default async function Home() {
               もっと見る →
             </Link>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {latestColumns.map((c) => (
-              <Link
-                key={c.id}
-                href={`/columns/${c.slug}`}
-                className="hover-lift group flex gap-3 rounded-none overflow-hidden p-3"
-                style={{ background: "var(--surface)", border: "1px solid var(--border-strong)" }}
-              >
-                <div className="w-20 aspect-square flex-none">
-                  <ArticleCoverImage slug={c.slug} text={`${c.title} ${stripHtml(c.body)}`} category={c.category} tags={c.tags} />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs mb-1" style={{ color: "var(--ink-muted)" }}>
-                    {formatDateJa(new Date(c.publishedAt))}
-                    {c.category && c.category.length > 0 && ` ・ ${c.category[0]}`}
-                  </p>
-                  <p
-                    className="text-sm leading-snug group-hover:underline"
-                    style={{ fontWeight: 700, textWrap: "balance" }}
-                  >
-                    {c.title}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </div>
+          {heroColumn && (
+            <Link
+              href={`/columns/${heroColumn.slug}`}
+              className="hover-lift group grid gap-0 sm:grid-cols-2 mb-4 rounded-none overflow-hidden"
+              style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
+            >
+              <div className="aspect-video sm:aspect-auto sm:h-full">
+                <ArticleCoverImage
+                  slug={heroColumn.slug}
+                  text={`${heroColumn.title} ${stripHtml(heroColumn.body)}`}
+                  category={heroColumn.category}
+                  tags={heroColumn.tags}
+                  showCategoryBadge
+                  priority
+                />
+              </div>
+              <div className="p-6 flex flex-col justify-center">
+                <p className="text-xs mb-2" style={{ color: "var(--ink-muted)" }}>
+                  {formatDateJa(new Date(heroColumn.publishedAt))} ・ 新着
+                </p>
+                <h3
+                  className="text-xl mb-0 leading-snug group-hover:underline sm:text-2xl"
+                  style={{ fontFamily: "var(--font-shippori-mincho)", fontWeight: 700, textWrap: "balance" }}
+                >
+                  {heroColumn.title}
+                </h3>
+              </div>
+            </Link>
+          )}
+
+          {restColumns.length > 0 && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {restColumns.map((c) => (
+                <Link
+                  key={c.id}
+                  href={`/columns/${c.slug}`}
+                  className="hover-lift group flex gap-3 rounded-none overflow-hidden p-3"
+                  style={{ background: "var(--surface)", border: "1px solid var(--border-strong)" }}
+                >
+                  <div className="w-20 aspect-square flex-none">
+                    <ArticleCoverImage slug={c.slug} text={`${c.title} ${stripHtml(c.body)}`} category={c.category} tags={c.tags} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs mb-1" style={{ color: "var(--ink-muted)" }}>
+                      {formatDateJa(new Date(c.publishedAt))}
+                      {c.category && c.category.length > 0 && ` ・ ${c.category[0]}`}
+                    </p>
+                    <p
+                      className="text-sm leading-snug group-hover:underline"
+                      style={{ fontWeight: 700, textWrap: "balance" }}
+                    >
+                      {c.title}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </section>
       )}
 

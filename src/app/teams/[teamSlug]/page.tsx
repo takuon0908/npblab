@@ -532,7 +532,7 @@ export default async function TeamPage({
                 style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
               >
                 <div className="aspect-video">
-                  <ArticleCoverImage slug={c.slug} text={`${c.title} ${c.body.replace(/<[^>]+>/g, "")}`} category={c.category} tags={c.tags} />
+                  <ArticleCoverImage slug={c.slug} text={`${c.title} ${c.body.replace(/<[^>]+>/g, "")}`} category={c.category} tags={c.tags} showCategoryBadge />
                 </div>
                 <div className="p-4">
                   <p className="text-xs mb-1.5" style={{ color: "var(--ink-muted)" }}>

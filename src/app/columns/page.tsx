@@ -150,7 +150,7 @@ export default async function ColumnsPage({
               style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
             >
               <div className="aspect-video sm:aspect-auto sm:h-full">
-                <ArticleCoverImage slug={hero.slug} text={`${hero.title} ${stripHtml(hero.body)}`} category={hero.category} tags={hero.tags} priority />
+                <ArticleCoverImage slug={hero.slug} text={`${hero.title} ${stripHtml(hero.body)}`} category={hero.category} tags={hero.tags} showCategoryBadge priority />
               </div>
               <div className="p-6 flex flex-col justify-center">
                 <p className="text-xs mb-2" style={{ color: "var(--ink-muted)" }}>
@@ -190,7 +190,7 @@ export default async function ColumnsPage({
                     style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
                   >
                     <div className="aspect-video">
-                      <ArticleCoverImage slug={c.slug} text={`${c.title} ${stripHtml(c.body)}`} category={c.category} tags={c.tags} />
+                      <ArticleCoverImage slug={c.slug} text={`${c.title} ${stripHtml(c.body)}`} category={c.category} tags={c.tags} showCategoryBadge />
                     </div>
                     <div className="p-4">
                       <p className="text-xs mb-1.5" style={{ color: "var(--ink-muted)" }}>
