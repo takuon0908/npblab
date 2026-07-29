@@ -16,6 +16,8 @@ import { siteUrl } from "@/lib/siteUrl";
 import { prisma } from "@/lib/prisma";
 import { detectColumnTeamSlug, TEAM_THEME } from "@/lib/teamTheme";
 import { categoryToSlug } from "@/lib/categorySlug";
+import { SITE_AUTHOR } from "@/lib/author";
+import Image from "next/image";
 
 export const revalidate = 60;
 
@@ -86,7 +88,7 @@ export default async function ColumnPage({
     datePublished: column.publishedAt,
     dateModified: column.updatedAt || column.publishedAt,
     image: [`${siteUrl}/columns/${column.slug}/opengraph-image`],
-    author: { "@type": "Organization", name: "プロ野球LAB" },
+    author: { "@type": "Person", name: SITE_AUTHOR.name, url: `${siteUrl}/about#author` },
     publisher: { "@type": "Organization", name: "プロ野球LAB" },
     mainEntityOfPage: { "@type": "WebPage", "@id": `${siteUrl}/columns/${column.slug}` },
   };
@@ -159,6 +161,10 @@ export default async function ColumnPage({
           <p className="text-sm" style={{ color: "var(--ink-muted)" }}>
             {formatDateJa(publishedDate)}
             {viewCount > 0 && ` ・ ${viewCount}回閲覧`}
+            {" ・ 執筆: "}
+            <Link href="/about#author" className="hover:underline" style={{ color: "var(--accent)" }}>
+              {SITE_AUTHOR.name}({SITE_AUTHOR.nickname})
+            </Link>
           </p>
           {column.category && column.category.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-3">
@@ -225,6 +231,29 @@ export default async function ColumnPage({
           <GoodButton slug={column.slug} initialCount={likeCount} />
           <ShareButton title={column.title} url={`${siteUrl}/columns/${column.slug}`} />
         </div>
+
+        <Link
+          href="/about#author"
+          className="hover-lift mt-10 flex items-center gap-4 p-4"
+          style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
+        >
+          <Image
+            src={SITE_AUTHOR.image}
+            alt={SITE_AUTHOR.name}
+            width={64}
+            height={64}
+            className="flex-none rounded-full object-cover"
+            style={{ width: 64, height: 64 }}
+          />
+          <div className="min-w-0">
+            <p className="text-xs mb-0.5" style={{ color: "var(--ink-muted)" }}>
+              この記事を書いた人
+            </p>
+            <p className="font-semibold" style={{ fontFamily: "var(--font-shippori-mincho)" }}>
+              {SITE_AUTHOR.name}({SITE_AUTHOR.nickname}) ・ {SITE_AUTHOR.jobTitle}
+            </p>
+          </div>
+        </Link>
       </article>
 
       {relatedTeam && relatedTeamTheme && (

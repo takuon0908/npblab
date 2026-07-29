@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
+import { SITE_AUTHOR } from "@/lib/author";
+import { siteUrl } from "@/lib/siteUrl";
 
 export const metadata: Metadata = {
   title: "このサイトについて",
@@ -19,9 +22,52 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export default function AboutPage() {
+  const personJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: SITE_AUTHOR.name,
+    alternateName: SITE_AUTHOR.nickname,
+    jobTitle: SITE_AUTHOR.jobTitle,
+    description: SITE_AUTHOR.bio,
+    image: `${siteUrl}${SITE_AUTHOR.image}`,
+    url: `${siteUrl}/about#author`,
+    worksFor: { "@type": "Organization", name: "プロ野球LAB" },
+  };
+
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
+      {/* eslint-disable-next-line react/no-danger */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }} />
+
       <h1 className="text-2xl font-bold mb-10">このサイトについて</h1>
+
+      <section id="author" className="mb-10 scroll-mt-20">
+        <h2 className="font-semibold text-lg mb-4">運営者について</h2>
+        <div
+          className="flex flex-col sm:flex-row items-start gap-5 p-5"
+          style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
+        >
+          <Image
+            src={SITE_AUTHOR.image}
+            alt={SITE_AUTHOR.name}
+            width={96}
+            height={96}
+            className="flex-none rounded-full object-cover"
+            style={{ width: 96, height: 96 }}
+          />
+          <div>
+            <p className="font-bold text-lg mb-0.5" style={{ fontFamily: "var(--font-shippori-mincho)" }}>
+              {SITE_AUTHOR.name}({SITE_AUTHOR.nickname})
+            </p>
+            <p className="text-xs mb-3" style={{ color: "var(--ink-muted)" }}>
+              {SITE_AUTHOR.jobTitle}
+            </p>
+            <p className="text-sm" style={{ color: "var(--ink-secondary)" }}>
+              {SITE_AUTHOR.bio}
+            </p>
+          </div>
+        </div>
+      </section>
 
       <Section title="プロ野球LABとは">
         <p>
