@@ -6,6 +6,7 @@ import { Table, Th, Td } from "@/components/Table";
 import { latestPerPlayer } from "@/lib/latestPerPlayer";
 import { teamAbbr } from "@/lib/teamAbbr";
 import { TEAM_THEME } from "@/lib/teamTheme";
+import { siteUrl } from "@/lib/siteUrl";
 
 function TeamDot({ slug }: { slug: string }) {
   return (
@@ -112,6 +113,20 @@ async function getRateStatLeaders() {
   return { qualifiedBatters, qualifiedPitchers };
 }
 
+function itemListJsonLd(name: string, items: { playerId: string; playerName: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name,
+    itemListElement: items.map((item, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: item.playerName,
+      url: `${siteUrl}/players/${item.playerId}`,
+    })),
+  };
+}
+
 export default async function TitlesPage() {
   const byCategory = await getTitleRaces();
   const rateStats = await getRateStatLeaders();
@@ -131,6 +146,15 @@ export default async function TitlesPage() {
             const unit = CATEGORY_UNITS[category] ?? "";
             return (
               <div key={category}>
+                {rows.length > 0 && (
+                  /* eslint-disable-next-line react/no-danger */
+                  <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{
+                      __html: JSON.stringify(itemListJsonLd(`${CATEGORY_LABELS[category]}獲得確率ランキング`, rows)),
+                    }}
+                  />
+                )}
                 <h2 className="font-semibold mb-3">{CATEGORY_LABELS[category]}</h2>
                 {rows.length === 0 ? (
                   <p className="text-sm" style={{ color: "var(--ink-secondary)" }}>
@@ -189,6 +213,24 @@ export default async function TitlesPage() {
 
       {rateStats && (
         <div className="mt-12">
+          {rateStats.qualifiedBatters.length > 0 && (
+            /* eslint-disable-next-line react/no-danger */
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify(itemListJsonLd("首位打者ランキング", rateStats.qualifiedBatters)),
+              }}
+            />
+          )}
+          {rateStats.qualifiedPitchers.length > 0 && (
+            /* eslint-disable-next-line react/no-danger */
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify(itemListJsonLd("防御率ランキング", rateStats.qualifiedPitchers)),
+              }}
+            />
+          )}
           <h2 className="font-semibold mb-1">首位打者・防御率（規定到達者）</h2>
           <p className="text-xs mb-4" style={{ color: "var(--ink-muted)" }}>
             規定打席（チーム試合数×3.1）・規定投球回（チーム試合数×1）に到達した選手の現在値です。

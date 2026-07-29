@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getColumns } from "@/lib/microcms";
+import { getAllColumns } from "@/lib/microcms";
 import { getViewCounts } from "@/lib/columnViews";
 import { Table, Th, Td } from "@/components/Table";
 import { formatDateJa } from "@/lib/date";
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 async function getRanking() {
-  const { contents } = await getColumns(100);
+  const contents = await getAllColumns();
   const viewCounts = await getViewCounts(contents.map((c) => c.slug));
 
   return contents

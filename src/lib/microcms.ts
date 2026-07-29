@@ -61,6 +61,21 @@ export async function getColumns(limit = 20, category?: string, tag?: string, of
   });
 }
 
+// getColumnsは1回のリクエストにつき最大100件までしか返さないため、
+// 公開済みコラムが100本を超えた場合に漏れが出ないようoffsetでページングして全件取得する
+export async function getAllColumns(category?: string, tag?: string) {
+  const pageSize = 100;
+  let offset = 0;
+  const all: Column[] = [];
+  for (;;) {
+    const { contents, totalCount } = await getColumns(pageSize, category, tag, offset);
+    all.push(...contents);
+    offset += pageSize;
+    if (offset >= totalCount || contents.length === 0) break;
+  }
+  return all;
+}
+
 export async function getColumnBySlug(slug: string) {
   const res = await getClient().getList<Column>({
     endpoint: "columns",

@@ -13,9 +13,10 @@ import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 import { computeWhatIf } from "@/lib/whatif";
 import { calcMagicNumber } from "@/lib/baseball";
 import { latestPerPlayer } from "@/lib/latestPerPlayer";
-import { getColumns } from "@/lib/microcms";
+import { getAllColumns } from "@/lib/microcms";
 import { formatDateJa } from "@/lib/date";
 import { detectColumnTeamSlug, TEAM_THEME } from "@/lib/teamTheme";
+import { siteUrl } from "@/lib/siteUrl";
 
 const MIN_AT_BATS_FOR_AVG_LEADER = 10;
 const MIN_INNINGS_FOR_ERA_LEADER = 10;
@@ -58,7 +59,7 @@ async function getTeamLeaders(teamId: string) {
 // microCMS未設定のビルド環境でも失敗させない
 async function getRelatedColumns(teamSlug: string) {
   try {
-    const { contents } = await getColumns(100);
+    const contents = await getAllColumns();
     return contents.filter((c) => detectColumnTeamSlug(c) === teamSlug).slice(0, 3);
   } catch {
     return [];
@@ -173,8 +174,41 @@ export default async function TeamPage({
   const whatIf = championship ? await computeWhatIf(team.id, championship.probability) : null;
   const teamLeaders = await getTeamLeaders(team.id);
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "プロ野球LAB", item: siteUrl },
+      { "@type": "ListItem", position: 2, name: "球団", item: `${siteUrl}/teams` },
+      { "@type": "ListItem", position: 3, name: team.name },
+    ],
+  };
+
+  const teamJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SportsTeam",
+    name: team.name,
+    url: `${siteUrl}/teams/${team.slug}`,
+    sport: "Baseball",
+  };
+
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
+      {/* eslint-disable-next-line react/no-danger */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      {/* eslint-disable-next-line react/no-danger */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(teamJsonLd) }} />
+
+      <nav className="mb-8 text-xs" style={{ color: "var(--ink-muted)" }} aria-label="パンくずリスト">
+        <Link href="/" className="hover:underline">
+          プロ野球LAB
+        </Link>
+        <span className="mx-1.5">›</span>
+        <Link href="/teams" className="hover:underline">
+          球団
+        </Link>
+      </nav>
+
       <div
         className="rounded-none p-5 mb-6"
         style={{

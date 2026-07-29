@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { ProspectCategory } from "@prisma/client";
 import { Table, Th, Td } from "@/components/Table";
 import { teamAbbr } from "@/lib/teamAbbr";
+import { siteUrl } from "@/lib/siteUrl";
 
 export const revalidate = 3600;
 
@@ -30,6 +31,20 @@ async function getProspects() {
   };
 }
 
+function itemListJsonLd(name: string, items: { playerId: string; playerName: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name,
+    itemListElement: items.map((item, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: item.playerName,
+      url: `${siteUrl}/players/${item.playerId}`,
+    })),
+  };
+}
+
 export default async function ProspectsPage() {
   const data = await getProspects();
 
@@ -48,6 +63,11 @@ export default async function ProspectsPage() {
       ) : (
         <div className="grid gap-8 sm:grid-cols-2 min-w-0">
           <div>
+            {/* eslint-disable-next-line react/no-danger */}
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd("2軍注目選手ランキング（打者）", data.batters)) }}
+            />
             <h2 className="font-semibold mb-1">打者（OPS換算）</h2>
             <p className="text-xs mb-3" style={{ color: "var(--ink-muted)" }}>
               打数30以上が対象。OPS = 出塁率 + 長打率
@@ -91,6 +111,11 @@ export default async function ProspectsPage() {
           </div>
 
           <div>
+            {/* eslint-disable-next-line react/no-danger */}
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd("2軍注目選手ランキング（投手）", data.pitchers)) }}
+            />
             <h2 className="font-semibold mb-1">投手（防御率換算）</h2>
             <p className="text-xs mb-3" style={{ color: "var(--ink-muted)" }}>
               投球回10以上が対象

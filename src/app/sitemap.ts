@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
-import { getColumns, CATEGORIES } from "@/lib/microcms";
+import { getAllColumns, CATEGORIES } from "@/lib/microcms";
 import { categoryToSlug } from "@/lib/categorySlug";
 import { siteUrl } from "@/lib/siteUrl";
 
@@ -14,18 +14,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]);
   const playerIds = [...new Set([...battingPlayers, ...pitchingPlayers].map((p) => p.playerId))];
 
-  // getColumnsは1回のリクエストにつき最大100件までしか返さないため、
-  // 公開済みコラムが100本を超えた場合に漏れが出ないようoffsetでページングして全件取得する
   let columns: { slug: string; updatedAt: string }[] = [];
   try {
-    const pageSize = 100;
-    let offset = 0;
-    for (;;) {
-      const { contents, totalCount } = await getColumns(pageSize, undefined, undefined, offset);
-      columns.push(...contents.map((c) => ({ slug: c.slug, updatedAt: c.updatedAt })));
-      offset += pageSize;
-      if (offset >= totalCount || contents.length === 0) break;
-    }
+    columns = (await getAllColumns()).map((c) => ({ slug: c.slug, updatedAt: c.updatedAt }));
   } catch {
     // microCMS未設定の段階ではコラムのURLは含めない
   }

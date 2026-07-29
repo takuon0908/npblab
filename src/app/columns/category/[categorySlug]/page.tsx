@@ -7,6 +7,7 @@ import { CATEGORIES } from "@/lib/microcms";
 import { formatDateJa } from "@/lib/date";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 import { getLikeCounts } from "@/lib/columnLikes";
+import { siteUrl } from "@/lib/siteUrl";
 
 export const revalidate = 60;
 
@@ -74,8 +75,31 @@ export default async function ColumnsCategoryPage({
   const rest = showHero ? contents.slice(1) : contents;
   const likeCounts = await getLikeCounts(contents.map((c) => c.slug));
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "プロ野球LAB", item: siteUrl },
+      { "@type": "ListItem", position: 2, name: "コラム", item: `${siteUrl}/columns` },
+      { "@type": "ListItem", position: 3, name: category },
+    ],
+  };
+
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
+      {/* eslint-disable-next-line react/no-danger */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+
+      <nav className="mb-8 text-xs" style={{ color: "var(--ink-muted)" }} aria-label="パンくずリスト">
+        <Link href="/" className="hover:underline">
+          プロ野球LAB
+        </Link>
+        <span className="mx-1.5">›</span>
+        <Link href="/columns" className="hover:underline">
+          コラム
+        </Link>
+      </nav>
+
       <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: "var(--accent)" }}>
         Column
       </p>

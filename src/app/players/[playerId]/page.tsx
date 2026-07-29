@@ -7,6 +7,7 @@ import { Table, Th, Td } from "@/components/Table";
 import { StatTile } from "@/components/StatTile";
 import { calcFipConstant, calcFip, calcWoba, calcWhip, calcKPercent, calcBBPercent } from "@/lib/sabermetrics";
 import { latestPerPlayer } from "@/lib/latestPerPlayer";
+import { siteUrl } from "@/lib/siteUrl";
 
 export const revalidate = 3600;
 
@@ -102,8 +103,40 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
 
   const latestValue = player.valueRatings.at(-1) ?? null;
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "プロ野球LAB", item: siteUrl },
+      { "@type": "ListItem", position: 2, name: "選手" },
+      { "@type": "ListItem", position: 3, name: player.playerName },
+    ],
+  };
+
+  const personJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: player.playerName,
+    url: `${siteUrl}/players/${playerId}`,
+    jobTitle: "プロ野球選手",
+    affiliation: { "@type": "SportsTeam", name: player.team.name, url: `${siteUrl}/teams/${player.team.slug}` },
+  };
+
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
+      {/* eslint-disable-next-line react/no-danger */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      {/* eslint-disable-next-line react/no-danger */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }} />
+
+      <nav className="mb-8 text-xs" style={{ color: "var(--ink-muted)" }} aria-label="パンくずリスト">
+        <Link href="/" className="hover:underline">
+          プロ野球LAB
+        </Link>
+        <span className="mx-1.5">›</span>
+        <span>選手</span>
+      </nav>
+
       <p className="text-xs mb-2" style={{ color: "var(--ink-muted)" }}>
         <Link href={`/teams/${player.team.slug}`} className="hover:underline" style={{ color: "var(--accent)" }}>
           {player.team.name}

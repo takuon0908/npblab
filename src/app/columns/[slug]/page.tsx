@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getColumnBySlug, getColumns, parseTags } from "@/lib/microcms";
+import { getColumnBySlug, getColumns, getAllColumns, parseTags } from "@/lib/microcms";
 import { formatDateJa } from "@/lib/date";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 import { GoodButton } from "@/components/GoodButton";
@@ -21,7 +21,7 @@ export const revalidate = 60;
 
 export async function generateStaticParams() {
   try {
-    const { contents } = await getColumns(100);
+    const contents = await getAllColumns();
     return contents.map((column) => ({ slug: column.slug }));
   } catch {
     // microCMS未設定のビルド環境でも失敗させない

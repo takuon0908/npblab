@@ -6,6 +6,7 @@ import { Table, Th, Td } from "@/components/Table";
 import { latestPerPlayer } from "@/lib/latestPerPlayer";
 import { calcFipConstant, calcFip, calcWoba, calcWhip, calcKPercent, calcBBPercent } from "@/lib/sabermetrics";
 import { teamAbbr } from "@/lib/teamAbbr";
+import { siteUrl } from "@/lib/siteUrl";
 
 const QUALIFYING_PA_PER_GAME = 3.1;
 const QUALIFYING_IP_PER_GAME = 1;
@@ -89,6 +90,20 @@ async function getSabermetricsLeaders() {
   return { wobaLeaders, fipLeaders, whipLeaders, kPercentLeaders, bbPercentLeaders };
 }
 
+function itemListJsonLd(name: string, items: { playerId: string; playerName: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name,
+    itemListElement: items.map((item, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: item.playerName,
+      url: `${siteUrl}/players/${item.playerId}`,
+    })),
+  };
+}
+
 export default async function AnalysisPage() {
   const rows = await getMvpRanking();
   const sabermetrics = await getSabermetricsLeaders();
@@ -118,7 +133,13 @@ export default async function AnalysisPage() {
           データがありません。<code>npm run scrape</code> と <code>npm run mvp</code> を実行してください。
         </p>
       ) : (
-        <Table>
+        <>
+          {/* eslint-disable-next-line react/no-danger */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd("LABバリューMVPランキング", rows)) }}
+          />
+          <Table>
           <thead>
             <tr>
               <Th>選手</Th>
@@ -162,7 +183,8 @@ export default async function AnalysisPage() {
               </tr>
             ))}
           </tbody>
-        </Table>
+          </Table>
+        </>
       )}
 
       {sabermetrics && (
@@ -174,6 +196,11 @@ export default async function AnalysisPage() {
           </p>
           <div className="grid gap-8 sm:grid-cols-2 min-w-0">
             <div>
+              {/* eslint-disable-next-line react/no-danger */}
+              <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd("wOBAランキング", sabermetrics.wobaLeaders)) }}
+              />
               <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
                 wOBA（打者）
               </h3>
@@ -212,6 +239,11 @@ export default async function AnalysisPage() {
             </div>
 
             <div>
+              {/* eslint-disable-next-line react/no-danger */}
+              <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd("FIPランキング", sabermetrics.fipLeaders)) }}
+              />
               <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
                 FIP（投手）
               </h3>
@@ -261,6 +293,11 @@ export default async function AnalysisPage() {
           </p>
           <div className="grid gap-8 sm:grid-cols-3 min-w-0">
             <div>
+              {/* eslint-disable-next-line react/no-danger */}
+              <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd("WHIPランキング", sabermetrics.whipLeaders)) }}
+              />
               <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
                 WHIP（投手）
               </h3>
@@ -299,6 +336,11 @@ export default async function AnalysisPage() {
             </div>
 
             <div>
+              {/* eslint-disable-next-line react/no-danger */}
+              <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd("低K%ランキング", sabermetrics.kPercentLeaders)) }}
+              />
               <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
                 低K%（打者、三振が少ない順）
               </h3>
@@ -337,6 +379,11 @@ export default async function AnalysisPage() {
             </div>
 
             <div>
+              {/* eslint-disable-next-line react/no-danger */}
+              <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd("高BB%ランキング", sabermetrics.bbPercentLeaders)) }}
+              />
               <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
                 高BB%（打者、四球が多い順）
               </h3>
