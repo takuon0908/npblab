@@ -34,7 +34,7 @@ const CATEGORY_RULES: [RegExp, string][] = [
   [/^pennant-race-/, "ペナントレース速報"],
   [/^(satoh|murakami|taira)-/, "選手フィーチャー"],
   [/^mlb-japanese-/, "選手フィーチャー"],
-  [/^amateur-baseball-/, "NPBデータ分析"],
+  [/^amateur-baseball-/, "アマチュア野球"],
 ];
 
 function inferCategory(slug: string): string {

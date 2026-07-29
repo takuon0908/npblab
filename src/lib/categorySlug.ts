@@ -9,6 +9,7 @@ const CATEGORY_SLUG_MAP: Record<(typeof CATEGORIES)[number], string> = {
   "ルール・基礎知識": "rules-basics",
   "体づくり・怪我予防": "injury-prevention",
   "用具選び": "gear-guide",
+  "アマチュア野球": "amateur-baseball",
 };
 
 export function categoryToSlug(category: string): string | null {
