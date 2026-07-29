@@ -1,5 +1,5 @@
 ---
-title: "CS新ルール解説：優勝チームへの『2勝』アドバンテージはどんな時に発動するのか、現在の順位表で試してみる"
+title: "野球のルール入門：CS「2勝」アドバンテージとは何か、いつ発動するのか(2026年新ルール)"
 slug: rules-basics-cs-new-rule-2026
 writer: writer-baseball-otaku
 ---

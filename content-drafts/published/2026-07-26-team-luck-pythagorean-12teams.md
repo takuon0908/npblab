@@ -1,5 +1,5 @@
 ---
-title: "12球団「運のいい球団・悪い球団」ランキング ― ヤクルト+8.3ptが最大の貯金、DeNAは-7.4ptで最大の持ち出し【7月25日試合終了時点】"
+title: "12球団『運のいい球団』ランキング ― ヤクルト+8.3pt、DeNA-7.4pt【7月25日時点】"
 slug: team-luck-pythagorean-12teams
 writer: writer-stats
 ---

@@ -1,5 +1,5 @@
 ---
-title: "「あがり症だから」は正しいのか？ プレッシャーで実力が出せなくなる仕組み"
+title: "「あがり症だから」は正しいのか？ 野球選手がプレッシャーで実力が出せなくなる仕組み"
 slug: mental-science-choking
 writer: writer-sports-science
 ---

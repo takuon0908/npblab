@@ -1,5 +1,5 @@
 ---
-title: "ファーム3地区制とは何か：2026年から2軍がイースタン・ウエスタンをやめた理由"
+title: "野球のルール入門：ファーム3地区制とは何か、イースタン・ウエスタン制度が変わった理由"
 slug: rules-basics-farm-3zone-2026
 writer: content-writer
 ---

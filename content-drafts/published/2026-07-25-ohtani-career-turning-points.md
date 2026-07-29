@@ -1,5 +1,5 @@
 ---
-title: "手術からわずか1カ月 ― 大谷翔平はなぜ「あの年」にメジャーへ渡ったのか"
+title: "手術からわずか1カ月 ― 大谷翔平はなぜ2017年にメジャー移籍を決断したのか"
 slug: ohtani-career-turning-points
 writer: writer-baseball-otaku
 ---

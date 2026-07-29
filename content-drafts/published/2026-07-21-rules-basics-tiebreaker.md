@@ -1,5 +1,5 @@
 ---
-title: "野球のルール入門：タイブレークとは何か"
+title: "野球のルール入門：タイブレークとは何か、いつ・どんな条件で導入されるのか"
 slug: rules-basics-tiebreaker
 writer: writer-baseball-otaku
 ---

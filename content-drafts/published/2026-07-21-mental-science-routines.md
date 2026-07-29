@@ -1,5 +1,5 @@
 ---
-title: "ルーティンは験担ぎか機能か？ 決まった動作が集中を助ける仕組み"
+title: "野球選手のルーティンは験担ぎか機能か？ 決まった動作が集中を助ける仕組み"
 slug: mental-science-routines
 writer: writer-sports-science
 ---
