@@ -76,6 +76,24 @@ export async function getAllColumns(category?: string, tag?: string) {
   return all;
 }
 
+// meta descriptionをHTML本文から生成する。単純な文字数カットだと文の途中で
+// 切れて読みにくくなるため、「。」の文境界を優先して150字前後に収める
+export function excerptForMeta(bodyHtml: string, maxLength = 150): string {
+  const text = bodyHtml.replace(/<[^>]+>/g, "").trim();
+  if (text.length <= maxLength) return text;
+
+  const sentences = text.split("。");
+  let result = "";
+  for (const sentence of sentences) {
+    const candidate = result ? `${result}。${sentence}` : sentence;
+    if (candidate.length > maxLength) break;
+    result = candidate;
+  }
+  if (result) return `${result}。`;
+  // 最初の一文だけでmaxLengthを超える場合は文字数で打ち切る
+  return `${text.slice(0, maxLength)}…`;
+}
+
 export async function getColumnBySlug(slug: string) {
   const res = await getClient().getList<Column>({
     endpoint: "columns",

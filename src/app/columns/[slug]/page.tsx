@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getColumnBySlug, getColumns, getAllColumns, parseTags } from "@/lib/microcms";
+import { getColumnBySlug, getColumns, getAllColumns, parseTags, excerptForMeta } from "@/lib/microcms";
 import { formatDateJa } from "@/lib/date";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 import { GoodButton } from "@/components/GoodButton";
@@ -40,7 +40,7 @@ export async function generateMetadata({
     if (!column) return {};
     return {
       title: column.title,
-      description: column.body.replace(/<[^>]+>/g, "").slice(0, 120),
+      description: excerptForMeta(column.body),
       alternates: { canonical: `/columns/${slug}` },
     };
   } catch {
