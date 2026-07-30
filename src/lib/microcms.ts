@@ -95,6 +95,22 @@ export function excerptForMeta(bodyHtml: string, maxLength = 150): string {
   return `${text.slice(0, maxLength)}…`;
 }
 
+// 記事本文のh2見出しから目次(TOC)用の一覧を作る。microCMSのリッチエディタはh2に
+// 既にユニークなid("ha9513ebe96"等)を振っているため、それを再利用する(無ければ生成する)
+export function withHeadingAnchors(bodyHtml: string): { html: string; headings: { id: string; text: string }[] } {
+  const headings: { id: string; text: string }[] = [];
+  let index = 0;
+  const html = bodyHtml.replace(/<h2([^>]*)>([\s\S]*?)<\/h2>/g, (_match, attrs: string, inner: string) => {
+    const text = inner.replace(/<[^>]+>/g, "").trim();
+    const existingId = attrs.match(/\bid="([^"]+)"/)?.[1];
+    const id = existingId ?? `section-${index}`;
+    headings.push({ id, text });
+    index += 1;
+    return existingId ? `<h2${attrs}>${inner}</h2>` : `<h2${attrs} id="${id}">${inner}</h2>`;
+  });
+  return { html, headings };
+}
+
 export async function getColumnBySlug(slug: string) {
   const res = await getClient().getList<Column>({
     endpoint: "columns",

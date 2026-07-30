@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getColumnBySlug, getColumns, getAllColumns, parseTags, excerptForMeta } from "@/lib/microcms";
+import { getColumnBySlug, getColumns, getAllColumns, parseTags, excerptForMeta, withHeadingAnchors } from "@/lib/microcms";
 import { formatDateJa } from "@/lib/date";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 import { GoodButton } from "@/components/GoodButton";
@@ -64,16 +64,29 @@ export default async function ColumnPage({
   if (!column) notFound();
 
   const publishedDate = new Date(column.publishedAt);
+  const { html: bodyWithAnchors, headings } = withHeadingAnchors(column.body);
+  const pointSummary = excerptForMeta(column.body);
 
-  // 同じカテゴリ(先頭の1件)の記事を関連記事として表示する。2本未満ならセクション自体を出さない
+  // 関連記事は「同じカテゴリ」を優先し、枠が余ればタグが一致する記事で埋める。
+  // カテゴリだけだと同カテゴリ内に記事が少ない場合に関連記事自体が出なくなるため
   const affiliateProduct = getAffiliateProduct(column.slug);
 
   const relatedCategory = column.category?.[0];
+  const relatedTag = parseTags(column.tags)[0];
+  const seenSlugs = new Set([column.slug]);
   const relatedColumns = relatedCategory
-    ? (await getColumns(4, relatedCategory)).contents
-        .filter((c) => c.slug !== column.slug)
-        .slice(0, 3)
+    ? (await getColumns(6, relatedCategory)).contents.filter((c) => {
+        if (seenSlugs.has(c.slug)) return false;
+        seenSlugs.add(c.slug);
+        return true;
+      })
     : [];
+  // カテゴリ一致だけで3本埋まらない場合のみ、タグ一致で不足分を補う(microCMSへの余分な問い合わせを避ける)
+  if (relatedColumns.length < 3 && relatedTag) {
+    const tagMatches = (await getColumns(6, undefined, relatedTag)).contents.filter((c) => !seenSlugs.has(c.slug));
+    relatedColumns.push(...tagMatches);
+  }
+  relatedColumns.splice(3);
 
   const relatedTeamSlug = detectColumnTeamSlug(column);
   const relatedTeam = relatedTeamSlug
@@ -199,6 +212,39 @@ export default async function ColumnPage({
           )}
         </header>
 
+        <div
+          className="mb-8 p-5"
+          style={{ background: "var(--surface-2)", borderLeft: "3px solid var(--accent)" }}
+        >
+          <p className="flex items-center gap-2 text-xs font-semibold tracking-widest uppercase mb-2" style={{ color: "var(--accent)" }}>
+            <span aria-hidden style={{ width: 7, height: 7, background: "var(--accent)", flex: "none", transform: "rotate(45deg)" }} />
+            Point
+          </p>
+          <p className="text-sm leading-relaxed" style={{ color: "var(--ink)" }}>
+            {pointSummary}
+          </p>
+        </div>
+
+        {headings.length >= 3 && (
+          <nav className="mb-10 p-5" style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }} aria-label="目次">
+            <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: "var(--ink-muted)" }}>
+              目次
+            </p>
+            <ol className="space-y-2 text-sm">
+              {headings.map((h, i) => (
+                <li key={h.id}>
+                  <a href={`#${h.id}`} className="flex gap-2 hover:underline" style={{ color: "var(--ink-secondary)" }}>
+                    <span className="tabular-nums" style={{ color: "var(--accent)" }}>
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    {h.text}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )}
+
         <div style={{ borderTop: "1px solid var(--border)" }} className="mb-10" />
 
         <div
@@ -216,7 +262,7 @@ export default async function ColumnPage({
               "--tw-prose-kbd": "var(--ink)",
             } as React.CSSProperties
           }
-          dangerouslySetInnerHTML={{ __html: column.body }}
+          dangerouslySetInnerHTML={{ __html: bodyWithAnchors }}
         />
 
         {affiliateProduct && (
