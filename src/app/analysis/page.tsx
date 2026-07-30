@@ -3,6 +3,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ProspectCategory, Level } from "@prisma/client";
 import { Table, Th, Td } from "@/components/Table";
+import { RankBar } from "@/components/RankBar";
 import { latestPerPlayer } from "@/lib/latestPerPlayer";
 import { calcFipConstant, calcFip, calcWoba, calcWhip, calcKPercent, calcBBPercent } from "@/lib/sabermetrics";
 import { teamAbbr } from "@/lib/teamAbbr";
@@ -178,7 +179,10 @@ export default async function AnalysisPage() {
                   {r.category === ProspectCategory.BATTING ? r.rawStat.toFixed(3) : r.rawStat.toFixed(2)}
                 </Td>
                 <Td align="right">
-                  <span className="font-semibold">{r.value.toFixed(2)}</span>
+                  <div className="flex flex-col items-end gap-1.5">
+                    <span className="font-semibold">{r.value.toFixed(2)}</span>
+                    <RankBar ratio={rows[0].value > 0 ? r.value / rows[0].value : 0} />
+                  </div>
                 </Td>
               </tr>
             ))}
@@ -230,7 +234,10 @@ export default async function AnalysisPage() {
                         </Link>
                       </Td>
                       <Td align="right">
-                        <span className="font-semibold text-base">{b.woba.toFixed(3)}</span>
+                        <div className="flex flex-col items-end gap-1.5">
+                          <span className="font-semibold text-base">{b.woba.toFixed(3)}</span>
+                          <RankBar ratio={b.woba / sabermetrics.wobaLeaders[0].woba} />
+                        </div>
                       </Td>
                     </tr>
                   ))}
@@ -273,7 +280,10 @@ export default async function AnalysisPage() {
                         </Link>
                       </Td>
                       <Td align="right">
-                        <span className="font-semibold text-base">{p.fip.toFixed(2)}</span>
+                        <div className="flex flex-col items-end gap-1.5">
+                          <span className="font-semibold text-base">{p.fip.toFixed(2)}</span>
+                          <RankBar ratio={sabermetrics.fipLeaders[0].fip / p.fip} />
+                        </div>
                       </Td>
                     </tr>
                   ))}
@@ -327,7 +337,10 @@ export default async function AnalysisPage() {
                         </Link>
                       </Td>
                       <Td align="right">
-                        <span className="font-semibold text-base">{p.whip.toFixed(2)}</span>
+                        <div className="flex flex-col items-end gap-1.5">
+                          <span className="font-semibold text-base">{p.whip.toFixed(2)}</span>
+                          <RankBar ratio={sabermetrics.whipLeaders[0].whip / p.whip} />
+                        </div>
                       </Td>
                     </tr>
                   ))}
@@ -370,7 +383,10 @@ export default async function AnalysisPage() {
                         </Link>
                       </Td>
                       <Td align="right">
-                        <span className="font-semibold text-base">{(b.kPercent * 100).toFixed(1)}%</span>
+                        <div className="flex flex-col items-end gap-1.5">
+                          <span className="font-semibold text-base">{(b.kPercent * 100).toFixed(1)}%</span>
+                          <RankBar ratio={sabermetrics.kPercentLeaders[0].kPercent / b.kPercent} />
+                        </div>
                       </Td>
                     </tr>
                   ))}
@@ -413,7 +429,10 @@ export default async function AnalysisPage() {
                         </Link>
                       </Td>
                       <Td align="right">
-                        <span className="font-semibold text-base">{(b.bbPercent * 100).toFixed(1)}%</span>
+                        <div className="flex flex-col items-end gap-1.5">
+                          <span className="font-semibold text-base">{(b.bbPercent * 100).toFixed(1)}%</span>
+                          <RankBar ratio={b.bbPercent / sabermetrics.bbPercentLeaders[0].bbPercent} />
+                        </div>
                       </Td>
                     </tr>
                   ))}

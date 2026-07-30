@@ -3,6 +3,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { TitleCategory, Level } from "@prisma/client";
 import { Table, Th, Td } from "@/components/Table";
+import { RankBar } from "@/components/RankBar";
 import { latestPerPlayer } from "@/lib/latestPerPlayer";
 import { teamAbbr } from "@/lib/teamAbbr";
 import { TEAM_THEME } from "@/lib/teamTheme";
@@ -198,7 +199,10 @@ export default async function TitlesPage() {
                             </div>
                           </Td>
                           <Td align="right" muted>
-                            {(row.probability * 100).toFixed(1)}%
+                            <div className="flex flex-col items-end gap-1.5">
+                              <span>{(row.probability * 100).toFixed(1)}%</span>
+                              <RankBar ratio={row.probability} />
+                            </div>
                           </Td>
                         </tr>
                       ))}
@@ -280,7 +284,10 @@ export default async function TitlesPage() {
                           </Link>
                         </Td>
                         <Td align="right">
-                          <span className="font-semibold text-base">{b.avg.toFixed(3)}</span>
+                          <div className="flex flex-col items-end gap-1.5">
+                            <span className="font-semibold text-base">{b.avg.toFixed(3)}</span>
+                            <RankBar ratio={b.avg / rateStats.qualifiedBatters[0].avg} />
+                          </div>
                         </Td>
                       </tr>
                     ))}
@@ -324,7 +331,10 @@ export default async function TitlesPage() {
                           </Link>
                         </Td>
                         <Td align="right">
-                          <span className="font-semibold text-base">{p.era.toFixed(2)}</span>
+                          <div className="flex flex-col items-end gap-1.5">
+                            <span className="font-semibold text-base">{p.era.toFixed(2)}</span>
+                            <RankBar ratio={rateStats.qualifiedPitchers[0].era / p.era} />
+                          </div>
                         </Td>
                       </tr>
                     ))}

@@ -106,6 +106,37 @@ input:focus-visible {
   font-weight: 600;
 }
 
+/* ランキング表の数値に添えるバー(RankBarコンポーネント)。
+   フラッドライトが照らすような発光感(box-shadow)を軽く効かせ、ナイターのコンセプトに寄せている。
+   初回表示時に0%から伸びるアニメーションを付け、数字の大小を視覚的に印象づける */
+.rank-bar-track {
+  position: relative;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--accent-track);
+  overflow: hidden;
+}
+
+.rank-bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent-deep), var(--accent));
+  box-shadow: 0 0 6px 0 rgba(240, 168, 60, 0.55);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .rank-bar-fill {
+    animation: rank-bar-grow 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+@keyframes rank-bar-grow {
+  from {
+    width: 0;
+  }
+}
+
 /* アフィリエイト広告を含む記事の冒頭に表示するPR表記(ステマ規制対応) */
 .pr-disclosure {
   display: inline-block;
