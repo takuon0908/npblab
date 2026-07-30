@@ -50,7 +50,7 @@ export default async function ProspectsPage() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
-      <h1 className="text-2xl font-bold mb-2">2軍注目選手</h1>
+      <h1 className="text-2xl font-black mb-2">2軍注目選手</h1>
       <p className="text-sm mb-8" style={{ color: "var(--ink-secondary)" }}>
         2軍成績を、同シーズンの1軍・2軍のリーグ平均差から算出した係数で「1軍換算」した参考値です。
         球場補正や対戦相手の強さは考慮していない粗い推計であり、特定選手の昇格後の成績を保証するものではありません。
@@ -82,7 +82,7 @@ export default async function ProspectsPage() {
               </thead>
               <tbody>
                 {data.batters.map((p) => (
-                  <tr key={p.playerId} className="hover:bg-black/[0.03]">
+                  <tr key={p.playerId} className="hover:bg-white/[0.05]">
                     <Td>
                       <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
                         {p.rank}
@@ -130,7 +130,7 @@ export default async function ProspectsPage() {
               </thead>
               <tbody>
                 {data.pitchers.map((p) => (
-                  <tr key={p.playerId} className="hover:bg-black/[0.03]">
+                  <tr key={p.playerId} className="hover:bg-white/[0.05]">
                     <Td>
                       <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
                         {p.rank}

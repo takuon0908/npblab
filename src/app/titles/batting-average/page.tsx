@@ -35,7 +35,7 @@ export default async function BattingAverageRankingPage() {
           タイトルレース
         </Link>
       </p>
-      <h1 className="text-2xl font-bold mb-2">打率ランキング（全選手）</h1>
+      <h1 className="text-2xl font-black mb-2">打率ランキング（全選手）</h1>
       <p className="text-sm mb-8" style={{ color: "var(--ink-secondary)" }}>
         規定打席未到達の選手も含む、今シーズン打数のある全選手（{batters.length}人）の打率一覧です。
       </p>
@@ -52,7 +52,7 @@ export default async function BattingAverageRankingPage() {
         </thead>
         <tbody>
           {batters.map((b, i) => (
-            <tr key={b.playerId} className="hover:bg-black/[0.03]">
+            <tr key={b.playerId} className="hover:bg-white/[0.05]">
               <Td align="right" muted>
                 {i + 1}
               </Td>

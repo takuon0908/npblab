@@ -35,7 +35,7 @@ export default async function EraRankingPage() {
           タイトルレース
         </Link>
       </p>
-      <h1 className="text-2xl font-bold mb-2">防御率ランキング（全選手）</h1>
+      <h1 className="text-2xl font-black mb-2">防御率ランキング（全選手）</h1>
       <p className="text-sm mb-8" style={{ color: "var(--ink-secondary)" }}>
         規定投球回未到達の選手も含む、今シーズン登板のある全投手（{pitchers.length}人）の防御率一覧です。
       </p>
@@ -52,7 +52,7 @@ export default async function EraRankingPage() {
         </thead>
         <tbody>
           {pitchers.map((p, i) => (
-            <tr key={p.playerId} className="hover:bg-black/[0.03]">
+            <tr key={p.playerId} className="hover:bg-white/[0.05]">
               <Td align="right" muted>
                 {i + 1}
               </Td>

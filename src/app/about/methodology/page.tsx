@@ -20,7 +20,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 export default function MethodologyPage() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
-      <h1 className="text-2xl font-bold mb-2">算出方法について</h1>
+      <h1 className="text-2xl font-black mb-2">算出方法について</h1>
       <p className="text-sm mb-10" style={{ color: "var(--ink-secondary)" }}>
         当サイトの確率・指標はすべて、公開されている試合結果・成績データをもとにした独自の分析・試算です。
         NPB公式の見解や予測ではありません。

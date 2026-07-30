@@ -33,8 +33,8 @@ export default async function ColumnsRankingPage() {
         </Link>
       </p>
       <h1
-        className="text-2xl font-bold mb-2 sm:text-3xl"
-        style={{ fontFamily: "var(--font-shippori-mincho)" }}
+        className="text-2xl font-black mb-2 sm:text-3xl"
+        style={{ fontFamily: "var(--font-heading)" }}
       >
         人気記事ランキング
       </h1>
@@ -57,7 +57,7 @@ export default async function ColumnsRankingPage() {
           </thead>
           <tbody>
             {ranked.map((c, i) => (
-              <tr key={c.id} className="hover:bg-black/[0.03]">
+              <tr key={c.id} className="hover:bg-white/[0.05]">
                 <Td align="right" muted>
                   {i + 1}
                 </Td>

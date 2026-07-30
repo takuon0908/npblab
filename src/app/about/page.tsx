@@ -39,7 +39,7 @@ export default function AboutPage() {
       {/* eslint-disable-next-line react/no-danger */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }} />
 
-      <h1 className="text-2xl font-bold mb-10">このサイトについて</h1>
+      <h1 className="text-2xl font-black mb-10">このサイトについて</h1>
 
       <section id="author" className="mb-10 scroll-mt-20">
         <h2 className="font-semibold text-lg mb-4">運営者について</h2>
@@ -56,7 +56,7 @@ export default function AboutPage() {
             style={{ width: 96, height: 96 }}
           />
           <div>
-            <p className="font-bold text-lg mb-0.5" style={{ fontFamily: "var(--font-shippori-mincho)" }}>
+            <p className="font-bold text-lg mb-0.5" style={{ fontFamily: "var(--font-heading)" }}>
               {SITE_AUTHOR.name}({SITE_AUTHOR.nickname})
             </p>
             <p className="text-xs mb-3" style={{ color: "var(--ink-muted)" }}>

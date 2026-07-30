@@ -150,7 +150,7 @@ export default async function InningsAnalysisPage() {
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-16">
-      <h1 className="text-2xl font-bold mb-2">イニング別 得点・失点傾向</h1>
+      <h1 className="text-2xl font-black mb-2">イニング別 得点・失点傾向</h1>
       <p className="text-sm mb-10" style={{ color: "var(--ink-secondary)" }}>
         今シーズンの全試合を回ごとに分解し、球団別の平均得点・平均失点を独自に集計。序盤に強いのか終盤に強いのか、リリーフ陣が終盤に踏ん張れているかといった傾向が見える。「延長」は10回以降の合計。
       </p>

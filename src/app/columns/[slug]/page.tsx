@@ -145,8 +145,8 @@ export default async function ColumnPage({
             Column
           </p>
           <h1
-            className="text-[1.75rem] leading-tight font-bold mb-4 sm:text-3xl"
-            style={{ fontFamily: "var(--font-shippori-mincho)", textWrap: "balance" }}
+            className="text-[1.75rem] leading-tight font-black mb-4 sm:text-3xl"
+            style={{ fontFamily: "var(--font-heading)", textWrap: "balance" }}
           >
             {column.title}
           </h1>
@@ -212,6 +212,8 @@ export default async function ColumnPage({
               "--tw-prose-quotes": "var(--ink-secondary)",
               "--tw-prose-quote-borders": "var(--border)",
               "--tw-prose-hr": "var(--border)",
+              "--tw-prose-code": "var(--ink)",
+              "--tw-prose-kbd": "var(--ink)",
             } as React.CSSProperties
           }
           dangerouslySetInnerHTML={{ __html: column.body }}
@@ -249,7 +251,7 @@ export default async function ColumnPage({
             <p className="text-xs mb-0.5" style={{ color: "var(--ink-muted)" }}>
               この記事を書いた人
             </p>
-            <p className="font-semibold" style={{ fontFamily: "var(--font-shippori-mincho)" }}>
+            <p className="font-semibold" style={{ fontFamily: "var(--font-heading)" }}>
               {SITE_AUTHOR.name}({SITE_AUTHOR.nickname}) ・ {SITE_AUTHOR.jobTitle}
             </p>
           </div>
@@ -259,7 +261,7 @@ export default async function ColumnPage({
       {relatedTeam && relatedTeamTheme && (
         <Link
           href={`/teams/${relatedTeam.slug}`}
-          className="group mt-10 flex items-center justify-between gap-3 rounded-none px-4 py-3 transition-colors hover:bg-black/[0.02]"
+          className="group mt-10 flex items-center justify-between gap-3 rounded-none px-4 py-3 transition-colors hover:bg-white/[0.04]"
           style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
         >
           <div className="flex items-center gap-3">
@@ -268,7 +270,7 @@ export default async function ColumnPage({
               <p className="text-xs" style={{ color: "var(--ink-muted)" }}>
                 この記事に関連する球団
               </p>
-              <p className="font-semibold" style={{ fontFamily: "var(--font-shippori-mincho)" }}>
+              <p className="font-semibold" style={{ fontFamily: "var(--font-heading)" }}>
                 {relatedTeam.name}
               </p>
             </div>
@@ -285,7 +287,7 @@ export default async function ColumnPage({
       {relatedColumns.length >= 2 && (
         <section className="mt-14 pt-8" style={{ borderTop: "1px solid var(--border)" }}>
           <h2 className="flex items-center gap-2 text-sm font-semibold mb-4" style={{ color: "var(--ink)" }}>
-            <span aria-hidden style={{ width: 9, height: 9, background: "var(--accent)", flex: "none" }} />
+            <span aria-hidden style={{ width: 9, height: 9, background: "var(--accent)", flex: "none", transform: "rotate(45deg)" }} />
             関連記事
           </h2>
           <div className="grid gap-5 sm:grid-cols-2">
@@ -305,7 +307,7 @@ export default async function ColumnPage({
                   </p>
                   <h3
                     className="mb-1 leading-snug group-hover:underline"
-                    style={{ fontFamily: "var(--font-shippori-mincho)", fontWeight: 700 }}
+                    style={{ fontFamily: "var(--font-heading)", fontWeight: 700 }}
                   >
                     {c.title}
                   </h3>

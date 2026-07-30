@@ -142,7 +142,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
           {player.team.name}
         </Link>
       </p>
-      <h1 className="text-2xl font-bold mb-8">{player.playerName}</h1>
+      <h1 className="text-2xl font-black mb-8">{player.playerName}</h1>
 
       {!player.currentBatting && !player.currentPitching && (
         <p className="text-sm mb-8" style={{ color: "var(--ink-secondary)" }}>
@@ -305,7 +305,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
                 </thead>
                 <tbody>
                   {player.battingHistory.map((b) => (
-                    <tr key={`${b.season}-${b.level}`} className="hover:bg-black/[0.03]">
+                    <tr key={`${b.season}-${b.level}`} className="hover:bg-white/[0.05]">
                       <Td>
                         {b.season}年
                         <span className="text-xs ml-1" style={{ color: "var(--ink-muted)" }}>
@@ -338,7 +338,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
                 </thead>
                 <tbody>
                   {player.pitchingHistory.map((p) => (
-                    <tr key={`${p.season}-${p.level}`} className="hover:bg-black/[0.03]">
+                    <tr key={`${p.season}-${p.level}`} className="hover:bg-white/[0.05]">
                       <Td>
                         {p.season}年
                         <span className="text-xs ml-1" style={{ color: "var(--ink-muted)" }}>

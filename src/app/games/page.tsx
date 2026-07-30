@@ -61,7 +61,7 @@ export default async function GamesPage() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
-      <h1 className="text-2xl font-bold mb-2">試合結果</h1>
+      <h1 className="text-2xl font-black mb-2">試合結果</h1>
       <p className="text-sm mb-8" style={{ color: "var(--ink-secondary)" }}>
         直近{DAYS_TO_SHOW}試合日分の結果です。
       </p>

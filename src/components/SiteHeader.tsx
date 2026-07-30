@@ -13,7 +13,7 @@ export async function SiteHeader() {
           <Link
             href="/"
             className="whitespace-nowrap"
-            style={{ fontFamily: "var(--font-shippori-mincho)", fontWeight: 700, fontSize: "1.35rem", letterSpacing: "0.01em" }}
+            style={{ fontFamily: "var(--font-heading)", fontWeight: 800, fontSize: "1.35rem", letterSpacing: "0.01em" }}
           >
             プロ野球LAB
           </Link>

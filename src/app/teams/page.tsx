@@ -72,7 +72,7 @@ export default async function TeamsPage() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
-      <h1 className="text-2xl font-bold mb-6">球団別 優勝確率</h1>
+      <h1 className="text-2xl font-black mb-6">球団別 優勝確率</h1>
 
       {rows.every((r) => !r.standing) ? (
         <p className="text-sm" style={{ color: "var(--ink-secondary)" }}>
@@ -119,7 +119,7 @@ function LeagueTable({
         </thead>
         <tbody>
           {rows.map(({ team, standing, championship, probabilityDelta }) => (
-            <tr key={team.id} className="hover:bg-black/[0.03]">
+            <tr key={team.id} className="hover:bg-white/[0.05]">
               <Td>
                 <Link href={`/teams/${team.slug}`} className="hover:underline inline-flex items-center gap-2">
                   <span

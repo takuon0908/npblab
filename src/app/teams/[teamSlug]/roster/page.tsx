@@ -71,7 +71,7 @@ function BattingTable({ rows, level }: { rows: Awaited<ReturnType<typeof getRost
         </thead>
         <tbody>
           {rows.map((b) => (
-            <tr key={b.playerId} className="hover:bg-black/[0.03]">
+            <tr key={b.playerId} className="hover:bg-white/[0.05]">
               <Td>
                 <Link href={`/players/${b.playerId}`} className="hover:underline">
                   {b.playerName}
@@ -116,7 +116,7 @@ function PitchingTable({ rows, level }: { rows: Awaited<ReturnType<typeof getRos
         </thead>
         <tbody>
           {rows.map((p) => (
-            <tr key={p.playerId} className="hover:bg-black/[0.03]">
+            <tr key={p.playerId} className="hover:bg-white/[0.05]">
               <Td>
                 <Link href={`/players/${p.playerId}`} className="hover:underline">
                   {p.playerName}
@@ -156,7 +156,7 @@ export default async function TeamRosterPage({ params }: { params: Promise<{ tea
           {team.name}
         </Link>
       </p>
-      <h1 className="text-2xl font-bold mb-2">{team.name} 全選手成績</h1>
+      <h1 className="text-2xl font-black mb-2">{team.name} 全選手成績</h1>
       <p className="text-sm mb-8" style={{ color: "var(--ink-secondary)" }}>
         今シーズン出場のあった全選手（1軍・2軍）の成績一覧です。選手名から個人ページに移動できます。
       </p>

@@ -2,22 +2,27 @@
 @plugin "@tailwindcss/typography";
 
 :root {
-  /* 号外・スポーツ報知風：ニュースプリント地に黒罫線、見出し赤 */
-  --page: #eeece4;
-  --surface: #ffffff;
-  --ink: #161513;
-  --ink-secondary: #4a4945;
-  --ink-muted: #65635c;
-  --border: rgba(22, 21, 19, 0.14);
-  --border-strong: var(--ink);
-  --gridline: #d8d5c9;
+  /* ナイター：深いネイビーの夜空にフラッドライトのアンバーが灯るスコアラボ */
+  --page: #0d1a26;
+  --surface: #142433;
+  --surface-2: #1b2f40;
+  --ink: #eee8d9;
+  --ink-secondary: #c9c2ae;
+  --ink-muted: #8fa3b0;
+  --border: #2c4152;
+  --border-strong: #3c5568;
+  --gridline: #23384a;
 
-  --accent: #c31f2d;
-  --accent-deep: #7c1219;
-  --accent-track: #f7dee1;
-  --good: #0ca30c;
-  --good-soft: #d9f2d9;
-  --critical: #d03b3b;
+  --accent: #f0a83c;
+  --accent-deep: #c9822a;
+  --accent-track: rgba(240, 168, 60, 0.16);
+
+  --turf: #5a8f6b;
+  --turf-track: rgba(90, 143, 107, 0.18);
+
+  --good: #5a8f6b;
+  --good-soft: rgba(90, 143, 107, 0.18);
+  --critical: #e0645a;
 
   --background: var(--page);
   --foreground: var(--ink);
@@ -30,7 +35,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* サイトのブランドとして常に白背景に統一する（OSのダークモード設定に追従しない） */
+/* サイトのブランドとして常にダークトーン（ネイビー×アンバー）に統一する（OSのダークモード設定に追従しない） */
 
 body {
   background: var(--background);

@@ -86,8 +86,8 @@ export default async function ColumnsPage({
         Column
       </p>
       <h1
-        className="text-2xl font-bold mb-3 sm:text-3xl"
-        style={{ fontFamily: "var(--font-shippori-mincho)" }}
+        className="text-2xl font-black mb-3 sm:text-3xl"
+        style={{ fontFamily: "var(--font-heading)" }}
       >
         コラム
       </h1>
@@ -106,7 +106,7 @@ export default async function ColumnsPage({
           className="rounded-full px-3 py-1 text-xs font-medium"
           style={
             !category
-              ? { background: "var(--accent)", color: "#fff" }
+              ? { background: "var(--accent)", color: "#1a1208" }
               : { border: "1px solid var(--border)", color: "var(--ink-secondary)" }
           }
         >
@@ -119,7 +119,7 @@ export default async function ColumnsPage({
             className="rounded-full px-3 py-1 text-xs font-medium"
             style={
               category === c
-                ? { background: "var(--accent)", color: "#fff" }
+                ? { background: "var(--accent)", color: "#1a1208" }
                 : { border: "1px solid var(--border)", color: "var(--ink-secondary)" }
             }
           >
@@ -159,7 +159,7 @@ export default async function ColumnsPage({
                 </p>
                 <h2
                   className="text-xl mb-2 leading-snug group-hover:underline sm:text-2xl"
-                  style={{ fontFamily: "var(--font-shippori-mincho)", fontWeight: 700, textWrap: "balance" }}
+                  style={{ fontFamily: "var(--font-heading)", fontWeight: 700, textWrap: "balance" }}
                 >
                   {hero.title}
                 </h2>
@@ -178,7 +178,7 @@ export default async function ColumnsPage({
           {rest.length > 0 && (
             <section>
               <h2 className="flex items-center gap-2 text-sm font-semibold mb-4" style={{ color: "var(--ink)" }}>
-                <span aria-hidden style={{ width: 9, height: 9, background: "var(--accent)", flex: "none" }} />
+                <span aria-hidden style={{ width: 9, height: 9, background: "var(--accent)", flex: "none", transform: "rotate(45deg)" }} />
                 {showHero ? "新着記事" : "記事一覧"}
               </h2>
               <div className="grid gap-5 sm:grid-cols-2">
@@ -199,7 +199,7 @@ export default async function ColumnsPage({
                       </p>
                       <h3
                         className="mb-1 leading-snug group-hover:underline"
-                        style={{ fontFamily: "var(--font-shippori-mincho)", fontWeight: 700 }}
+                        style={{ fontFamily: "var(--font-heading)", fontWeight: 700 }}
                       >
                         {c.title}
                       </h3>

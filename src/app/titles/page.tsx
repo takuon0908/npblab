@@ -133,7 +133,7 @@ export default async function TitlesPage() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
-      <h1 className="text-2xl font-bold mb-6">タイトルレース</h1>
+      <h1 className="text-2xl font-black mb-6">タイトルレース</h1>
 
       {!byCategory ? (
         <p className="text-sm" style={{ color: "var(--ink-secondary)" }}>
@@ -171,7 +171,7 @@ export default async function TitlesPage() {
                     </thead>
                     <tbody>
                       {rows.map((row, i) => (
-                        <tr key={row.playerId} className="hover:bg-black/[0.03]">
+                        <tr key={row.playerId} className="hover:bg-white/[0.05]">
                           <Td>
                             <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
                               {i + 1}
@@ -263,7 +263,7 @@ export default async function TitlesPage() {
                   </thead>
                   <tbody>
                     {rateStats.qualifiedBatters.map((b, i) => (
-                      <tr key={b.playerId} className="hover:bg-black/[0.03]">
+                      <tr key={b.playerId} className="hover:bg-white/[0.05]">
                         <Td>
                           <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
                             {i + 1}
@@ -307,7 +307,7 @@ export default async function TitlesPage() {
                   </thead>
                   <tbody>
                     {rateStats.qualifiedPitchers.map((p, i) => (
-                      <tr key={p.playerId} className="hover:bg-black/[0.03]">
+                      <tr key={p.playerId} className="hover:bg-white/[0.05]">
                         <Td>
                           <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
                             {i + 1}

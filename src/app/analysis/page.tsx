@@ -110,7 +110,7 @@ export default async function AnalysisPage() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
-      <h1 className="text-2xl font-bold mb-2">独自指標</h1>
+      <h1 className="text-2xl font-black mb-2">独自指標</h1>
       <p className="text-sm mb-1" style={{ color: "var(--ink-secondary)" }}>
         <strong>LABバリュー</strong>
         は、1軍の打者・投手を「リーグ平均をどれだけ上回ったか」という同じ物差しで比較する当サイト独自の貢献度指数です。
@@ -149,7 +149,7 @@ export default async function AnalysisPage() {
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.playerId} className="hover:bg-black/[0.03]">
+              <tr key={r.playerId} className="hover:bg-white/[0.05]">
                 <Td>
                   <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
                     {r.rank}
@@ -213,7 +213,7 @@ export default async function AnalysisPage() {
                 </thead>
                 <tbody>
                   {sabermetrics.wobaLeaders.map((b, i) => (
-                    <tr key={b.playerId} className="hover:bg-black/[0.03]">
+                    <tr key={b.playerId} className="hover:bg-white/[0.05]">
                       <Td>
                         <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
                           {i + 1}
@@ -256,7 +256,7 @@ export default async function AnalysisPage() {
                 </thead>
                 <tbody>
                   {sabermetrics.fipLeaders.map((p, i) => (
-                    <tr key={p.playerId} className="hover:bg-black/[0.03]">
+                    <tr key={p.playerId} className="hover:bg-white/[0.05]">
                       <Td>
                         <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
                           {i + 1}
@@ -310,7 +310,7 @@ export default async function AnalysisPage() {
                 </thead>
                 <tbody>
                   {sabermetrics.whipLeaders.map((p, i) => (
-                    <tr key={p.playerId} className="hover:bg-black/[0.03]">
+                    <tr key={p.playerId} className="hover:bg-white/[0.05]">
                       <Td>
                         <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
                           {i + 1}
@@ -353,7 +353,7 @@ export default async function AnalysisPage() {
                 </thead>
                 <tbody>
                   {sabermetrics.kPercentLeaders.map((b, i) => (
-                    <tr key={b.playerId} className="hover:bg-black/[0.03]">
+                    <tr key={b.playerId} className="hover:bg-white/[0.05]">
                       <Td>
                         <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
                           {i + 1}
@@ -396,7 +396,7 @@ export default async function AnalysisPage() {
                 </thead>
                 <tbody>
                   {sabermetrics.bbPercentLeaders.map((b, i) => (
-                    <tr key={b.playerId} className="hover:bg-black/[0.03]">
+                    <tr key={b.playerId} className="hover:bg-white/[0.05]">
                       <Td>
                         <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
                           {i + 1}

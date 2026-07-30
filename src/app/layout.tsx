@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Shippori_Mincho } from "next/font/google";
+import { Geist, Geist_Mono, Zen_Kaku_Gothic_New } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -19,10 +19,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// コラム記事の見出し用。データページの機械的な数字表と、読み物であるコラムを書体で区別する
-const shipporiMincho = Shippori_Mincho({
-  variable: "--font-shippori-mincho",
-  weight: ["500", "700"],
+// 見出し用。「ナイター」コンセプトの力強いゴシック体
+const headingFont = Zen_Kaku_Gothic_New({
+  variable: "--font-heading",
+  weight: ["500", "700", "900"],
   subsets: ["latin"],
 });
 
@@ -61,7 +61,7 @@ export default function RootLayout({
   return (
     <html
       lang="ja"
-      className={`${geistSans.variable} ${geistMono.variable} ${shipporiMincho.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${headingFont.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {/* eslint-disable-next-line react/no-danger */}

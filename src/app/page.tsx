@@ -50,7 +50,7 @@ function HighlightGame({ game }: { game: NonNullable<Awaited<ReturnType<typeof g
       <p className="text-xs font-semibold mb-1.5" style={{ color: "var(--accent)" }}>
         今日の一戦 ・ {label}
       </p>
-      <p className="text-base font-bold group-hover:underline" style={{ fontFamily: "var(--font-shippori-mincho)" }}>
+      <p className="text-base font-bold group-hover:underline" style={{ fontFamily: "var(--font-heading)" }}>
         {game.awayTeam.name} {game.awayScore}-{game.homeScore} {game.homeTeam.name}
       </p>
       {game.winningPitcher && (
@@ -70,37 +70,48 @@ export default async function Home() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
-      <h1
-        className="text-4xl mb-2"
-        style={{ fontFamily: "var(--font-shippori-mincho)", fontWeight: 700, letterSpacing: "0.01em" }}
-      >
-        プロ野球LAB
-      </h1>
-      <p className="text-sm mb-10" style={{ color: "var(--ink-secondary)" }}>
-        野球を科学する。NPBのデータを独自に分析し、優勝確率・タイトル獲得確率を毎日更新します。
-      </p>
+      <div className="relative">
+        {/* ナイター照明が上から柔らかく当たっているような光彩。ヒーロー部分のみの控えめな演出 */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-80"
+          style={{
+            background:
+              "radial-gradient(ellipse at 50% 0%, rgba(240,168,60,0.14) 0%, rgba(240,168,60,0) 62%)",
+          }}
+        />
+        <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: "var(--accent)" }}>
+          プロ野球LAB
+        </p>
+        <h1
+          className="text-2xl mb-10 leading-snug sm:text-3xl"
+          style={{ fontFamily: "var(--font-heading)", fontWeight: 900, letterSpacing: "0.01em", textWrap: "balance" }}
+        >
+          野球を科学する。NPBのデータを独自に分析し、優勝確率・タイトル獲得確率を毎日更新します。
+        </h1>
 
-      {latestGames && latestGames.games.length > 0 && (
-        <section className="mb-10">
-          <div className="flex items-baseline justify-between mb-3">
-            <h2 className="flex items-center gap-2 font-semibold text-sm" style={{ color: "var(--ink)" }}>
-              <span aria-hidden style={{ width: 9, height: 9, background: "var(--accent)", flex: "none" }} />
-              {formatDateJa(latestGames.date)}の試合結果
-            </h2>
-            <Link href="/games" className="text-xs hover:underline" style={{ color: "var(--accent)" }}>
-              もっと見る →
-            </Link>
-          </div>
-          {highlightGame && <HighlightGame game={highlightGame} />}
-          <FavoriteAwareGameGrid games={latestGames.games} />
-        </section>
-      )}
+        {latestGames && latestGames.games.length > 0 && (
+          <section className="mb-10">
+            <div className="flex items-baseline justify-between mb-3">
+              <h2 className="flex items-center gap-2 font-semibold text-sm" style={{ color: "var(--ink)" }}>
+                <span aria-hidden style={{ width: 9, height: 9, background: "var(--accent)", flex: "none", transform: "rotate(45deg)" }} />
+                {formatDateJa(latestGames.date)}の試合結果
+              </h2>
+              <Link href="/games" className="text-xs hover:underline" style={{ color: "var(--accent)" }}>
+                もっと見る →
+              </Link>
+            </div>
+            {highlightGame && <HighlightGame game={highlightGame} />}
+            <FavoriteAwareGameGrid games={latestGames.games} />
+          </section>
+        )}
+      </div>
 
       {latestColumns.length > 0 && (
         <section className="mb-10">
           <div className="flex items-baseline justify-between mb-3">
             <h2 className="flex items-center gap-2 font-semibold text-sm" style={{ color: "var(--ink)" }}>
-              <span aria-hidden style={{ width: 9, height: 9, background: "var(--accent)", flex: "none" }} />
+              <span aria-hidden style={{ width: 9, height: 9, background: "var(--accent)", flex: "none", transform: "rotate(45deg)" }} />
               最新コラム
             </h2>
             <Link href="/columns" className="text-xs hover:underline" style={{ color: "var(--accent)" }}>
@@ -129,7 +140,7 @@ export default async function Home() {
                 </p>
                 <h3
                   className="text-xl mb-0 leading-snug group-hover:underline sm:text-2xl"
-                  style={{ fontFamily: "var(--font-shippori-mincho)", fontWeight: 700, textWrap: "balance" }}
+                  style={{ fontFamily: "var(--font-heading)", fontWeight: 800, textWrap: "balance" }}
                 >
                   {heroColumn.title}
                 </h3>
@@ -177,7 +188,7 @@ export default async function Home() {
             style={{ background: "var(--surface)", border: "1px solid var(--border-strong)" }}
           >
             <div className="flex items-center gap-2 font-semibold">
-              <span aria-hidden style={{ width: 9, height: 9, background: "var(--accent)", flex: "none" }} />
+              <span aria-hidden style={{ width: 9, height: 9, background: "var(--accent)", flex: "none", transform: "rotate(45deg)" }} />
               <span className="group-hover:underline">{s.label}</span>
             </div>
             <div className="text-sm mt-1.5" style={{ color: "var(--ink-secondary)" }}>

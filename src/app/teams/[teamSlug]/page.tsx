@@ -217,7 +217,7 @@ export default async function TeamPage({
           borderLeft: `5px solid ${teamAccent}`,
         }}
       >
-        <h1 className="text-2xl font-bold">{team.name}</h1>
+        <h1 className="text-2xl font-black">{team.name}</h1>
       </div>
 
       {trendData.length >= 2 && (
@@ -231,7 +231,7 @@ export default async function TeamPage({
         >
           <h2
             className="text-lg font-bold mb-4"
-            style={{ fontFamily: "var(--font-shippori-mincho)", color: "var(--ink)" }}
+            style={{ fontFamily: "var(--font-heading)", color: "var(--ink)" }}
           >
             優勝確率の推移
           </h2>
@@ -294,7 +294,7 @@ export default async function TeamPage({
               <Table>
                 <tbody>
                   {teamLeaders.avg && (
-                    <tr className="hover:bg-black/[0.03]">
+                    <tr className="hover:bg-white/[0.05]">
                       <Td muted>打率</Td>
                       <Td>
                         <Link href={`/players/${teamLeaders.avg.playerId}`} className="hover:underline">
@@ -307,7 +307,7 @@ export default async function TeamPage({
                     </tr>
                   )}
                   {teamLeaders.homeRuns && (
-                    <tr className="hover:bg-black/[0.03]">
+                    <tr className="hover:bg-white/[0.05]">
                       <Td muted>本塁打</Td>
                       <Td>
                         <Link href={`/players/${teamLeaders.homeRuns.playerId}`} className="hover:underline">
@@ -320,7 +320,7 @@ export default async function TeamPage({
                     </tr>
                   )}
                   {teamLeaders.rbi && (
-                    <tr className="hover:bg-black/[0.03]">
+                    <tr className="hover:bg-white/[0.05]">
                       <Td muted>打点</Td>
                       <Td>
                         <Link href={`/players/${teamLeaders.rbi.playerId}`} className="hover:underline">
@@ -333,7 +333,7 @@ export default async function TeamPage({
                     </tr>
                   )}
                   {teamLeaders.stolenBases && (
-                    <tr className="hover:bg-black/[0.03]">
+                    <tr className="hover:bg-white/[0.05]">
                       <Td muted>盗塁</Td>
                       <Td>
                         <Link href={`/players/${teamLeaders.stolenBases.playerId}`} className="hover:underline">
@@ -356,7 +356,7 @@ export default async function TeamPage({
               <Table>
                 <tbody>
                   {teamLeaders.era && (
-                    <tr className="hover:bg-black/[0.03]">
+                    <tr className="hover:bg-white/[0.05]">
                       <Td muted>防御率</Td>
                       <Td>
                         <Link href={`/players/${teamLeaders.era.playerId}`} className="hover:underline">
@@ -369,7 +369,7 @@ export default async function TeamPage({
                     </tr>
                   )}
                   {teamLeaders.wins && (
-                    <tr className="hover:bg-black/[0.03]">
+                    <tr className="hover:bg-white/[0.05]">
                       <Td muted>勝利</Td>
                       <Td>
                         <Link href={`/players/${teamLeaders.wins.playerId}`} className="hover:underline">
@@ -382,7 +382,7 @@ export default async function TeamPage({
                     </tr>
                   )}
                   {teamLeaders.strikeouts && (
-                    <tr className="hover:bg-black/[0.03]">
+                    <tr className="hover:bg-white/[0.05]">
                       <Td muted>奪三振</Td>
                       <Td>
                         <Link href={`/players/${teamLeaders.strikeouts.playerId}`} className="hover:underline">
@@ -395,7 +395,7 @@ export default async function TeamPage({
                     </tr>
                   )}
                   {teamLeaders.saves && (
-                    <tr className="hover:bg-black/[0.03]">
+                    <tr className="hover:bg-white/[0.05]">
                       <Td muted>セーブ</Td>
                       <Td>
                         <Link href={`/players/${teamLeaders.saves.playerId}`} className="hover:underline">
@@ -497,7 +497,7 @@ export default async function TeamPage({
                 </thead>
                 <tbody>
                   {yearlyStandings.map((s) => (
-                    <tr key={s.date.getFullYear()} className="hover:bg-black/[0.03]">
+                    <tr key={s.date.getFullYear()} className="hover:bg-white/[0.05]">
                       <Td>{s.date.getFullYear()}年</Td>
                       <Td align="right" muted>
                         {s.wins}勝{s.losses}敗{s.draws}分
@@ -519,7 +519,7 @@ export default async function TeamPage({
           <h2 className="flex items-center gap-2 text-sm font-semibold mb-4" style={{ color: "var(--ink)" }}>
             <span
               aria-hidden
-              style={{ width: 9, height: 9, background: TEAM_THEME[team.slug]?.accent ?? "var(--accent)", flex: "none" }}
+              style={{ width: 9, height: 9, background: TEAM_THEME[team.slug]?.accent ?? "var(--accent)", flex: "none", transform: "rotate(45deg)" }}
             />
             {team.name}に関連するコラム
           </h2>
@@ -540,7 +540,7 @@ export default async function TeamPage({
                   </p>
                   <h3
                     className="mb-1 leading-snug group-hover:underline"
-                    style={{ fontFamily: "var(--font-shippori-mincho)", fontWeight: 700 }}
+                    style={{ fontFamily: "var(--font-heading)", fontWeight: 700 }}
                   >
                     {c.title}
                   </h3>
