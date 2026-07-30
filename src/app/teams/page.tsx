@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { League } from "@prisma/client";
-import { Meter } from "@/components/Meter";
 import { GamesAboveBelow500 } from "@/components/GamesAboveBelow500";
 import { Table, Th, Td } from "@/components/Table";
+import { RankBar } from "@/components/RankBar";
 import { calcMagicNumber } from "@/lib/baseball";
 import { TEAM_THEME } from "@/lib/teamTheme";
 
@@ -149,9 +149,12 @@ function LeagueTable({
               </Td>
               <Td align="right">
                 {championship ? (
-                  <div className="flex items-center justify-end gap-2">
-                    <ProbabilityDelta delta={probabilityDelta} />
-                    <span className="font-semibold">{(championship.probability * 100).toFixed(1)}%</span>
+                  <div className="flex flex-col items-end gap-1.5">
+                    <div className="flex items-center gap-2">
+                      <ProbabilityDelta delta={probabilityDelta} />
+                      <span className="font-semibold">{(championship.probability * 100).toFixed(1)}%</span>
+                    </div>
+                    <RankBar ratio={championship.probability} />
                   </div>
                 ) : (
                   "-"

@@ -6,6 +6,8 @@ import { FavoriteAwareGameGrid } from "@/components/FavoriteAwareGameGrid";
 import { getColumns } from "@/lib/microcms";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 import { TEAM_THEME } from "@/lib/teamTheme";
+import { prisma } from "@/lib/prisma";
+import { TitleCategory, ProspectCategory } from "@prisma/client";
 
 function stripHtml(html: string): string {
   return html.replace(/<[^>]+>/g, "").trim();
@@ -17,12 +19,17 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-const sections = [
-  { href: "/teams", label: "球団別 優勝確率", desc: "残り試合シミュレーションによる優勝確率の推移" },
-  { href: "/titles", label: "タイトルレース", desc: "打者・投手タイトルの獲得確率を日次更新" },
-  { href: "/prospects", label: "2軍注目選手", desc: "2軍成績を1軍換算した昇格候補ランキング" },
-  { href: "/analysis", label: "独自指標", desc: "LABバリューMVPランキングなど" },
-  { href: "/columns", label: "コラム", desc: "分析記事・考察" },
+const sections: {
+  href: string;
+  label: string;
+  desc: string;
+  teaserKey: "teams" | "titles" | "prospects" | "analysis" | "columns";
+}[] = [
+  { href: "/teams", label: "球団別 優勝確率", desc: "残り試合シミュレーションによる優勝確率の推移", teaserKey: "teams" },
+  { href: "/titles", label: "タイトルレース", desc: "打者・投手タイトルの獲得確率を日次更新", teaserKey: "titles" },
+  { href: "/prospects", label: "2軍注目選手", desc: "2軍成績を1軍換算した昇格候補ランキング", teaserKey: "prospects" },
+  { href: "/analysis", label: "独自指標", desc: "LABバリューMVPランキングなど", teaserKey: "analysis" },
+  { href: "/columns", label: "コラム", desc: "分析記事・考察", teaserKey: "columns" },
 ];
 
 async function getLatestColumnsSafely() {
@@ -32,6 +39,57 @@ async function getLatestColumnsSafely() {
   } catch {
     // microCMS未設定のビルド環境でも失敗させない([slug]/page.tsxのgenerateStaticParamsと同じ考え方)
     return [];
+  }
+}
+
+// TOPページの導線カードに添える「今の一番」の生きた数字。取得できない項目はdescの静的文言にフォールバックする
+async function getSectionTeasers(): Promise<Record<string, string | null>> {
+  try {
+    const [champDate, titleDate, prospectDate, valueDate] = await Promise.all([
+      prisma.championshipProbability.aggregate({ _max: { date: true } }),
+      prisma.titleRaceProbability.aggregate({ _max: { date: true } }),
+      prisma.prospectRating.aggregate({ _max: { date: true } }),
+      prisma.playerValueRating.aggregate({ _max: { date: true } }),
+    ]);
+
+    const [topTeam, topTitle, topProspect, topValue] = await Promise.all([
+      champDate._max.date
+        ? prisma.championshipProbability.findFirst({
+            where: { date: champDate._max.date },
+            orderBy: { probability: "desc" },
+            include: { team: true },
+          })
+        : null,
+      titleDate._max.date
+        ? prisma.titleRaceProbability.findFirst({
+            where: { date: titleDate._max.date, category: TitleCategory.HOME_RUNS },
+            orderBy: { currentValue: "desc" },
+          })
+        : null,
+      prospectDate._max.date
+        ? prisma.prospectRating.findFirst({
+            where: { date: prospectDate._max.date, category: ProspectCategory.BATTING },
+            orderBy: { rank: "asc" },
+          })
+        : null,
+      valueDate._max.date
+        ? prisma.playerValueRating.findFirst({
+            where: { date: valueDate._max.date },
+            orderBy: { rank: "asc" },
+          })
+        : null,
+    ]);
+
+    return {
+      teams: topTeam ? `首位 ${topTeam.team.name} 優勝確率${(topTeam.probability * 100).toFixed(1)}%` : null,
+      titles: topTitle ? `本塁打王 ${topTitle.playerName} ${topTitle.currentValue}本` : null,
+      prospects: topProspect ? `1位 ${topProspect.playerName} 換算OPS ${topProspect.translatedValue.toFixed(3)}` : null,
+      analysis: topValue ? `MVP ${topValue.playerName} LABバリュー${topValue.value.toFixed(2)}` : null,
+      columns: null,
+    };
+  } catch {
+    // DB未接続のビルド環境でも失敗させない
+    return { teams: null, titles: null, prospects: null, analysis: null, columns: null };
   }
 }
 
@@ -64,7 +122,11 @@ function HighlightGame({ game }: { game: NonNullable<Awaited<ReturnType<typeof g
 }
 
 export default async function Home() {
-  const [latestGames, latestColumns] = await Promise.all([getLatestDayGames(), getLatestColumnsSafely()]);
+  const [latestGames, latestColumns, teasers] = await Promise.all([
+    getLatestDayGames(),
+    getLatestColumnsSafely(),
+    getSectionTeasers(),
+  ]);
   const highlightGame = latestGames ? pickClosestGame(latestGames.games) : null;
   const [heroColumn, ...restColumns] = latestColumns;
 
@@ -180,22 +242,31 @@ export default async function Home() {
       )}
 
       <div className="grid gap-4 sm:grid-cols-2">
-        {sections.map((s) => (
-          <Link
-            key={s.href}
-            href={s.href}
-            className="hover-lift group block rounded-none p-5"
-            style={{ background: "var(--surface)", border: "1px solid var(--border-strong)" }}
-          >
-            <div className="flex items-center gap-2 font-semibold">
-              <span aria-hidden style={{ width: 9, height: 9, background: "var(--accent)", flex: "none", transform: "rotate(45deg)" }} />
-              <span className="group-hover:underline">{s.label}</span>
-            </div>
-            <div className="text-sm mt-1.5" style={{ color: "var(--ink-secondary)" }}>
-              {s.desc}
-            </div>
-          </Link>
-        ))}
+        {sections.map((s) => {
+          const teaser = teasers[s.teaserKey];
+          return (
+            <Link
+              key={s.href}
+              href={s.href}
+              className="hover-lift group block rounded-none p-5"
+              style={{ background: "var(--surface)", border: "1px solid var(--border-strong)" }}
+            >
+              <div className="flex items-center gap-2 font-semibold">
+                <span aria-hidden style={{ width: 9, height: 9, background: "var(--accent)", flex: "none", transform: "rotate(45deg)" }} />
+                <span className="group-hover:underline">{s.label}</span>
+              </div>
+              {teaser ? (
+                <div className="text-sm mt-1.5 font-semibold tabular-nums" style={{ color: "var(--accent)" }}>
+                  {teaser}
+                </div>
+              ) : (
+                <div className="text-sm mt-1.5" style={{ color: "var(--ink-secondary)" }}>
+                  {s.desc}
+                </div>
+              )}
+            </Link>
+          );
+        })}
       </div>
     </main>
   );

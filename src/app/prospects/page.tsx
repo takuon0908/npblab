@@ -3,6 +3,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ProspectCategory } from "@prisma/client";
 import { Table, Th, Td } from "@/components/Table";
+import { RankBar } from "@/components/RankBar";
 import { teamAbbr } from "@/lib/teamAbbr";
 import { siteUrl } from "@/lib/siteUrl";
 
@@ -102,7 +103,10 @@ export default async function ProspectsPage() {
                       {p.nigunValue.toFixed(3)}
                     </Td>
                     <Td align="right">
-                      <span className="font-semibold">{p.translatedValue.toFixed(3)}</span>
+                      <div className="flex flex-col items-end gap-1.5">
+                        <span className="font-semibold">{p.translatedValue.toFixed(3)}</span>
+                        <RankBar ratio={p.translatedValue / data.batters[0].translatedValue} />
+                      </div>
                     </Td>
                   </tr>
                 ))}
@@ -150,7 +154,10 @@ export default async function ProspectsPage() {
                       {p.nigunValue.toFixed(2)}
                     </Td>
                     <Td align="right">
-                      <span className="font-semibold">{p.translatedValue.toFixed(2)}</span>
+                      <div className="flex flex-col items-end gap-1.5">
+                        <span className="font-semibold">{p.translatedValue.toFixed(2)}</span>
+                        <RankBar ratio={data.pitchers[0].translatedValue / p.translatedValue} />
+                      </div>
                     </Td>
                   </tr>
                 ))}
