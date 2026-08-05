@@ -1,5 +1,5 @@
 ---
-title: "野球のルール入門：CS「2勝」アドバンテージとは何か、いつ発動するのか(2026年新ルール)"
+title: "野球のルール入門：CS(クライマックスシリーズ)2026年新ルール ― 「2勝」アドバンテージとは何か"
 slug: rules-basics-cs-new-rule-2026
 writer: writer-baseball-otaku
 ---
