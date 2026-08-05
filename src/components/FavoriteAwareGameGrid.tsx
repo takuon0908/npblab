@@ -6,11 +6,12 @@ import { FAVORITE_TEAM_EVENT, getFavoriteTeam } from "@/lib/favoriteTeam";
 
 interface GameData {
   id: string;
-  homeTeam: { slug: string };
-  awayTeam: { slug: string };
+  homeTeam: { slug: string; name?: string };
+  awayTeam: { slug: string; name?: string };
   homeScore: number | null;
   awayScore: number | null;
   winningPitcher?: string | null;
+  losingPitcher?: string | null;
   savePitcher?: string | null;
   homeInnings?: number[];
   awayInnings?: number[];
@@ -20,7 +21,15 @@ interface GameData {
   awayErrors?: number | null;
 }
 
-export function FavoriteAwareGameGrid({ games, className }: { games: GameData[]; className?: string }) {
+export function FavoriteAwareGameGrid({
+  games,
+  className,
+  variant,
+}: {
+  games: GameData[];
+  className?: string;
+  variant?: "compact" | "scoreboard";
+}) {
   const [favoriteTeam, setFavoriteTeamState] = useState<string | null>(null);
 
   useEffect(() => {
@@ -50,6 +59,7 @@ export function FavoriteAwareGameGrid({ games, className }: { games: GameData[];
             homeScore={g.homeScore}
             awayScore={g.awayScore}
             winningPitcher={g.winningPitcher}
+            losingPitcher={g.losingPitcher}
             savePitcher={g.savePitcher}
             homeInnings={g.homeInnings}
             awayInnings={g.awayInnings}
@@ -57,6 +67,7 @@ export function FavoriteAwareGameGrid({ games, className }: { games: GameData[];
             homeErrors={g.homeErrors}
             awayHits={g.awayHits}
             awayErrors={g.awayErrors}
+            variant={variant}
           />
         </div>
       ))}

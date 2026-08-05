@@ -111,7 +111,8 @@ export default async function GamesPage() {
               </h2>
               <FavoriteAwareGameGrid
                 games={games}
-                className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 flex-1 min-w-0"
+                className="flex flex-col gap-2 flex-1 min-w-0"
+                variant="scoreboard"
               />
             </section>
           ))}
