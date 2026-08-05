@@ -17,16 +17,27 @@ function findPortrait(playerId: string): string | null {
   return null;
 }
 
-export function PlayerPortrait({ playerId, playerName }: { playerId: string; playerName: string }) {
+export function PlayerPortrait({
+  playerId,
+  playerName,
+  size = 96,
+  rounded = false,
+}: {
+  playerId: string;
+  playerName: string;
+  // ランキング表の行など小さく使う場所ではsize=32程度+rounded=trueを指定する
+  size?: number;
+  rounded?: boolean;
+}) {
   const src = findPortrait(playerId);
   if (!src) return null;
 
   return (
     <div
-      className="flex-none overflow-hidden rounded-none"
-      style={{ width: 96, height: 96, border: "1px solid var(--border-strong)", background: "var(--surface)" }}
+      className={`flex-none overflow-hidden ${rounded ? "rounded-full" : "rounded-none"}`}
+      style={{ width: size, height: size, border: "1px solid var(--border-strong)", background: "var(--surface)" }}
     >
-      <Image src={src} alt={playerName} width={96} height={96} style={{ objectFit: "cover", width: 96, height: 96 }} />
+      <Image src={src} alt={playerName} width={size} height={size} style={{ objectFit: "cover", width: size, height: size }} />
     </div>
   );
 }

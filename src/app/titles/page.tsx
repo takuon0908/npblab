@@ -7,9 +7,9 @@ import { RankBar } from "@/components/RankBar";
 import { PlayerSocialIcons } from "@/components/PlayerSocialLinks";
 import { getPlayerSocialLinks } from "@/lib/playerSocialLinks";
 import { latestPerPlayer } from "@/lib/latestPerPlayer";
-import { teamAbbr } from "@/lib/teamAbbr";
 import { TEAM_THEME } from "@/lib/teamTheme";
 import { siteUrl } from "@/lib/siteUrl";
+import { PlayerPortrait } from "@/components/PlayerPortrait";
 
 function TeamDot({ slug }: { slug: string }) {
   return (
@@ -137,7 +137,10 @@ export default async function TitlesPage() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
-      <h1 className="text-2xl font-black mb-6">タイトルレース</h1>
+      <h1 className="text-2xl font-black mb-2">タイトルレース</h1>
+      <p className="text-sm mb-6" style={{ color: "var(--ink-secondary)" }}>
+        獲得確率は、シーズン残り試合をコンピュータで1万回シミュレーションし、そのタイトルを獲得した試行の割合です。
+      </p>
 
       {!byCategory ? (
         <p className="text-sm" style={{ color: "var(--ink-secondary)" }}>
@@ -177,20 +180,30 @@ export default async function TitlesPage() {
                       {rows.map((row, i) => (
                         <tr key={row.playerId} className="hover:bg-white/[0.05]">
                           <Td>
-                            <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
-                              {i + 1}
-                            </span>
-                            <Link href={`/players/${row.playerId}`} className="hover:underline">
-                              {row.playerName}
-                            </Link>
-                            <Link
-                              href={`/teams/${row.team.slug}`}
-                              className="text-xs ml-1 hover:underline inline-flex items-center"
-                              style={{ color: "var(--ink-secondary)" }}
-                            >
-                              <TeamDot slug={row.team.slug} />({teamAbbr(row.team.slug)})
-                            </Link>
-                            <PlayerSocialIcons links={getPlayerSocialLinks(row.playerId)} />
+                            <div className="flex items-start gap-2.5">
+                              <PlayerPortrait playerId={row.playerId} playerName={row.playerName} size={32} rounded />
+                              <div style={{ maxWidth: 150 }}>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-xs" style={{ color: "var(--ink-muted)" }}>
+                                    {i + 1}
+                                  </span>
+                                  <Link href={`/players/${row.playerId}`} className="hover:underline font-medium">
+                                    {row.playerName}
+                                  </Link>
+                                </div>
+                                <Link
+                                  href={`/teams/${row.team.slug}`}
+                                  className="text-xs hover:underline inline-flex items-center gap-1"
+                                  style={{ color: "var(--ink-secondary)" }}
+                                >
+                                  <TeamDot slug={row.team.slug} />
+                                  {row.team.name}
+                                </Link>
+                                <div className="mt-1">
+                                  <PlayerSocialIcons links={getPlayerSocialLinks(row.playerId)} />
+                                </div>
+                              </div>
+                            </div>
                           </Td>
                           <Td align="right">
                             <div className="font-semibold text-base">
@@ -273,20 +286,30 @@ export default async function TitlesPage() {
                     {rateStats.qualifiedBatters.map((b, i) => (
                       <tr key={b.playerId} className="hover:bg-white/[0.05]">
                         <Td>
-                          <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
-                            {i + 1}
-                          </span>
-                          <Link href={`/players/${b.playerId}`} className="hover:underline">
-                            {b.playerName}
-                          </Link>
-                          <Link
-                            href={`/teams/${b.team.slug}`}
-                            className="text-xs ml-1 hover:underline inline-flex items-center"
-                            style={{ color: "var(--ink-secondary)" }}
-                          >
-                            <TeamDot slug={b.team.slug} />({teamAbbr(b.team.slug)})
-                          </Link>
-                          <PlayerSocialIcons links={getPlayerSocialLinks(b.playerId)} />
+                          <div className="flex items-start gap-2.5">
+                            <PlayerPortrait playerId={b.playerId} playerName={b.playerName} size={32} rounded />
+                            <div style={{ maxWidth: 150 }}>
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-xs" style={{ color: "var(--ink-muted)" }}>
+                                  {i + 1}
+                                </span>
+                                <Link href={`/players/${b.playerId}`} className="hover:underline font-medium">
+                                  {b.playerName}
+                                </Link>
+                              </div>
+                              <Link
+                                href={`/teams/${b.team.slug}`}
+                                className="text-xs hover:underline inline-flex items-center gap-1"
+                                style={{ color: "var(--ink-secondary)" }}
+                              >
+                                <TeamDot slug={b.team.slug} />
+                                {b.team.name}
+                              </Link>
+                              <div className="mt-1">
+                                <PlayerSocialIcons links={getPlayerSocialLinks(b.playerId)} />
+                              </div>
+                            </div>
+                          </div>
                         </Td>
                         <Td align="right">
                           <div className="flex flex-col items-end gap-1.5">
@@ -321,20 +344,30 @@ export default async function TitlesPage() {
                     {rateStats.qualifiedPitchers.map((p, i) => (
                       <tr key={p.playerId} className="hover:bg-white/[0.05]">
                         <Td>
-                          <span className="text-xs mr-1.5" style={{ color: "var(--ink-muted)" }}>
-                            {i + 1}
-                          </span>
-                          <Link href={`/players/${p.playerId}`} className="hover:underline">
-                            {p.playerName}
-                          </Link>
-                          <Link
-                            href={`/teams/${p.team.slug}`}
-                            className="text-xs ml-1 hover:underline inline-flex items-center"
-                            style={{ color: "var(--ink-secondary)" }}
-                          >
-                            <TeamDot slug={p.team.slug} />({teamAbbr(p.team.slug)})
-                          </Link>
-                          <PlayerSocialIcons links={getPlayerSocialLinks(p.playerId)} />
+                          <div className="flex items-start gap-2.5">
+                            <PlayerPortrait playerId={p.playerId} playerName={p.playerName} size={32} rounded />
+                            <div style={{ maxWidth: 150 }}>
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-xs" style={{ color: "var(--ink-muted)" }}>
+                                  {i + 1}
+                                </span>
+                                <Link href={`/players/${p.playerId}`} className="hover:underline font-medium">
+                                  {p.playerName}
+                                </Link>
+                              </div>
+                              <Link
+                                href={`/teams/${p.team.slug}`}
+                                className="text-xs hover:underline inline-flex items-center gap-1"
+                                style={{ color: "var(--ink-secondary)" }}
+                              >
+                                <TeamDot slug={p.team.slug} />
+                                {p.team.name}
+                              </Link>
+                              <div className="mt-1">
+                                <PlayerSocialIcons links={getPlayerSocialLinks(p.playerId)} />
+                              </div>
+                            </div>
+                          </div>
                         </Td>
                         <Td align="right">
                           <div className="flex flex-col items-end gap-1.5">

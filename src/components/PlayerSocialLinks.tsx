@@ -65,7 +65,7 @@ export function PlayerSocialIcons({ links }: { links: PlayerSocialLinks | null }
   if (entries.length === 0) return null;
 
   return (
-    <span className="inline-flex items-center gap-2 ml-2" aria-label="選手本人のSNS">
+    <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1" aria-label="選手本人のSNS">
       {entries.map(({ key, Icon, label, link }) => (
         <a
           key={key}
@@ -82,7 +82,7 @@ export function PlayerSocialIcons({ links }: { links: PlayerSocialLinks | null }
           </span>
         </a>
       ))}
-    </span>
+    </div>
   );
 }
 
