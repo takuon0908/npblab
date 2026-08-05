@@ -10,6 +10,7 @@ import { latestPerPlayer } from "@/lib/latestPerPlayer";
 import { TEAM_THEME } from "@/lib/teamTheme";
 import { siteUrl } from "@/lib/siteUrl";
 import { PlayerPortrait } from "@/components/PlayerPortrait";
+import { RankBadge } from "@/components/RankBadge";
 
 function TeamDot({ slug }: { slug: string }) {
   return (
@@ -181,16 +182,12 @@ export default async function TitlesPage() {
                         <tr key={row.playerId} className="hover:bg-white/[0.05]">
                           <Td>
                             <div className="flex items-start gap-2.5">
+                              <RankBadge rank={i + 1} />
                               <PlayerPortrait playerId={row.playerId} playerName={row.playerName} size={32} rounded />
-                              <div style={{ maxWidth: 150 }}>
-                                <div className="flex items-center gap-1.5">
-                                  <span className="text-xs" style={{ color: "var(--ink-muted)" }}>
-                                    {i + 1}
-                                  </span>
-                                  <Link href={`/players/${row.playerId}`} className="hover:underline font-medium">
-                                    {row.playerName}
-                                  </Link>
-                                </div>
+                              <div style={{ maxWidth: 115 }}>
+                                <Link href={`/players/${row.playerId}`} className="hover:underline font-medium">
+                                  {row.playerName}
+                                </Link>
                                 <Link
                                   href={`/teams/${row.team.slug}`}
                                   className="text-xs hover:underline inline-flex items-center gap-1"
@@ -287,16 +284,12 @@ export default async function TitlesPage() {
                       <tr key={b.playerId} className="hover:bg-white/[0.05]">
                         <Td>
                           <div className="flex items-start gap-2.5">
+                            <RankBadge rank={i + 1} />
                             <PlayerPortrait playerId={b.playerId} playerName={b.playerName} size={32} rounded />
-                            <div style={{ maxWidth: 150 }}>
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-xs" style={{ color: "var(--ink-muted)" }}>
-                                  {i + 1}
-                                </span>
-                                <Link href={`/players/${b.playerId}`} className="hover:underline font-medium">
-                                  {b.playerName}
-                                </Link>
-                              </div>
+                            <div style={{ maxWidth: 115 }}>
+                              <Link href={`/players/${b.playerId}`} className="hover:underline font-medium">
+                                {b.playerName}
+                              </Link>
                               <Link
                                 href={`/teams/${b.team.slug}`}
                                 className="text-xs hover:underline inline-flex items-center gap-1"
@@ -345,16 +338,12 @@ export default async function TitlesPage() {
                       <tr key={p.playerId} className="hover:bg-white/[0.05]">
                         <Td>
                           <div className="flex items-start gap-2.5">
+                            <RankBadge rank={i + 1} />
                             <PlayerPortrait playerId={p.playerId} playerName={p.playerName} size={32} rounded />
-                            <div style={{ maxWidth: 150 }}>
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-xs" style={{ color: "var(--ink-muted)" }}>
-                                  {i + 1}
-                                </span>
-                                <Link href={`/players/${p.playerId}`} className="hover:underline font-medium">
-                                  {p.playerName}
-                                </Link>
-                              </div>
+                            <div style={{ maxWidth: 115 }}>
+                              <Link href={`/players/${p.playerId}`} className="hover:underline font-medium">
+                                {p.playerName}
+                              </Link>
                               <Link
                                 href={`/teams/${p.team.slug}`}
                                 className="text-xs hover:underline inline-flex items-center gap-1"
