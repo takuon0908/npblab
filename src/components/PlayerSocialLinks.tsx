@@ -1,4 +1,4 @@
-import type { PlayerSocialLinks } from "@/lib/playerSocialLinks";
+import type { PlayerSocialLinks, SocialLink } from "@/lib/playerSocialLinks";
 
 function XIcon({ size = 15 }: { size?: number }) {
   return (
@@ -18,70 +18,98 @@ function InstagramIcon({ size = 15 }: { size?: number }) {
   );
 }
 
-// ランキング表の行など、スペースが限られる場所で使うアイコンのみの簡易版。
-// ラベル文字は付けず、アイコンの色でリンクだと分かるようにしている
+function YouTubeIcon({ size = 15 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <rect x="2" y="5" width="20" height="14" rx="4" stroke="currentColor" strokeWidth="2" />
+      <path d="M10 9.5v5l4.5-2.5z" fill="currentColor" />
+    </svg>
+  );
+}
+
+function FanClubIcon({ size = 15 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+      <path d="M12 20.5s-7.5-4.35-9.5-9.1C1.2 8.2 3 5 6.3 5c1.9 0 3.4 1 5.7 3.4C14.3 6 15.8 5 17.7 5 21 5 22.8 8.2 21.5 11.4c-2 4.75-9.5 9.1-9.5 9.1z" />
+    </svg>
+  );
+}
+
+function WikipediaIcon({ size = 15 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+      <path d="M4 6h4M4 6l4 12 3-9 3 9 4-12M17 6h3" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+const PLATFORMS: {
+  key: keyof PlayerSocialLinks;
+  Icon: (props: { size?: number }) => React.ReactElement;
+  label: string;
+}[] = [
+  { key: "x", Icon: XIcon, label: "X" },
+  { key: "instagram", Icon: InstagramIcon, label: "Instagram" },
+  { key: "youtube", Icon: YouTubeIcon, label: "YouTube" },
+  { key: "fanclub", Icon: FanClubIcon, label: "Fan Club" },
+  { key: "wikipedia", Icon: WikipediaIcon, label: "Wikipedia" },
+];
+
+// ランキング表の行など、スペースが限られる場所で使うコンパクト版。
+// アイコンだけだと何のリンクか分かりにくいため、ユーザー名(handle)も併記する
 export function PlayerSocialIcons({ links }: { links: PlayerSocialLinks | null }) {
-  if (!links || (!links.x && !links.instagram)) return null;
+  if (!links) return null;
+  const entries = PLATFORMS.map((p) => ({ ...p, link: links[p.key] })).filter(
+    (p): p is (typeof PLATFORMS)[number] & { link: SocialLink } => Boolean(p.link),
+  );
+  if (entries.length === 0) return null;
 
   return (
-    <span className="inline-flex items-center gap-1 ml-1.5" aria-label="選手本人のSNS">
-      {links.x && (
+    <span className="inline-flex items-center gap-2 ml-2" aria-label="選手本人のSNS">
+      {entries.map(({ key, Icon, label, link }) => (
         <a
-          href={links.x}
+          key={key}
+          href={link.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex hover:opacity-70"
+          className="inline-flex items-center gap-1 hover:underline"
           style={{ color: "var(--accent)" }}
-          title="X"
+          title={label}
         >
-          <XIcon size={13} />
+          <Icon size={12} />
+          <span className="text-xs whitespace-nowrap" style={{ color: "var(--ink-muted)" }}>
+            {link.handle ?? label}
+          </span>
         </a>
-      )}
-      {links.instagram && (
-        <a
-          href={links.instagram}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex hover:opacity-70"
-          style={{ color: "var(--accent)" }}
-          title="Instagram"
-        >
-          <InstagramIcon size={13} />
-        </a>
-      )}
+      ))}
     </span>
   );
 }
 
-// 本人確認が取れている選手だけ、公式サイト等へのリンクと同じ並びでSNSアイコンを表示する
+// 選手ページ本体で使うフル版。アイコン+プラットフォーム名+ユーザー名を1つのピルに収める
 export function PlayerSocialLinksRow({ links }: { links: PlayerSocialLinks | null }) {
-  if (!links || (!links.x && !links.instagram)) return null;
+  if (!links) return null;
+  const entries = PLATFORMS.map((p) => ({ ...p, link: links[p.key] })).filter(
+    (p): p is (typeof PLATFORMS)[number] & { link: SocialLink } => Boolean(p.link),
+  );
+  if (entries.length === 0) return null;
 
   return (
-    <div className="flex gap-2 mt-3" aria-label="選手本人のSNS">
-      {links.x && (
+    <div className="flex flex-wrap gap-2 mt-3" aria-label="選手本人のSNS">
+      {entries.map(({ key, Icon, label, link }) => (
         <a
-          href={links.x}
+          key={key}
+          href={link.url}
           target="_blank"
           rel="noopener noreferrer"
           className="hover-lift inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium"
           style={{ border: "1px solid var(--border-strong)", color: "var(--ink-secondary)" }}
         >
-          <XIcon />X
+          <Icon />
+          <span style={{ color: "var(--ink)" }}>{label}</span>
+          {link.handle && <span style={{ color: "var(--ink-muted)" }}>{link.handle}</span>}
         </a>
-      )}
-      {links.instagram && (
-        <a
-          href={links.instagram}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover-lift inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium"
-          style={{ border: "1px solid var(--border-strong)", color: "var(--ink-secondary)" }}
-        >
-          <InstagramIcon />
-          Instagram
-        </a>
-      )}
+      ))}
     </div>
   );
 }

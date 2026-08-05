@@ -106,7 +106,13 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
 
   const latestValue = player.valueRatings.at(-1) ?? null;
   const socialLinks = getPlayerSocialLinks(playerId);
-  const sameAs = [socialLinks?.x, socialLinks?.instagram].filter((url): url is string => Boolean(url));
+  const sameAs = [
+    socialLinks?.x?.url,
+    socialLinks?.instagram?.url,
+    socialLinks?.youtube?.url,
+    socialLinks?.fanclub?.url,
+    socialLinks?.wikipedia?.url,
+  ].filter((url): url is string => Boolean(url));
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
