@@ -8,6 +8,8 @@ import { StatTile } from "@/components/StatTile";
 import { calcFipConstant, calcFip, calcWoba, calcWhip, calcKPercent, calcBBPercent } from "@/lib/sabermetrics";
 import { latestPerPlayer } from "@/lib/latestPerPlayer";
 import { siteUrl } from "@/lib/siteUrl";
+import { getPlayerSocialLinks } from "@/lib/playerSocialLinks";
+import { PlayerSocialLinksRow } from "@/components/PlayerSocialLinks";
 
 // データは1日1回(日次パイプライン)しか更新されないため6時間に緩めている(Supabase egress対策)
 export const revalidate = 21600;
@@ -103,6 +105,8 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
   const whip = player.currentPitching ? calcWhip(player.currentPitching) : null;
 
   const latestValue = player.valueRatings.at(-1) ?? null;
+  const socialLinks = getPlayerSocialLinks(playerId);
+  const sameAs = [socialLinks?.x, socialLinks?.instagram].filter((url): url is string => Boolean(url));
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -121,6 +125,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
     url: `${siteUrl}/players/${playerId}`,
     jobTitle: "プロ野球選手",
     affiliation: { "@type": "SportsTeam", name: player.team.name, url: `${siteUrl}/teams/${player.team.slug}` },
+    ...(sameAs.length > 0 ? { sameAs } : {}),
   };
 
   return (
@@ -143,7 +148,9 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
           {player.team.name}
         </Link>
       </p>
-      <h1 className="text-2xl font-black mb-8">{player.playerName}</h1>
+      <h1 className="text-2xl font-black">{player.playerName}</h1>
+      <PlayerSocialLinksRow links={socialLinks} />
+      <div className="mb-8" />
 
       {!player.currentBatting && !player.currentPitching && (
         <p className="text-sm mb-8" style={{ color: "var(--ink-secondary)" }}>

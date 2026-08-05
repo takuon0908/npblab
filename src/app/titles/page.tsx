@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { TitleCategory, Level } from "@prisma/client";
 import { Table, Th, Td } from "@/components/Table";
 import { RankBar } from "@/components/RankBar";
+import { PlayerSocialIcons } from "@/components/PlayerSocialLinks";
+import { getPlayerSocialLinks } from "@/lib/playerSocialLinks";
 import { latestPerPlayer } from "@/lib/latestPerPlayer";
 import { teamAbbr } from "@/lib/teamAbbr";
 import { TEAM_THEME } from "@/lib/teamTheme";
@@ -188,6 +190,7 @@ export default async function TitlesPage() {
                             >
                               <TeamDot slug={row.team.slug} />({teamAbbr(row.team.slug)})
                             </Link>
+                            <PlayerSocialIcons links={getPlayerSocialLinks(row.playerId)} />
                           </Td>
                           <Td align="right">
                             <div className="font-semibold text-base">
@@ -283,6 +286,7 @@ export default async function TitlesPage() {
                           >
                             <TeamDot slug={b.team.slug} />({teamAbbr(b.team.slug)})
                           </Link>
+                          <PlayerSocialIcons links={getPlayerSocialLinks(b.playerId)} />
                         </Td>
                         <Td align="right">
                           <div className="flex flex-col items-end gap-1.5">
@@ -330,6 +334,7 @@ export default async function TitlesPage() {
                           >
                             <TeamDot slug={p.team.slug} />({teamAbbr(p.team.slug)})
                           </Link>
+                          <PlayerSocialIcons links={getPlayerSocialLinks(p.playerId)} />
                         </Td>
                         <Td align="right">
                           <div className="flex flex-col items-end gap-1.5">
