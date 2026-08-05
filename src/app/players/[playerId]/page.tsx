@@ -10,6 +10,7 @@ import { latestPerPlayer } from "@/lib/latestPerPlayer";
 import { siteUrl } from "@/lib/siteUrl";
 import { getPlayerSocialLinks } from "@/lib/playerSocialLinks";
 import { PlayerSocialLinksRow } from "@/components/PlayerSocialLinks";
+import { PlayerPortrait } from "@/components/PlayerPortrait";
 
 // データは1日1回(日次パイプライン)しか更新されないため6時間に緩めている(Supabase egress対策)
 export const revalidate = 21600;
@@ -149,13 +150,18 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
         <span>選手</span>
       </nav>
 
-      <p className="text-xs mb-2" style={{ color: "var(--ink-muted)" }}>
-        <Link href={`/teams/${player.team.slug}`} className="hover:underline" style={{ color: "var(--accent)" }}>
-          {player.team.name}
-        </Link>
-      </p>
-      <h1 className="text-2xl font-black">{player.playerName}</h1>
-      <PlayerSocialLinksRow links={socialLinks} />
+      <div className="flex items-start gap-4">
+        <PlayerPortrait playerId={playerId} playerName={player.playerName} />
+        <div>
+          <p className="text-xs mb-2" style={{ color: "var(--ink-muted)" }}>
+            <Link href={`/teams/${player.team.slug}`} className="hover:underline" style={{ color: "var(--accent)" }}>
+              {player.team.name}
+            </Link>
+          </p>
+          <h1 className="text-2xl font-black">{player.playerName}</h1>
+          <PlayerSocialLinksRow links={socialLinks} />
+        </div>
+      </div>
       <div className="mb-8" />
 
       {!player.currentBatting && !player.currentPitching && (
