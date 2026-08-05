@@ -8,7 +8,8 @@ import { RankBar } from "@/components/RankBar";
 import { calcMagicNumber } from "@/lib/baseball";
 import { TEAM_THEME } from "@/lib/teamTheme";
 
-export const revalidate = 3600;
+// データは1日1回(日次パイプライン)しか更新されないため6時間に緩めている(Supabase egress対策)
+export const revalidate = 21600;
 
 export const metadata: Metadata = {
   title: "セ・パ12球団 優勝確率一覧",

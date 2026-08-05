@@ -23,7 +23,8 @@ function TeamDot({ slug }: { slug: string }) {
 const QUALIFYING_PA_PER_GAME = 3.1;
 const QUALIFYING_IP_PER_GAME = 1;
 
-export const revalidate = 3600;
+// データは1日1回(日次パイプライン)しか更新されないため6時間に緩めている(Supabase egress対策)
+export const revalidate = 21600;
 
 export const metadata: Metadata = {
   title: "プロ野球タイトルレース 獲得確率ランキング",

@@ -76,7 +76,8 @@ function summarizeByYear<T extends { date: Date }>(rows: T[]): T[] {
   return [...byYear.values()].sort((a, b) => b.date.getFullYear() - a.date.getFullYear());
 }
 
-export const revalidate = 3600;
+// データは1日1回(日次パイプライン)しか更新されないため6時間に緩めている(Supabase egress対策)
+export const revalidate = 21600;
 
 export async function generateStaticParams() {
   const teams = await prisma.team.findMany({ select: { slug: true } });

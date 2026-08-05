@@ -7,7 +7,8 @@ import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 import { getLikeCounts } from "@/lib/columnLikes";
 import { siteUrl } from "@/lib/siteUrl";
 
-export const revalidate = 60;
+// 60秒は短すぎてSupabase egressを無駄に消費するため5分に緩めている
+export const revalidate = 300;
 
 const PAGE_SIZE = 20;
 

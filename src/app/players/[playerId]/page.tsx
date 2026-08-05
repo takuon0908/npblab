@@ -9,7 +9,8 @@ import { calcFipConstant, calcFip, calcWoba, calcWhip, calcKPercent, calcBBPerce
 import { latestPerPlayer } from "@/lib/latestPerPlayer";
 import { siteUrl } from "@/lib/siteUrl";
 
-export const revalidate = 3600;
+// データは1日1回(日次パイプライン)しか更新されないため6時間に緩めている(Supabase egress対策)
+export const revalidate = 21600;
 
 // 選手数が多く全件のビルド時プリレンダーは重いため、初回アクセス時にオンデマンドでISR生成する
 export async function generateStaticParams() {

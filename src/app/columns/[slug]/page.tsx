@@ -19,7 +19,8 @@ import { categoryToSlug } from "@/lib/categorySlug";
 import { SITE_AUTHOR } from "@/lib/author";
 import Image from "next/image";
 
-export const revalidate = 60;
+// 60秒は短すぎてSupabase egressを無駄に消費するため5分に緩めている(記事更新の反映は5分遅れる程度で実用上問題ない)
+export const revalidate = 300;
 
 export async function generateStaticParams() {
   try {
