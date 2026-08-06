@@ -1,5 +1,5 @@
 ---
-title: "野球のルール入門：ビデオ判定（リクエスト）の仕組みとは"
+title: "野球のルール入門：ビデオ判定（リクエスト）は1試合何回まで？仕組みと回数のルール"
 slug: rules-basics-video-review
 writer: writer-baseball-otaku
 ---
