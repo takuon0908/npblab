@@ -17,6 +17,8 @@ import { getAllColumns } from "@/lib/microcms";
 import { formatDateJa } from "@/lib/date";
 import { detectColumnTeamSlug, TEAM_THEME } from "@/lib/teamTheme";
 import { siteUrl } from "@/lib/siteUrl";
+import { getTeamSocialLinks } from "@/lib/teamSocialLinks";
+import { TeamSocialLinksRow } from "@/components/TeamSocialLinks";
 
 const MIN_AT_BATS_FOR_AVG_LEADER = 10;
 const MIN_INNINGS_FOR_ERA_LEADER = 10;
@@ -185,12 +187,20 @@ export default async function TeamPage({
     ],
   };
 
+  const teamSocialLinks = getTeamSocialLinks(team.slug);
+  const teamSameAs = [
+    teamSocialLinks?.x?.url,
+    teamSocialLinks?.instagram?.url,
+    teamSocialLinks?.youtube?.url,
+  ].filter((url): url is string => Boolean(url));
+
   const teamJsonLd = {
     "@context": "https://schema.org",
     "@type": "SportsTeam",
     name: team.name,
     url: `${siteUrl}/teams/${team.slug}`,
     sport: "Baseball",
+    ...(teamSameAs.length > 0 ? { sameAs: teamSameAs } : {}),
   };
 
   return (
@@ -219,6 +229,7 @@ export default async function TeamPage({
         }}
       >
         <h1 className="text-2xl font-black">{team.name}</h1>
+        <TeamSocialLinksRow links={getTeamSocialLinks(team.slug)} accentColor={teamAccent} />
       </div>
 
       {trendData.length >= 2 && (
