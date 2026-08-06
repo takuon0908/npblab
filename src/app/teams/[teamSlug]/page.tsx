@@ -19,6 +19,8 @@ import { detectColumnTeamSlug, TEAM_THEME } from "@/lib/teamTheme";
 import { siteUrl } from "@/lib/siteUrl";
 import { getTeamSocialLinks } from "@/lib/teamSocialLinks";
 import { TeamSocialLinksRow } from "@/components/TeamSocialLinks";
+import { getTeamReporter } from "@/lib/teamReporters";
+import { TeamReporterBadge } from "@/components/TeamReporterBadge";
 
 const MIN_AT_BATS_FOR_AVG_LEADER = 10;
 const MIN_INNINGS_FOR_ERA_LEADER = 10;
@@ -230,6 +232,7 @@ export default async function TeamPage({
       >
         <h1 className="text-2xl font-black">{team.name}</h1>
         <TeamSocialLinksRow links={getTeamSocialLinks(team.slug)} accentColor={teamAccent} />
+        <TeamReporterBadge reporter={getTeamReporter(team.slug)} />
       </div>
 
       {trendData.length >= 2 && (
