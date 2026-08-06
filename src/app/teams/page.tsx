@@ -7,6 +7,8 @@ import { Table, Th, Td } from "@/components/Table";
 import { RankBar } from "@/components/RankBar";
 import { calcMagicNumber } from "@/lib/baseball";
 import { TEAM_THEME } from "@/lib/teamTheme";
+import { getTeamSocialLinks } from "@/lib/teamSocialLinks";
+import { TeamSocialIcons } from "@/components/TeamSocialLinks";
 
 // データは1日1回(日次パイプライン)しか更新されないため6時間に緩めている(Supabase egress対策)
 export const revalidate = 21600;
@@ -122,19 +124,27 @@ function LeagueTable({
           {rows.map(({ team, standing, championship, probabilityDelta }) => (
             <tr key={team.id} className="hover:bg-white/[0.05]">
               <Td>
-                <Link href={`/teams/${team.slug}`} className="hover:underline inline-flex items-center gap-2">
-                  <span
-                    aria-hidden
-                    className="rounded-full"
-                    style={{
-                      width: 9,
-                      height: 9,
-                      flex: "none",
-                      background: TEAM_THEME[team.slug]?.accent ?? "var(--ink-muted)",
-                    }}
-                  />
-                  {team.name}
-                </Link>
+                <div>
+                  <Link href={`/teams/${team.slug}`} className="hover:underline inline-flex items-center gap-2">
+                    <span
+                      aria-hidden
+                      className="rounded-full"
+                      style={{
+                        width: 9,
+                        height: 9,
+                        flex: "none",
+                        background: TEAM_THEME[team.slug]?.accent ?? "var(--ink-muted)",
+                      }}
+                    />
+                    {team.name}
+                  </Link>
+                  <div className="mt-1">
+                    <TeamSocialIcons
+                      links={getTeamSocialLinks(team.slug)}
+                      accentColor={TEAM_THEME[team.slug]?.accent ?? "var(--accent)"}
+                    />
+                  </div>
+                </div>
               </Td>
               <Td align="right" muted>
                 {standing ? (

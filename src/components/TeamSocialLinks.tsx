@@ -1,16 +1,16 @@
 import type { TeamSocialLinks, TeamSocialLink } from "@/lib/teamSocialLinks";
 
-function XIcon() {
+function XIcon({ size = 14 }: { size?: number }) {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
     </svg>
   );
 }
 
-function InstagramIcon() {
+function InstagramIcon({ size = 14 }: { size?: number }) {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
       <rect x="3" y="3" width="18" height="18" rx="5" />
       <circle cx="12" cy="12" r="4" />
       <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
@@ -18,18 +18,18 @@ function InstagramIcon() {
   );
 }
 
-function YouTubeIcon() {
+function YouTubeIcon({ size = 14 }: { size?: number }) {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
       <rect x="2" y="5" width="20" height="14" rx="4" stroke="currentColor" strokeWidth="2" />
       <path d="M10 9.5v5l4.5-2.5z" fill="currentColor" />
     </svg>
   );
 }
 
-function FanClubIcon() {
+function FanClubIcon({ size = 14 }: { size?: number }) {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
       <path d="M12 20.5s-7.5-4.35-9.5-9.1C1.2 8.2 3 5 6.3 5c1.9 0 3.4 1 5.7 3.4C14.3 6 15.8 5 17.7 5 21 5 22.8 8.2 21.5 11.4c-2 4.75-9.5 9.1-9.5 9.1z" />
     </svg>
   );
@@ -37,7 +37,7 @@ function FanClubIcon() {
 
 const PLATFORMS: {
   key: keyof TeamSocialLinks;
-  Icon: () => React.ReactElement;
+  Icon: (props: { size?: number }) => React.ReactElement;
   label: string;
 }[] = [
   { key: "x", Icon: XIcon, label: "X" },
@@ -83,5 +83,33 @@ export function TeamSocialLinksRow({ links, accentColor }: { links: TeamSocialLi
         </a>
       ))}
     </div>
+  );
+}
+
+// ランキング表など、名前の横に小さく添えるだけのコンパクト版。
+// ラベルは付けずアイコンのみ、色は球団カラーそのものを使う
+export function TeamSocialIcons({ links, accentColor }: { links: TeamSocialLinks | null; accentColor: string }) {
+  if (!links) return null;
+  const entries = PLATFORMS.map((p) => ({ ...p, link: links[p.key] })).filter(
+    (p): p is (typeof PLATFORMS)[number] & { link: TeamSocialLink } => Boolean(p.link),
+  );
+  if (entries.length === 0) return null;
+
+  return (
+    <span className="inline-flex items-center gap-1" aria-label="球団公式SNS">
+      {entries.map(({ key, Icon, label, link }) => (
+        <a
+          key={key}
+          href={link.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex hover:opacity-70"
+          style={{ color: accentColor }}
+          title={label}
+        >
+          <Icon size={11} />
+        </a>
+      ))}
+    </span>
   );
 }
