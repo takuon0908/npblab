@@ -77,10 +77,24 @@ export async function getAllColumns(category?: string, tag?: string) {
   return all;
 }
 
+// リッチエディタが本文中の引用符等をHTMLエンティティとして保存することがあり、
+// タグを取り除いただけでは "&quot;改革&quot;" のような生の文字列が残ってしまうため、
+// meta descriptionや本文冒頭の抜粋を作る前にデコードしておく
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&");
+}
+
 // meta descriptionをHTML本文から生成する。単純な文字数カットだと文の途中で
 // 切れて読みにくくなるため、「。」の文境界を優先して150字前後に収める
 export function excerptForMeta(bodyHtml: string, maxLength = 150): string {
-  const text = bodyHtml.replace(/<[^>]+>/g, "").trim();
+  const text = decodeHtmlEntities(bodyHtml.replace(/<[^>]+>/g, "")).trim();
   if (text.length <= maxLength) return text;
 
   const sentences = text.split("。");
