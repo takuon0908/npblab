@@ -6,6 +6,7 @@ import { Level } from "@prisma/client";
 import { Table, Th, Td } from "@/components/Table";
 import { StatTile } from "@/components/StatTile";
 import { calcFipConstant, calcFip, calcWoba, calcWhip, calcKPercent, calcBBPercent } from "@/lib/sabermetrics";
+import { generateBatterSummary, generatePitcherSummary } from "@/lib/playerSummary";
 import { latestPerPlayer } from "@/lib/latestPerPlayer";
 import { siteUrl } from "@/lib/siteUrl";
 import { getPlayerSocialLinks } from "@/lib/playerSocialLinks";
@@ -55,10 +56,28 @@ async function getPlayer(playerId: string) {
   const currentNigunPitching = pitchingRows.find((p) => p.season === season && p.level === Level.NIGUN) ?? null;
 
   // FIPはリーグ全体の防御率に較正する定数が必要なため、現シーズンの1軍投手陣全体を取得する
+  // ついでに同じデータから防御率の順位も算出し、選手ページの要約文(スカウティングレポート)に使う
   let fipConstant: number | null = null;
+  let pitchingRank: { rank: number; total: number } | null = null;
   if (currentPitching) {
     const seasonPitchers = await prisma.playerPitchingStat.findMany({ where: { season, level: Level.ICHIGUN } });
-    fipConstant = calcFipConstant(latestPerPlayer(seasonPitchers));
+    const latestSeasonPitchers = latestPerPlayer(seasonPitchers);
+    fipConstant = calcFipConstant(latestSeasonPitchers);
+
+    const qualified = latestSeasonPitchers.filter((p) => p.inningsPitched >= 10);
+    const byEra = [...qualified].sort((a, b) => a.era - b.era);
+    const rank = byEra.findIndex((p) => p.playerId === playerId) + 1;
+    if (rank > 0) pitchingRank = { rank, total: qualified.length };
+  }
+
+  // 打率の順位も同様に、今季1軍で打数のある選手全体の中での位置づけを算出する
+  let battingRank: { rank: number; total: number } | null = null;
+  if (currentBatting) {
+    const seasonBatters = await prisma.playerBattingStat.findMany({ where: { season, level: Level.ICHIGUN } });
+    const qualified = latestPerPlayer(seasonBatters).filter((b) => b.atBats > 0);
+    const byAvg = [...qualified].sort((a, b) => b.avg - a.avg);
+    const rank = byAvg.findIndex((b) => b.playerId === playerId) + 1;
+    if (rank > 0) battingRank = { rank, total: qualified.length };
   }
 
   return {
@@ -69,6 +88,8 @@ async function getPlayer(playerId: string) {
     currentNigunBatting,
     currentNigunPitching,
     fipConstant,
+    battingRank,
+    pitchingRank,
     battingHistory: latestBySeasonLevel(battingRows),
     pitchingHistory: latestBySeasonLevel(pitchingRows),
     valueRatings,
@@ -86,10 +107,15 @@ export async function generateMetadata({
   const player = await getPlayer(playerId);
   if (!player) return {};
 
+  // 今シーズンの現役データが無い(引退・故障者等)選手は解説文が生成できず内容が薄いため、評価対象から外す
+  const hasCurrentSeasonData =
+    player.currentBatting || player.currentPitching || player.currentNigunBatting || player.currentNigunPitching;
+
   return {
     title: `${player.playerName} 成績・データ`,
     description: `${player.playerName}(${player.team.name})の最新成績、LABバリュー、セイバーメトリクス指標をシーズン推移で掲載。`,
     alternates: { canonical: `/players/${playerId}` },
+    ...(hasCurrentSeasonData ? {} : { robots: { index: false, follow: true } }),
   };
 }
 
@@ -104,6 +130,58 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
   const bbPercent = player.currentBatting ? calcBBPercent(player.currentBatting) : null;
   const fip = player.currentPitching && player.fipConstant !== null ? calcFip(player.currentPitching, player.fipConstant) : null;
   const whip = player.currentPitching ? calcWhip(player.currentPitching) : null;
+
+  const battingSummary = player.currentBatting
+    ? generateBatterSummary({
+        avg: player.currentBatting.avg,
+        homeRuns: player.currentBatting.homeRuns,
+        stolenBases: player.currentBatting.stolenBases,
+        kPercent: kPercent ?? 0,
+        bbPercent: bbPercent ?? 0,
+        atBats: player.currentBatting.atBats,
+        avgRank: player.battingRank?.rank ?? null,
+        totalQualified: player.battingRank?.total ?? null,
+      })
+    : "";
+  const pitchingSummary = player.currentPitching
+    ? generatePitcherSummary({
+        era: player.currentPitching.era,
+        saves: player.currentPitching.saves,
+        holds: player.currentPitching.holds,
+        appearances: player.currentPitching.appearances,
+        inningsPitched: player.currentPitching.inningsPitched,
+        strikeouts: player.currentPitching.strikeouts,
+        walks: player.currentPitching.walks + player.currentPitching.hitByPitch,
+        eraRank: player.pitchingRank?.rank ?? null,
+        totalQualified: player.pitchingRank?.total ?? null,
+      })
+    : "";
+  const nigunBattingSummary =
+    !player.currentBatting && player.currentNigunBatting
+      ? generateBatterSummary({
+          avg: player.currentNigunBatting.avg,
+          homeRuns: player.currentNigunBatting.homeRuns,
+          stolenBases: player.currentNigunBatting.stolenBases,
+          kPercent: calcKPercent(player.currentNigunBatting),
+          bbPercent: calcBBPercent(player.currentNigunBatting),
+          atBats: player.currentNigunBatting.atBats,
+        })
+      : "";
+  const nigunPitchingSummary =
+    !player.currentPitching && player.currentNigunPitching
+      ? generatePitcherSummary({
+          era: player.currentNigunPitching.era,
+          saves: player.currentNigunPitching.saves,
+          holds: player.currentNigunPitching.holds,
+          appearances: player.currentNigunPitching.appearances,
+          inningsPitched: player.currentNigunPitching.inningsPitched,
+          strikeouts: player.currentNigunPitching.strikeouts,
+          walks: player.currentNigunPitching.walks + player.currentNigunPitching.hitByPitch,
+        })
+      : "";
+  const scoutingReport = [battingSummary, pitchingSummary, nigunBattingSummary, nigunPitchingSummary]
+    .filter(Boolean)
+    .join(" ");
 
   const latestValue = player.valueRatings.at(-1) ?? null;
   const socialLinks = getPlayerSocialLinks(playerId);
@@ -163,6 +241,21 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
         </div>
       </div>
       <div className="mb-8" />
+
+      {scoutingReport && (
+        <div
+          className="rounded-none p-5 mb-8"
+          style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+        >
+          <div className="text-sm mb-2" style={{ color: "var(--ink-muted)" }}>
+            LAB分析レポート
+          </div>
+          <p className="leading-relaxed">{scoutingReport}</p>
+          <p className="text-xs mt-2" style={{ color: "var(--ink-muted)" }}>
+            今シーズンの実成績から当サイトが独自に生成した分析コメントです。
+          </p>
+        </div>
+      )}
 
       {!player.currentBatting && !player.currentPitching && (
         <p className="text-sm mb-8" style={{ color: "var(--ink-secondary)" }}>
