@@ -13,8 +13,8 @@ import { getPlayerSocialLinks } from "@/lib/playerSocialLinks";
 import { PlayerSocialLinksRow } from "@/components/PlayerSocialLinks";
 import { PlayerPortrait } from "@/components/PlayerPortrait";
 
-// データは1日1回(日次パイプライン)しか更新されないため6時間に緩めている(Supabase egress対策)
-export const revalidate = 21600;
+// データは1日1回(日次パイプライン)しか更新されないため24時間に緩めている(Supabase egress/Vercel ISR Writes対策)
+export const revalidate = 86400;
 
 // 選手数が多く全件のビルド時プリレンダーは重いため、初回アクセス時にオンデマンドでISR生成する
 export async function generateStaticParams() {

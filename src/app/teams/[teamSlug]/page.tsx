@@ -80,8 +80,8 @@ function summarizeByYear<T extends { date: Date }>(rows: T[]): T[] {
   return [...byYear.values()].sort((a, b) => b.date.getFullYear() - a.date.getFullYear());
 }
 
-// データは1日1回(日次パイプライン)しか更新されないため6時間に緩めている(Supabase egress対策)
-export const revalidate = 21600;
+// データは1日1回(日次パイプライン)しか更新されないため24時間に緩めている(Supabase egress/Vercel ISR Writes対策)
+export const revalidate = 86400;
 
 export async function generateStaticParams() {
   const teams = await prisma.team.findMany({ select: { slug: true } });

@@ -10,8 +10,8 @@ import { TEAM_THEME } from "@/lib/teamTheme";
 import { getTeamSocialLinks } from "@/lib/teamSocialLinks";
 import { TeamSocialIcons } from "@/components/TeamSocialLinks";
 
-// データは1日1回(日次パイプライン)しか更新されないため6時間に緩めている(Supabase egress対策)
-export const revalidate = 21600;
+// データは1日1回(日次パイプライン)しか更新されないため24時間に緩めている(Supabase egress/Vercel ISR Writes対策)
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: "セ・パ12球団 優勝確率一覧",

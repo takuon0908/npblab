@@ -4,8 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { Table, Th, Td } from "@/components/Table";
 import { TEAM_THEME } from "@/lib/teamTheme";
 
-// データは1日1回(日次パイプライン)しか更新されないため6時間に緩めている(Supabase egress対策)
-export const revalidate = 21600;
+// データは1日1回(日次パイプライン)しか更新されないため24時間に緩めている(Supabase egress/Vercel ISR Writes対策)
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: "イニング別 得点・失点傾向",

@@ -6,8 +6,8 @@ import { Level } from "@prisma/client";
 import { Table, Th, Td } from "@/components/Table";
 import { latestPerPlayer } from "@/lib/latestPerPlayer";
 
-// データは1日1回(日次パイプライン)しか更新されないため6時間に緩めている(Supabase egress対策)
-export const revalidate = 21600;
+// データは1日1回(日次パイプライン)しか更新されないため24時間に緩めている(Supabase egress/Vercel ISR Writes対策)
+export const revalidate = 86400;
 
 export async function generateStaticParams() {
   const teams = await prisma.team.findMany({ select: { slug: true } });

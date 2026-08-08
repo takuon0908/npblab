@@ -14,8 +14,8 @@ function stripHtml(html: string): string {
 }
 
 // データは1日1回(日次パイプライン)しか更新されないため、それより高頻度で再取得しても
-// 表示は変わらずDBの読み取り(Supabase egress)を無駄に消費するだけ。6時間に緩めている
-export const revalidate = 21600;
+// 表示は変わらずDBの読み取り(Supabase egress)やVercelのISR Writesを無駄に消費するだけ。24時間に緩めている
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },

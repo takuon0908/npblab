@@ -7,8 +7,8 @@ import { RankBar } from "@/components/RankBar";
 import { teamAbbr } from "@/lib/teamAbbr";
 import { siteUrl } from "@/lib/siteUrl";
 
-// データは1日1回(日次パイプライン)しか更新されないため6時間に緩めている(Supabase egress対策)
-export const revalidate = 21600;
+// データは1日1回(日次パイプライン)しか更新されないため24時間に緩めている(Supabase egress/Vercel ISR Writes対策)
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: "2軍注目選手ランキング・1軍昇格候補",

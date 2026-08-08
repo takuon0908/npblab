@@ -85,14 +85,35 @@ async function main() {
     const raw = fs.readFileSync(filePath, "utf-8");
     const draft = parseDraft(raw, file);
 
+    const category = inferCategory(draft.slug);
     const result = await client.create({
       endpoint: "columns",
-      content: { title: draft.title, slug: draft.slug, body: draft.body, category: [inferCategory(draft.slug)] },
+      content: { title: draft.title, slug: draft.slug, body: draft.body, category: [category] },
       isDraft: false,
     });
 
     fs.renameSync(filePath, path.join(PUBLISHED_DIR, file));
     console.log(`公開しました: ${draft.title} (id=${result.id}, slug=${draft.slug})`);
+
+    await triggerRevalidate(draft.slug, category);
+  }
+}
+
+// 記事系ページはrevalidateをかなり長く取っている(Vercel無料枠のISR Writes節約のため)ので、
+// 公開直後に本番サイトへ反映させるにはこのオンデマンド呼び出しが必須
+async function triggerRevalidate(slug: string, category: string) {
+  const secret = process.env.REVALIDATE_SECRET;
+  if (!secret) {
+    console.warn("REVALIDATE_SECRET未設定のため、本番反映まで最大24時間かかります(.env.localを確認)");
+    return;
+  }
+  try {
+    const url = `https://www.npblab.com/api/revalidate?secret=${encodeURIComponent(secret)}&slug=${encodeURIComponent(slug)}&category=${encodeURIComponent(category)}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    console.log("本番サイトのキャッシュを即時更新しました");
+  } catch (err) {
+    console.warn("revalidate呼び出しに失敗しました(反映まで時間がかかる可能性):", (err as Error).message);
   }
 }
 

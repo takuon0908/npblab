@@ -5,8 +5,8 @@ import { getViewCounts } from "@/lib/columnViews";
 import { Table, Th, Td } from "@/components/Table";
 import { formatDateJa } from "@/lib/date";
 
-// 記事は手動公開でしか更新されないため、他ページと同じ6時間に緩めている(Vercel ISR Writes枠対策)
-export const revalidate = 21600;
+// 記事の即時反映は公開時のオンデマンドrevalidation(/api/revalidate)で行うため、これはあくまでフォールバック値(Vercel ISR Writes枠対策)
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: "人気記事ランキング",
