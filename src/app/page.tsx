@@ -3,6 +3,7 @@ import Link from "next/link";
 import { formatDateJa } from "@/lib/date";
 import { getLatestDayGames, pickClosestGame } from "@/lib/games";
 import { FavoriteAwareGameGrid } from "@/components/FavoriteAwareGameGrid";
+import { FavoriteTeamHighlight } from "@/components/FavoriteTeamHighlight";
 import { getColumns } from "@/lib/microcms";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 import { TEAM_THEME } from "@/lib/teamTheme";
@@ -95,6 +96,84 @@ async function getSectionTeasers(): Promise<Record<string, string | null>> {
   }
 }
 
+const TITLE_CATEGORY_SHORT_LABEL: Partial<Record<TitleCategory, string>> = {
+  [TitleCategory.BATTING_AVERAGE]: "首位打者",
+  [TitleCategory.HOME_RUNS]: "本塁打王",
+  [TitleCategory.RBI]: "打点王",
+  [TitleCategory.STOLEN_BASES]: "盗塁王",
+  [TitleCategory.WINS]: "最多勝",
+  [TitleCategory.ERA]: "防御率",
+  [TitleCategory.STRIKEOUTS]: "最多奪三振",
+  [TitleCategory.SAVES]: "最多セーブ",
+  [TitleCategory.HOLDS]: "最多ホールド",
+};
+
+export interface TeamHighlight {
+  slug: string;
+  name: string;
+  probability: number;
+  rank: number;
+  wins: number;
+  losses: number;
+  gamesBehind: number;
+  topTitleCandidate: { playerName: string; label: string; probability: number } | null;
+}
+
+// お気に入り球団のパーソナライズ表示用に、全12球団分をまとめて1回で取得しておく。
+// (お気に入りはブラウザのlocalStorageにしか無くサーバー側からは分からないため、
+// 「どの球団が選ばれても対応できるデータ」を先に渡し、選別はクライアント側で行う)
+async function getTeamHighlights(): Promise<TeamHighlight[]> {
+  try {
+    const [champDate, standingsDate, titleDate] = await Promise.all([
+      prisma.championshipProbability.aggregate({ _max: { date: true } }),
+      prisma.standingsSnapshot.aggregate({ _max: { date: true } }),
+      prisma.titleRaceProbability.aggregate({ _max: { date: true } }),
+    ]);
+    if (!champDate._max.date || !standingsDate._max.date) return [];
+
+    const [probs, standings, titleRows] = await Promise.all([
+      prisma.championshipProbability.findMany({
+        where: { date: champDate._max.date },
+        include: { team: true },
+        orderBy: { probability: "desc" },
+      }),
+      prisma.standingsSnapshot.findMany({ where: { date: standingsDate._max.date } }),
+      titleDate._max.date
+        ? prisma.titleRaceProbability.findMany({ where: { date: titleDate._max.date }, orderBy: { probability: "desc" } })
+        : Promise.resolve([]),
+    ]);
+
+    const standingsByTeam = new Map(standings.map((s) => [s.teamId, s]));
+    const bestTitleByTeam = new Map<string, (typeof titleRows)[number]>();
+    for (const row of titleRows) {
+      if (!bestTitleByTeam.has(row.teamId)) bestTitleByTeam.set(row.teamId, row);
+    }
+
+    return probs.map((p, i) => {
+      const standing = standingsByTeam.get(p.teamId);
+      const title = bestTitleByTeam.get(p.teamId);
+      return {
+        slug: p.team.slug,
+        name: p.team.name,
+        probability: p.probability,
+        rank: i + 1,
+        wins: standing?.wins ?? 0,
+        losses: standing?.losses ?? 0,
+        gamesBehind: standing?.gamesBehind ?? 0,
+        topTitleCandidate: title
+          ? {
+              playerName: title.playerName,
+              label: TITLE_CATEGORY_SHORT_LABEL[title.category] ?? "タイトル候補",
+              probability: title.probability,
+            }
+          : null,
+      };
+    });
+  } catch {
+    return [];
+  }
+}
+
 function HighlightGame({ game }: { game: NonNullable<Awaited<ReturnType<typeof getLatestDayGames>>>["games"][number] }) {
   const margin = Math.abs(game.homeScore! - game.awayScore!);
   const homeWin = game.homeScore! > game.awayScore!;
@@ -124,10 +203,11 @@ function HighlightGame({ game }: { game: NonNullable<Awaited<ReturnType<typeof g
 }
 
 export default async function Home() {
-  const [latestGames, latestColumns, teasers] = await Promise.all([
+  const [latestGames, latestColumns, teasers, teamHighlights] = await Promise.all([
     getLatestDayGames(),
     getLatestColumnsSafely(),
     getSectionTeasers(),
+    getTeamHighlights(),
   ]);
   const highlightGame = latestGames ? pickClosestGame(latestGames.games) : null;
   const [heroColumn, ...restColumns] = latestColumns;
@@ -153,6 +233,8 @@ export default async function Home() {
         >
           野球を科学する。NPBのデータを独自に分析し、優勝確率・タイトル獲得確率を毎日更新します。
         </h1>
+
+        {teamHighlights.length > 0 && <FavoriteTeamHighlight teams={teamHighlights} />}
 
         {latestGames && latestGames.games.length > 0 && (
           <section className="mb-10">
