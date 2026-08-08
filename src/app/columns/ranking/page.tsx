@@ -5,8 +5,8 @@ import { getViewCounts } from "@/lib/columnViews";
 import { Table, Th, Td } from "@/components/Table";
 import { formatDateJa } from "@/lib/date";
 
-// 60秒は短すぎてSupabase egressを無駄に消費するため5分に緩めている
-export const revalidate = 300;
+// 記事は手動公開でしか更新されないため、他ページと同じ6時間に緩めている(Vercel ISR Writes枠対策)
+export const revalidate = 21600;
 
 export const metadata: Metadata = {
   title: "人気記事ランキング",
