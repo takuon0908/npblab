@@ -30,7 +30,7 @@ const sections: {
   { href: "/teams", label: "球団別 優勝確率", desc: "残り試合シミュレーションによる優勝確率の推移", teaserKey: "teams" },
   { href: "/titles", label: "タイトルレース", desc: "打者・投手タイトルの獲得確率を日次更新", teaserKey: "titles" },
   { href: "/prospects", label: "2軍注目選手", desc: "2軍成績を1軍換算した昇格候補ランキング", teaserKey: "prospects" },
-  { href: "/analysis", label: "独自指標", desc: "LABバリューMVPランキングなど", teaserKey: "analysis" },
+  { href: "/analysis", label: "LABバリュー", desc: "セイバーメトリクスで算出する独自のMVPランキング", teaserKey: "analysis" },
   { href: "/columns", label: "コラム", desc: "分析記事・考察", teaserKey: "columns" },
 ];
 

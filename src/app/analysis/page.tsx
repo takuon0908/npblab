@@ -89,7 +89,18 @@ async function getSabermetricsLeaders() {
     .sort((a, b) => b.bbPercent - a.bbPercent)
     .slice(0, 5);
 
-  return { wobaLeaders, fipLeaders, whipLeaders, kPercentLeaders, bbPercentLeaders };
+  // ランキング上位の数字だけでは「それがどれだけ凄いか」が伝わらないため、
+  // 規定到達選手全体のリーグ平均も併記して比較の物差しにする
+  const average = (values: number[]) => (values.length > 0 ? values.reduce((a, b) => a + b, 0) / values.length : 0);
+  const leagueAverages = {
+    woba: average(qualifiedBatters.map((b) => calcWoba(b))),
+    fip: average(qualifiedPitchers.map((p) => calcFip(p, fipConstant))),
+    whip: average(qualifiedPitchers.map((p) => calcWhip(p))),
+    kPercent: average(qualifiedBatters.map((b) => calcKPercent(b))),
+    bbPercent: average(qualifiedBatters.map((b) => calcBBPercent(b))),
+  };
+
+  return { wobaLeaders, fipLeaders, whipLeaders, kPercentLeaders, bbPercentLeaders, leagueAverages };
 }
 
 function itemListJsonLd(name: string, items: { playerId: string; playerName: string }[]) {
@@ -116,6 +127,7 @@ export default async function AnalysisPage() {
       <p className="text-sm mb-1" style={{ color: "var(--ink-secondary)" }}>
         <strong>LABバリュー</strong>
         は、1軍の打者・投手を「リーグ平均をどれだけ上回ったか」という同じ物差しで比較する当サイト独自の貢献度指数です。
+        <strong>0が平均的な選手</strong>を表し、プラスが大きいほど貢献度が高いことを意味します。
       </p>
       <p className="text-xs mb-8" style={{ color: "var(--ink-muted)" }}>
         算出方法の詳細は
@@ -206,8 +218,11 @@ export default async function AnalysisPage() {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd("wOBAランキング", sabermetrics.wobaLeaders)) }}
               />
-              <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
-                wOBA（打者）
+              <h3 className="flex items-baseline justify-between text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
+                <span>wOBA（打者）</span>
+                <span className="text-xs font-normal" style={{ color: "var(--ink-muted)" }}>
+                  リーグ平均 {sabermetrics.leagueAverages.woba.toFixed(3)}
+                </span>
               </h3>
               <Table>
                 <thead>
@@ -252,8 +267,11 @@ export default async function AnalysisPage() {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd("FIPランキング", sabermetrics.fipLeaders)) }}
               />
-              <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
-                FIP（投手）
+              <h3 className="flex items-baseline justify-between text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
+                <span>FIP（投手）</span>
+                <span className="text-xs font-normal" style={{ color: "var(--ink-muted)" }}>
+                  リーグ平均 {sabermetrics.leagueAverages.fip.toFixed(2)}
+                </span>
               </h3>
               <Table>
                 <thead>
@@ -309,8 +327,11 @@ export default async function AnalysisPage() {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd("WHIPランキング", sabermetrics.whipLeaders)) }}
               />
-              <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
-                WHIP（投手）
+              <h3 className="flex items-baseline justify-between text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
+                <span>WHIP（投手）</span>
+                <span className="text-xs font-normal" style={{ color: "var(--ink-muted)" }}>
+                  リーグ平均 {sabermetrics.leagueAverages.whip.toFixed(2)}
+                </span>
               </h3>
               <Table>
                 <thead>
@@ -355,8 +376,11 @@ export default async function AnalysisPage() {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd("低K%ランキング", sabermetrics.kPercentLeaders)) }}
               />
-              <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
-                低K%（打者、三振が少ない順）
+              <h3 className="flex items-baseline justify-between text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
+                <span>低K%（打者、三振が少ない順）</span>
+                <span className="text-xs font-normal" style={{ color: "var(--ink-muted)" }}>
+                  リーグ平均 {(sabermetrics.leagueAverages.kPercent * 100).toFixed(1)}%
+                </span>
               </h3>
               <Table>
                 <thead>
@@ -401,8 +425,11 @@ export default async function AnalysisPage() {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd("高BB%ランキング", sabermetrics.bbPercentLeaders)) }}
               />
-              <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
-                高BB%（打者、四球が多い順）
+              <h3 className="flex items-baseline justify-between text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
+                <span>高BB%（打者、四球が多い順）</span>
+                <span className="text-xs font-normal" style={{ color: "var(--ink-muted)" }}>
+                  リーグ平均 {(sabermetrics.leagueAverages.bbPercent * 100).toFixed(1)}%
+                </span>
               </h3>
               <Table>
                 <thead>
