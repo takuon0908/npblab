@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { formatDateJa } from "@/lib/date";
-import { getLatestDayGames, pickClosestGame } from "@/lib/games";
-import { FavoriteAwareGameGrid } from "@/components/FavoriteAwareGameGrid";
+import { getLatestDayGames, getScheduledGames, pickClosestGame } from "@/lib/games";
+import { GamesTabSwitcher } from "@/components/GamesTabSwitcher";
 import { FavoriteTeamHighlight } from "@/components/FavoriteTeamHighlight";
 import { getColumns } from "@/lib/microcms";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
@@ -45,8 +45,9 @@ async function getLatestColumnsSafely() {
   }
 }
 
-// TOPページの導線カードに添える「今の一番」の生きた数字。取得できない項目はdescの静的文言にフォールバックする
-async function getSectionTeasers(): Promise<Record<string, string | null>> {
+// TOPページの導線カードとヒーローの「キラーデータ」カードの両方に使う「今の一番」の生きた数字。
+// 同じクエリ結果を使い回し、DB問い合わせを1回で済ませる
+async function getHeroStats() {
   try {
     const [champDate, titleDate, prospectDate, valueDate] = await Promise.all([
       prisma.championshipProbability.aggregate({ _max: { date: true } }),
@@ -83,17 +84,88 @@ async function getSectionTeasers(): Promise<Record<string, string | null>> {
         : null,
     ]);
 
-    return {
-      teams: topTeam ? `首位 ${topTeam.team.name} 優勝確率${(topTeam.probability * 100).toFixed(1)}%` : null,
-      titles: topTitle ? `本塁打王 ${topTitle.playerName} ${topTitle.currentValue}本` : null,
-      prospects: topProspect ? `1位 ${topProspect.playerName} 換算OPS ${topProspect.translatedValue.toFixed(3)}` : null,
-      analysis: topValue ? `MVP ${topValue.playerName} LABバリュー${topValue.value.toFixed(2)}` : null,
-      columns: null,
-    };
+    return { topTeam, topTitle, topProspect, topValue };
   } catch {
     // DB未接続のビルド環境でも失敗させない
-    return { teams: null, titles: null, prospects: null, analysis: null, columns: null };
+    return { topTeam: null, topTitle: null, topProspect: null, topValue: null };
   }
+}
+
+type HeroStats = Awaited<ReturnType<typeof getHeroStats>>;
+
+// ナビカードに添える「今の一番」の一行テキストを、ヒーロー統計と同じ生データから組み立てる
+function buildSectionTeasers(hero: HeroStats): Record<string, string | null> {
+  return {
+    teams: hero.topTeam ? `首位 ${hero.topTeam.team.name} 優勝確率${(hero.topTeam.probability * 100).toFixed(1)}%` : null,
+    titles: hero.topTitle ? `本塁打王 ${hero.topTitle.playerName} ${hero.topTitle.currentValue}本` : null,
+    prospects: hero.topProspect
+      ? `1位 ${hero.topProspect.playerName} 換算OPS ${hero.topProspect.translatedValue.toFixed(3)}`
+      : null,
+    analysis: hero.topValue ? `MVP ${hero.topValue.playerName} LABバリュー${hero.topValue.value.toFixed(2)}` : null,
+    columns: null,
+  };
+}
+
+// ヒーロー最上部に並べる「キラーデータ」カード。数字の力を最初に見せるため、
+// 文章に埋め込まず大きな数字として独立させる(dataviz原則: 見出しは数字、文脈は添え書き)
+function HeroStatCard({ label, value, sub, href, accent }: { label: string; value: string; sub: string; href: string; accent?: string }) {
+  return (
+    <Link
+      href={href}
+      className="hover-lift block p-4"
+      style={{ background: "var(--surface)", border: "1px solid var(--border-strong)", borderTop: `3px solid ${accent ?? "var(--accent)"}` }}
+    >
+      <p className="text-xs mb-1.5" style={{ color: "var(--ink-muted)" }}>
+        {label}
+      </p>
+      <p className="text-2xl font-black tabular-nums mb-1" style={{ fontFamily: "var(--font-heading)", color: "var(--accent)" }}>
+        {value}
+      </p>
+      <p className="text-xs" style={{ color: "var(--ink-secondary)" }}>
+        {sub}
+      </p>
+    </Link>
+  );
+}
+
+function HeroStatsRow({ hero }: { hero: HeroStats }) {
+  const cards = [
+    hero.topTeam && {
+      label: "優勝確率 首位",
+      value: `${(hero.topTeam.probability * 100).toFixed(1)}%`,
+      sub: hero.topTeam.team.name,
+      href: "/teams",
+      accent: TEAM_THEME[hero.topTeam.team.slug]?.accent,
+    },
+    hero.topTitle && {
+      label: "本塁打王争い",
+      value: `${hero.topTitle.currentValue}本`,
+      sub: hero.topTitle.playerName,
+      href: "/titles",
+    },
+    hero.topValue && {
+      label: "LABバリュー MVP",
+      value: hero.topValue.value.toFixed(2),
+      sub: hero.topValue.playerName,
+      href: "/analysis",
+    },
+    hero.topProspect && {
+      label: "2軍注目 換算OPS",
+      value: hero.topProspect.translatedValue.toFixed(3),
+      sub: hero.topProspect.playerName,
+      href: "/prospects",
+    },
+  ].filter((c): c is NonNullable<typeof c> => Boolean(c));
+
+  if (cards.length === 0) return null;
+
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 mb-10">
+      {cards.map((c) => (
+        <HeroStatCard key={c.label} {...c} />
+      ))}
+    </div>
+  );
 }
 
 const TITLE_CATEGORY_SHORT_LABEL: Partial<Record<TitleCategory, string>> = {
@@ -203,12 +275,14 @@ function HighlightGame({ game }: { game: NonNullable<Awaited<ReturnType<typeof g
 }
 
 export default async function Home() {
-  const [latestGames, latestColumns, teasers, teamHighlights] = await Promise.all([
+  const [latestGames, scheduledGames, latestColumns, heroStats, teamHighlights] = await Promise.all([
     getLatestDayGames(),
+    getScheduledGames(),
     getLatestColumnsSafely(),
-    getSectionTeasers(),
+    getHeroStats(),
     getTeamHighlights(),
   ]);
+  const teasers = buildSectionTeasers(heroStats);
   const highlightGame = latestGames ? pickClosestGame(latestGames.games) : null;
   const [heroColumn, ...restColumns] = latestColumns;
 
@@ -234,21 +308,27 @@ export default async function Home() {
           野球を科学する。NPBのデータを独自に分析し、優勝確率・タイトル獲得確率を毎日更新します。
         </h1>
 
+        <HeroStatsRow hero={heroStats} />
+
         {teamHighlights.length > 0 && <FavoriteTeamHighlight teams={teamHighlights} />}
 
         {latestGames && latestGames.games.length > 0 && (
           <section className="mb-10">
-            <div className="flex items-baseline justify-between mb-3">
+            <div className="flex items-baseline justify-between mb-1">
               <h2 className="flex items-center gap-2 font-semibold text-sm" style={{ color: "var(--ink)" }}>
                 <span aria-hidden style={{ width: 9, height: 9, background: "var(--accent)", flex: "none", transform: "rotate(45deg)" }} />
-                {formatDateJa(latestGames.date)}の試合結果
+                試合結果
               </h2>
               <Link href="/games" className="text-xs hover:underline" style={{ color: "var(--accent)" }}>
                 もっと見る →
               </Link>
             </div>
             {highlightGame && <HighlightGame game={highlightGame} />}
-            <FavoriteAwareGameGrid games={latestGames.games} />
+            <GamesTabSwitcher
+              resultsDateLabel={formatDateJa(latestGames.date).replace(/^\d+年/, "")}
+              resultsGames={latestGames.games}
+              scheduleGames={scheduledGames.map((g) => ({ ...g, date: g.date.toISOString() }))}
+            />
           </section>
         )}
       </div>

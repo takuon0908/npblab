@@ -20,6 +20,19 @@ export async function getLatestDayGames() {
   return { date: latest.date, games };
 }
 
+// 今日以降でまだ終わっていない、予告先発が決まっている試合(直近分)
+export async function getScheduledGames() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return prisma.game.findMany({
+    where: { date: { gte: today }, isFinished: false, probableHomePitcher: { not: null } },
+    include: { homeTeam: true, awayTeam: true },
+    orderBy: { date: "asc" },
+    take: 12,
+  });
+}
+
 // その日の試合の中から、最も僅差だった一戦を「今日の接戦」として選ぶ
 export function pickClosestGame<T extends { homeScore: number | null; awayScore: number | null }>(
   games: T[]
