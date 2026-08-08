@@ -4,6 +4,11 @@ import { getAllColumns, CATEGORIES } from "@/lib/microcms";
 import { categoryToSlug } from "@/lib/categorySlug";
 import { siteUrl } from "@/lib/siteUrl";
 
+// revalidate未指定だとビルド時(=コードデプロイ時)にしか再生成されない。
+// 日次パイプラインはコードを触らずSupabaseにデータを書き込むだけなので、それだと
+// デプロイの無い日に増えた新規選手・新着記事がサイトマップに反映されないまま取り残される
+export const revalidate = 3600;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const teams = await prisma.team.findMany({ select: { slug: true } });
 
