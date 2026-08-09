@@ -11,6 +11,7 @@ const FOOTER_LINKS = [
   { href: "/columns", label: "コラム" },
   { href: "/about", label: "このサイトについて" },
   { href: "/about/methodology", label: "算出方法について" },
+  { href: "/privacy", label: "プライバシーポリシー" },
   { href: "/contact", label: "お問い合わせ" },
 ];
 

@@ -12,6 +12,10 @@ import { siteUrl } from "@/lib/siteUrl";
 import { getPlayerSocialLinks } from "@/lib/playerSocialLinks";
 import { PlayerSocialLinksRow } from "@/components/PlayerSocialLinks";
 import { PlayerPortrait } from "@/components/PlayerPortrait";
+import { ShareButton } from "@/components/ShareButton";
+import { RakutenWidget } from "@/components/RakutenWidget";
+import { getColumns } from "@/lib/microcms";
+import { formatDateJa } from "@/lib/date";
 
 // データは1日1回(日次パイプライン)しか更新されないため24時間に緩めている(Supabase egress/Vercel ISR Writes対策)
 export const revalidate = 86400;
@@ -80,6 +84,17 @@ async function getPlayer(playerId: string) {
     if (rank > 0) battingRank = { rank, total: qualified.length };
   }
 
+  // 選手ページが行き止まりにならないよう、同球団のLABバリュー上位選手を関連選手として案内する
+  const latestValue = valueRatings.at(-1) ?? null;
+  let teammates: { playerId: string; playerName: string; value: number }[] = [];
+  if (latestValue) {
+    const teamRatings = await prisma.playerValueRating.findMany({
+      where: { teamId: first.team.id, date: latestValue.date },
+      orderBy: { rank: "asc" },
+    });
+    teammates = teamRatings.filter((r) => r.playerId !== playerId).slice(0, 5);
+  }
+
   return {
     playerName: first.playerName,
     team: first.team,
@@ -94,7 +109,18 @@ async function getPlayer(playerId: string) {
     pitchingHistory: latestBySeasonLevel(pitchingRows),
     valueRatings,
     prospectRating: prospectRatings[0] ?? null,
+    teammates,
   };
+}
+
+// 選手ページが行き止まりにならないよう最新コラムへの導線も添える(microCMS未設定のビルド環境でも失敗させない)
+async function getLatestColumnsSafely() {
+  try {
+    const { contents } = await getColumns(3);
+    return contents;
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({
@@ -122,7 +148,7 @@ export async function generateMetadata({
 export default async function PlayerPage({ params }: { params: Promise<{ playerId: string }> }) {
   const { playerId: rawPlayerId } = await params;
   const playerId = decodeURIComponent(rawPlayerId);
-  const player = await getPlayer(playerId);
+  const [player, latestColumns] = await Promise.all([getPlayer(playerId), getLatestColumnsSafely()]);
   if (!player) notFound();
 
   const woba = player.currentBatting ? calcWoba(player.currentBatting) : null;
@@ -239,6 +265,9 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
           <h1 className="text-2xl font-black">{player.playerName}</h1>
           <PlayerSocialLinksRow links={socialLinks} />
         </div>
+      </div>
+      <div className="mt-3">
+        <ShareButton title={`${player.playerName}(${player.team.name})の成績・データ`} url={`${siteUrl}/players/${playerId}`} />
       </div>
       <div className="mb-8" />
 
@@ -472,6 +501,59 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
                 </tbody>
               </Table>
             )}
+          </div>
+        </div>
+      )}
+
+      <RakutenWidget pageUrl={`${siteUrl}/players/${playerId}`} />
+
+      {player.teammates.length > 0 && (
+        <div className="mt-12">
+          <h2 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-muted)" }}>
+            {player.team.name}の他の注目選手
+          </h2>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {player.teammates.map((t) => (
+              <Link
+                key={t.playerId}
+                href={`/players/${t.playerId}`}
+                className="hover-lift flex items-center justify-between gap-2 px-3 py-2 text-sm"
+                style={{ background: "var(--surface)", border: "1px solid var(--border-strong)" }}
+              >
+                <span className="hover:underline">{t.playerName}</span>
+                <span className="text-xs tabular-nums" style={{ color: "var(--ink-muted)" }}>
+                  LABバリュー {t.value.toFixed(2)}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {latestColumns.length > 0 && (
+        <div className="mt-12">
+          <div className="flex items-baseline justify-between mb-3">
+            <h2 className="text-sm font-semibold" style={{ color: "var(--ink-muted)" }}>
+              最新コラム
+            </h2>
+            <Link href="/columns" className="text-xs hover:underline" style={{ color: "var(--accent)" }}>
+              もっと見る →
+            </Link>
+          </div>
+          <div className="grid gap-2">
+            {latestColumns.map((c) => (
+              <Link
+                key={c.id}
+                href={`/columns/${c.slug}`}
+                className="hover-lift flex items-baseline justify-between gap-3 px-3 py-2 text-sm"
+                style={{ background: "var(--surface)", border: "1px solid var(--border-strong)" }}
+              >
+                <span className="hover:underline">{c.title}</span>
+                <span className="text-xs whitespace-nowrap" style={{ color: "var(--ink-muted)" }}>
+                  {formatDateJa(new Date(c.publishedAt))}
+                </span>
+              </Link>
+            ))}
           </div>
         </div>
       )}

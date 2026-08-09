@@ -42,6 +42,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/columns/ranking`, changeFrequency: "daily", priority: 0.6, lastModified: now },
     { url: `${siteUrl}/about`, changeFrequency: "monthly", priority: 0.4, lastModified: now },
     { url: `${siteUrl}/about/methodology`, changeFrequency: "monthly", priority: 0.4, lastModified: now },
+    { url: `${siteUrl}/privacy`, changeFrequency: "monthly", priority: 0.3, lastModified: now },
   ];
 
   const teamRoutes: MetadataRoute.Sitemap = teams.flatMap((t) => [
