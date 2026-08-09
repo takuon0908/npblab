@@ -13,13 +13,25 @@ function hashString(input: string): number {
   return hash;
 }
 
-type Motif = "ball" | "glove" | "bat" | "strikezone";
+type Motif = "ball" | "glove" | "bat" | "strikezone" | "star" | "pennant" | "dumbbell" | "chart";
 
-function pickMotif(text: string): Motif {
+// カテゴリごとに既定のモチーフを割り当て、本文キーワードはそれを上書きする形で使う。
+// 以前は「ball」がほぼ全記事のデフォルトになってしまい、見た目の代わり映えがしなかったための対応
+const CATEGORY_MOTIF: Partial<Record<string, Motif>> = {
+  選手フィーチャー: "star",
+  ペナントレース速報: "pennant",
+  "野球理論（科学的検証）": "chart",
+  "体づくり・怪我予防": "dumbbell",
+  用具選び: "glove",
+  "ルール・基礎知識": "strikezone",
+};
+
+function pickMotif(text: string, category?: string[]): Motif {
   if (/グローブ|グラブ|捕手|キャッチャー/.test(text)) return "glove";
   if (/バット|素振り|スイング/.test(text)) return "bat";
   if (/ストライク|ボール判定|審判|ルール/.test(text)) return "strikezone";
-  return "ball";
+  const fromCategory = category?.[0] ? CATEGORY_MOTIF[category[0]] : undefined;
+  return fromCategory ?? "ball";
 }
 
 function BallIcon({ bg }: { bg: string }) {
@@ -66,11 +78,57 @@ function StrikeZoneIcon({ bg }: { bg: string }) {
   );
 }
 
+// 5稜星。選手フィーチャー(注目選手・特定選手の話題)向け
+function StarIcon({ bg }: { bg: string }) {
+  const points = Array.from({ length: 10 }, (_, i) => {
+    const angle = (Math.PI / 5) * i - Math.PI / 2;
+    const r = i % 2 === 0 ? 46 : 19;
+    return `${(r * Math.cos(angle)).toFixed(1)},${(r * Math.sin(angle)).toFixed(1)}`;
+  }).join(" ");
+  return <polygon points={points} fill="#f5f0e6" stroke={bg} strokeWidth="2" strokeDasharray="4 4" />;
+}
+
+// ペナント(三角旗)。ペナントレース速報向け
+function PennantIcon({ bg }: { bg: string }) {
+  return (
+    <g>
+      <line x1="-28" y1="-52" x2="-28" y2="52" stroke="#f5f0e6" strokeWidth="5" />
+      <path d="M -28 -46 L 44 -28 L -28 -10 Z" fill="#f5f0e6" stroke={bg} strokeWidth="2" strokeDasharray="3 4" />
+    </g>
+  );
+}
+
+// ダンベル。体づくり・怪我予防向け
+function DumbbellIcon({ bg }: { bg: string }) {
+  return (
+    <g>
+      <rect x="-38" y="-7" width="76" height="14" rx="4" fill="#f5f0e6" />
+      <rect x="-54" y="-26" width="18" height="52" rx="5" fill="#f5f0e6" stroke={bg} strokeWidth="2" strokeDasharray="3 4" />
+      <rect x="36" y="-26" width="18" height="52" rx="5" fill="#f5f0e6" stroke={bg} strokeWidth="2" strokeDasharray="3 4" />
+    </g>
+  );
+}
+
+// 棒グラフ。野球理論(科学的検証)向け
+function ChartIcon({ bg }: { bg: string }) {
+  return (
+    <g>
+      <rect x="-42" y="6" width="20" height="44" fill="#f5f0e6" />
+      <rect x="-11" y="-16" width="20" height="66" fill="#f5f0e6" />
+      <rect x="20" y="-38" width="20" height="88" fill="#f5f0e6" stroke={bg} strokeWidth="2" strokeDasharray="3 4" />
+    </g>
+  );
+}
+
 const MOTIF_ICONS: Record<Motif, (props: { bg: string }) => React.ReactElement> = {
   ball: BallIcon,
   glove: GloveIcon,
   bat: BatIcon,
   strikezone: StrikeZoneIcon,
+  star: StarIcon,
+  pennant: PennantIcon,
+  dumbbell: DumbbellIcon,
+  chart: ChartIcon,
 };
 
 export function ArticleCover({
@@ -93,7 +151,7 @@ export function ArticleCover({
   const seed = hashString(slug);
   const flip = seed % 2 === 1; // ダイアゴナルとアイコンの左右を反転
   const iconY = 70 + (seed % 3) * 40; // 縦位置を3パターンで変化
-  const Motif = MOTIF_ICONS[pickMotif(text)];
+  const Motif = MOTIF_ICONS[pickMotif(text, category)];
 
   const iconX = flip ? 100 : 300;
   const diagonalPoints = flip ? "0,0 170,0 280,225 0,225" : "230,0 400,0 400,225 120,225";
