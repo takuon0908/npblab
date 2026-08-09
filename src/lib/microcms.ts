@@ -125,6 +125,26 @@ export function withHeadingAnchors(bodyHtml: string): { html: string; headings: 
   return { html, headings };
 }
 
+// 記事本文をh2見出しの境界でセクションに分割する。図解画像をmicroCMSのbody(リッチテキスト)に
+// 直接埋め込めない(API経由の<img>は保存時に除去される)ため、指定セクションの直後にReactコンポーネント
+// として画像を挿入できるようにするための下準備。戻り値のsegments[0]は最初のh2より前の導入部、
+// segments[N]はN番目(1始まり)のh2から次のh2の直前までの本文
+export function splitBodyIntoSections(bodyHtml: string): string[] {
+  const h2Regex = /<h2[^>]*>/g;
+  const starts: number[] = [];
+  let match: RegExpExecArray | null;
+  while ((match = h2Regex.exec(bodyHtml))) starts.push(match.index);
+
+  const segments: string[] = [];
+  let prev = 0;
+  for (const start of starts) {
+    segments.push(bodyHtml.slice(prev, start));
+    prev = start;
+  }
+  segments.push(bodyHtml.slice(prev));
+  return segments;
+}
+
 export async function getColumnBySlug(slug: string) {
   const res = await getClient().getList<Column>({
     endpoint: "columns",

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getColumnBySlug, getColumns, getAllColumns, parseTags, excerptForMeta, withHeadingAnchors } from "@/lib/microcms";
+import { getColumnBySlug, getColumns, getAllColumns, parseTags, excerptForMeta, withHeadingAnchors, splitBodyIntoSections } from "@/lib/microcms";
+import { getArticleDiagrams } from "@/lib/articleDiagrams";
 import { formatDateJa } from "@/lib/date";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 import { GoodButton } from "@/components/GoodButton";
@@ -67,6 +68,8 @@ export default async function ColumnPage({
   const publishedDate = new Date(column.publishedAt);
   const { html: bodyWithAnchors, headings } = withHeadingAnchors(column.body);
   const pointSummary = excerptForMeta(column.body);
+  const diagrams = getArticleDiagrams(column.slug);
+  const bodySections = diagrams.length > 0 ? splitBodyIntoSections(bodyWithAnchors) : null;
 
   // 関連記事は「同じカテゴリ」を優先し、枠が余ればタグが一致する記事で埋める。
   // カテゴリだけだと同カテゴリ内に記事が少ない場合に関連記事自体が出なくなるため
@@ -263,8 +266,30 @@ export default async function ColumnPage({
               "--tw-prose-kbd": "var(--ink)",
             } as React.CSSProperties
           }
-          dangerouslySetInnerHTML={{ __html: bodyWithAnchors }}
-        />
+        >
+          {bodySections
+            ? bodySections.map((section, i) => (
+                <div key={i}>
+                  <div dangerouslySetInnerHTML={{ __html: section }} />
+                  {diagrams
+                    .filter((d) => d.afterSection === i)
+                    .map((d) => (
+                      <figure key={d.src} className="not-prose my-8">
+                        <Image
+                          src={d.src}
+                          alt={d.alt}
+                          width={1400}
+                          height={764}
+                          className="w-full h-auto rounded-none"
+                          style={{ border: "1px solid var(--border-strong)" }}
+                        />
+                      </figure>
+                    ))}
+                </div>
+              ))
+            : // eslint-disable-next-line react/no-danger
+              <div dangerouslySetInnerHTML={{ __html: bodyWithAnchors }} />}
+        </div>
 
         {affiliateProduct && (
           <div className="mt-8 flex justify-center">

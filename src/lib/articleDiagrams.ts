@@ -1,0 +1,37 @@
+// 記事本文に埋め込む解説図解。microCMSのAPI経由でbody(リッチテキスト)に<img>タグを含めても
+// 保存時に除去されてしまうため、画像はpublic/に置きコード側でセクション見出しの直後に挿入する。
+// afterSection は本文中のh2見出しの何番目の直後に挿入するか(1始まり)
+export interface ArticleDiagram {
+  src: string;
+  alt: string;
+  afterSection: number;
+}
+
+export const ARTICLE_DIAGRAMS: Record<string, ArticleDiagram[]> = {
+  "increase-pitching-velocity-guide": [
+    {
+      src: "/columns/diagrams/increase-pitching-velocity-guide-kinetic-chain.jpg",
+      alt: "運動連鎖によるエネルギー伝達と、胸郭の開き(ヒップ・ショルダー・セパレーション)の比較図解",
+      afterSection: 1,
+    },
+    {
+      src: "/columns/diagrams/increase-pitching-velocity-guide-training-tools.jpg",
+      alt: "加重ボールトレーニングやバイオメカニクス計測など、球速アップに使われる主なトレーニングツールの図解",
+      afterSection: 2,
+    },
+    {
+      src: "/columns/diagrams/increase-pitching-velocity-guide-mobility.jpg",
+      alt: "肩甲骨・股関節の可動域チェックと、部位別トレーニングの図解",
+      afterSection: 3,
+    },
+    {
+      src: "/columns/diagrams/increase-pitching-velocity-guide-data.jpg",
+      alt: "球速と回転数の相関、下半身出力と球速の相関、トレーニングによる出力向上の推移を示すグラフ",
+      afterSection: 4,
+    },
+  ],
+};
+
+export function getArticleDiagrams(slug: string): ArticleDiagram[] {
+  return ARTICLE_DIAGRAMS[slug] ?? [];
+}
