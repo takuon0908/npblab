@@ -184,7 +184,7 @@ export default async function TitlesPage() {
                             <div className="flex items-start gap-2.5">
                               <RankBadge rank={i + 1} />
                               <PlayerPortrait playerId={row.playerId} playerName={row.playerName} size={32} rounded />
-                              <div style={{ maxWidth: 115 }}>
+                              <div className="whitespace-normal" style={{ maxWidth: 115 }}>
                                 <Link href={`/players/${row.playerId}`} className="hover:underline font-medium">
                                   {row.playerName}
                                 </Link>
@@ -286,7 +286,7 @@ export default async function TitlesPage() {
                           <div className="flex items-start gap-2.5">
                             <RankBadge rank={i + 1} />
                             <PlayerPortrait playerId={b.playerId} playerName={b.playerName} size={32} rounded />
-                            <div style={{ maxWidth: 115 }}>
+                            <div className="whitespace-normal" style={{ maxWidth: 115 }}>
                               <Link href={`/players/${b.playerId}`} className="hover:underline font-medium">
                                 {b.playerName}
                               </Link>
@@ -340,7 +340,7 @@ export default async function TitlesPage() {
                           <div className="flex items-start gap-2.5">
                             <RankBadge rank={i + 1} />
                             <PlayerPortrait playerId={p.playerId} playerName={p.playerName} size={32} rounded />
-                            <div style={{ maxWidth: 115 }}>
+                            <div className="whitespace-normal" style={{ maxWidth: 115 }}>
                               <Link href={`/players/${p.playerId}`} className="hover:underline font-medium">
                                 {p.playerName}
                               </Link>
