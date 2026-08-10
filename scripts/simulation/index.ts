@@ -107,60 +107,72 @@ async function simulateTitleRaces(date: Date, runs: number) {
     });
     if (leaders.length === 0) continue;
 
-    const candidates: TitleCandidate[] = [];
-    const meta = new Map<string, { playerName: string; teamId: string; currentValue: number; perGameRate: number; remaining: number }>();
-
+    // NPBの各タイトルはセ・リーグ/パ・リーグでそれぞれ独立に選出される(12球団合同のタイトルは無い)。
+    // 12球団まとめて1回シミュレーションすると「リーグを跨いだ獲得確率」という実態と異なる数字に
+    // なってしまうため、リーグごとに候補を分けて別々にシミュレーションする
+    const leadersByLeague = new Map<League, typeof leaders>();
     for (const leader of leaders) {
-      const standing = await prisma.standingsSnapshot.findFirst({
-        where: { teamId: leader.teamId },
-        orderBy: { date: "desc" },
-      });
-      const teamGamesPlayed = standing ? standing.wins + standing.losses + standing.draws : 0;
-      const perGameRate = teamGamesPlayed > 0 ? leader.value / teamGamesPlayed : 0;
-      const remaining = await remainingGamesForTeam(leader.teamId, date);
-
-      candidates.push({
-        playerId: leader.playerId,
-        currentValue: leader.value,
-        remainingGames: remaining,
-        perGameRate,
-      });
-      meta.set(leader.playerId, {
-        playerName: leader.playerName,
-        teamId: leader.teamId,
-        currentValue: leader.value,
-        perGameRate,
-        remaining,
-      });
+      const arr = leadersByLeague.get(leader.team.league) ?? [];
+      arr.push(leader);
+      leadersByLeague.set(leader.team.league, arr);
     }
 
-    const probabilities = simulateTitleRace(candidates, runs);
+    for (const leagueLeaders of leadersByLeague.values()) {
+      const candidates: TitleCandidate[] = [];
+      const meta = new Map<string, { playerName: string; teamId: string; currentValue: number; perGameRate: number; remaining: number }>();
 
-    for (const [playerId, probability] of Object.entries(probabilities)) {
-      const info = meta.get(playerId)!;
-      const projectedValue = info.currentValue + info.perGameRate * info.remaining;
+      for (const leader of leagueLeaders) {
+        const standing = await prisma.standingsSnapshot.findFirst({
+          where: { teamId: leader.teamId },
+          orderBy: { date: "desc" },
+        });
+        const teamGamesPlayed = standing ? standing.wins + standing.losses + standing.draws : 0;
+        const perGameRate = teamGamesPlayed > 0 ? leader.value / teamGamesPlayed : 0;
+        const remaining = await remainingGamesForTeam(leader.teamId, date);
 
-      await prisma.titleRaceProbability.upsert({
-        where: { playerId_category_date: { playerId, category, date } },
-        update: {
-          probability,
-          currentValue: info.currentValue,
-          projectedValue,
-          playerName: info.playerName,
-          teamId: info.teamId,
-        },
-        create: {
-          playerId,
-          playerName: info.playerName,
-          teamId: info.teamId,
-          category,
-          date,
-          probability,
-          currentValue: info.currentValue,
-          projectedValue,
-        },
-      });
-      candidateCount++;
+        candidates.push({
+          playerId: leader.playerId,
+          currentValue: leader.value,
+          remainingGames: remaining,
+          perGameRate,
+        });
+        meta.set(leader.playerId, {
+          playerName: leader.playerName,
+          teamId: leader.teamId,
+          currentValue: leader.value,
+          perGameRate,
+          remaining,
+        });
+      }
+
+      const probabilities = simulateTitleRace(candidates, runs);
+
+      for (const [playerId, probability] of Object.entries(probabilities)) {
+        const info = meta.get(playerId)!;
+        const projectedValue = info.currentValue + info.perGameRate * info.remaining;
+
+        await prisma.titleRaceProbability.upsert({
+          where: { playerId_category_date: { playerId, category, date } },
+          update: {
+            probability,
+            currentValue: info.currentValue,
+            projectedValue,
+            playerName: info.playerName,
+            teamId: info.teamId,
+          },
+          create: {
+            playerId,
+            playerName: info.playerName,
+            teamId: info.teamId,
+            category,
+            date,
+            probability,
+            currentValue: info.currentValue,
+            projectedValue,
+          },
+        });
+        candidateCount++;
+      }
     }
   }
 
