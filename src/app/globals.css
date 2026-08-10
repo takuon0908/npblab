@@ -106,6 +106,13 @@ input:focus-visible {
   font-weight: 600;
 }
 
+.amazon-product-card-price {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  margin-top: 2px;
+}
+
 /* ランキング表の数値に添えるバー(RankBarコンポーネント)。
    フラッドライトが照らすような発光感(box-shadow)を軽く効かせ、ナイターのコンセプトに寄せている。
    初回表示時に0%から伸びるアニメーションを付け、数字の大小を視覚的に印象づける */

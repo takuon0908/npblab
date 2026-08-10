@@ -12,12 +12,15 @@ import { ViewTracker } from "@/components/ViewTracker";
 import { RakutenWidget } from "@/components/RakutenWidget";
 import { AmazonProductCard } from "@/components/AmazonProductCard";
 import { getAffiliateProduct } from "@/lib/affiliateProducts";
+import { RakutenProductCard } from "@/components/RakutenProductCard";
+import { getRakutenProduct } from "@/lib/rakutenProducts";
 import { getViewCount, getPopularColumns } from "@/lib/columnViews";
 import { siteUrl } from "@/lib/siteUrl";
 import { prisma } from "@/lib/prisma";
 import { detectColumnTeamSlug, TEAM_THEME } from "@/lib/teamTheme";
 import { categoryToSlug } from "@/lib/categorySlug";
 import { SITE_AUTHOR } from "@/lib/author";
+import { getActivePlayerNames, linkPlayerNames } from "@/lib/playerLinks";
 import Image from "next/image";
 
 // 記事の即時反映は公開時のオンデマンドrevalidation(/api/revalidate)で行うため、これはあくまでフォールバック値(Vercel ISR Writes枠対策)
@@ -58,15 +61,17 @@ export default async function ColumnPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [column, likeCount, viewCount] = await Promise.all([
+  const [column, likeCount, viewCount, activePlayers] = await Promise.all([
     getColumnBySlug(slug),
     getLikeCount(slug),
     getViewCount(slug),
+    getActivePlayerNames(),
   ]);
   if (!column) notFound();
 
   const publishedDate = new Date(column.publishedAt);
-  const { html: bodyWithAnchors, headings } = withHeadingAnchors(column.body);
+  const bodyWithPlayerLinks = linkPlayerNames(column.body, activePlayers);
+  const { html: bodyWithAnchors, headings } = withHeadingAnchors(bodyWithPlayerLinks);
   const pointSummary = excerptForMeta(column.body);
   const diagrams = getArticleDiagrams(column.slug);
   const bodySections = diagrams.length > 0 ? splitBodyIntoSections(bodyWithAnchors) : null;
@@ -74,6 +79,7 @@ export default async function ColumnPage({
   // 関連記事は「同じカテゴリ」を優先し、枠が余ればタグが一致する記事で埋める。
   // カテゴリだけだと同カテゴリ内に記事が少ない場合に関連記事自体が出なくなるため
   const affiliateProduct = getAffiliateProduct(column.slug, column.category?.[0]);
+  const rakutenProduct = getRakutenProduct(column.slug);
 
   const relatedCategory = column.category?.[0];
   const relatedTag = parseTags(column.tags)[0];
@@ -171,7 +177,7 @@ export default async function ColumnPage({
           >
             {column.title}
           </h1>
-          {affiliateProduct && (
+          {(affiliateProduct || rakutenProduct) && (
             <p
               className="inline-block text-xs px-2.5 py-1 mb-3"
               style={{ color: "var(--ink-muted)", background: "var(--surface)", border: "1px solid var(--border-strong)" }}
@@ -298,6 +304,12 @@ export default async function ColumnPage({
         {affiliateProduct && (
           <div className="mt-8 flex justify-center">
             <AmazonProductCard product={affiliateProduct} />
+          </div>
+        )}
+
+        {rakutenProduct && (
+          <div className="mt-8 flex justify-center">
+            <RakutenProductCard product={rakutenProduct} />
           </div>
         )}
 
