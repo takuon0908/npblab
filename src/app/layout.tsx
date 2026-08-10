@@ -39,6 +39,9 @@ export const metadata: Metadata = {
     locale: "ja_JP",
     type: "website",
   },
+  alternates: {
+    types: { "application/rss+xml": `${siteUrl}/feed.xml` },
+  },
   verification: {
     google: "ZrRa9EIIMCpIUswfoTZC2oLp8MwXwt6HsPvOQxbpORU",
   },
