@@ -12,7 +12,7 @@ import { ViewTracker } from "@/components/ViewTracker";
 import { RakutenWidget } from "@/components/RakutenWidget";
 import { AmazonProductCard } from "@/components/AmazonProductCard";
 import { getAffiliateProduct } from "@/lib/affiliateProducts";
-import { getViewCount } from "@/lib/columnViews";
+import { getViewCount, getPopularColumns } from "@/lib/columnViews";
 import { siteUrl } from "@/lib/siteUrl";
 import { prisma } from "@/lib/prisma";
 import { detectColumnTeamSlug, TEAM_THEME } from "@/lib/teamTheme";
@@ -91,6 +91,10 @@ export default async function ColumnPage({
     relatedColumns.push(...tagMatches);
   }
   relatedColumns.splice(3);
+
+  const popularColumns = (await getPopularColumns(column.slug)).filter(
+    (c) => !relatedColumns.some((r) => r.slug === c.slug)
+  );
 
   const relatedTeamSlug = detectColumnTeamSlug(column);
   const relatedTeam = relatedTeamSlug
@@ -390,9 +394,42 @@ export default async function ColumnPage({
         </section>
       )}
 
+      {popularColumns.length >= 2 && (
+        <section className="mt-14 pt-8" style={{ borderTop: "1px solid var(--border)" }}>
+          <h2 className="flex items-center gap-2 text-sm font-semibold mb-4" style={{ color: "var(--ink)" }}>
+            <span aria-hidden style={{ width: 9, height: 9, background: "var(--accent)", flex: "none", transform: "rotate(45deg)" }} />
+            人気記事
+          </h2>
+          <ol className="space-y-3">
+            {popularColumns.map((c, i) => (
+              <li key={c.id}>
+                <Link
+                  href={`/columns/${c.slug}`}
+                  className="hover-lift group flex items-center gap-3 p-3"
+                  style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
+                >
+                  <span
+                    className="flex-none text-lg font-black tabular-nums"
+                    style={{ color: "var(--accent)", width: 24 }}
+                  >
+                    {i + 1}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium group-hover:underline" style={{ fontFamily: "var(--font-heading)" }}>
+                    {c.title}
+                  </span>
+                  <span className="flex-none text-xs" style={{ color: "var(--ink-muted)" }}>
+                    {c.views}回閲覧
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+
       <div
         className="mt-14 pt-6"
-        style={relatedColumns.length >= 2 ? undefined : { borderTop: "1px solid var(--border)" }}
+        style={relatedColumns.length >= 2 || popularColumns.length >= 2 ? undefined : { borderTop: "1px solid var(--border)" }}
       >
         <Link href="/columns" className="text-sm hover:underline" style={{ color: "var(--accent)" }}>
           ← コラム一覧へ戻る
