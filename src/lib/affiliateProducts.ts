@@ -62,10 +62,27 @@ const PREFIX_FALLBACK_PRODUCTS: [RegExp, AffiliateProduct][] = [
   ],
 ];
 
-export function getAffiliateProduct(slug: string): AffiliateProduct | null {
+// スラッグの完全一致もプレフィックスも無い場合、記事のカテゴリからフォールバックする商品。
+// 「体づくり・怪我予防」「野球理論(科学的検証)」はどちらもコンディショニング関連の記事が多いため、
+// 実売上位・高評価のフォームローラーを共通の汎用商品として割り当てる
+const CATEGORY_FALLBACK_PRODUCTS: Partial<Record<string, AffiliateProduct>> = {
+  "体づくり・怪我予防": {
+    asin: "B09STY2JDQ",
+    title: "Gruper フォームローラー 筋膜リリース グリッドフォームローラー",
+    imageUrl: "https://m.media-amazon.com/images/I/51ouuxkhO4L._AC_SX679_.jpg",
+  },
+  "野球理論（科学的検証）": {
+    asin: "B09STY2JDQ",
+    title: "Gruper フォームローラー 筋膜リリース グリッドフォームローラー",
+    imageUrl: "https://m.media-amazon.com/images/I/51ouuxkhO4L._AC_SX679_.jpg",
+  },
+};
+
+export function getAffiliateProduct(slug: string, category?: string): AffiliateProduct | null {
   if (AFFILIATE_PRODUCTS[slug]) return AFFILIATE_PRODUCTS[slug];
   for (const [pattern, product] of PREFIX_FALLBACK_PRODUCTS) {
     if (pattern.test(slug)) return product;
   }
+  if (category && CATEGORY_FALLBACK_PRODUCTS[category]) return CATEGORY_FALLBACK_PRODUCTS[category];
   return null;
 }

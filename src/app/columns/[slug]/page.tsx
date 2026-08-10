@@ -73,7 +73,7 @@ export default async function ColumnPage({
 
   // 関連記事は「同じカテゴリ」を優先し、枠が余ればタグが一致する記事で埋める。
   // カテゴリだけだと同カテゴリ内に記事が少ない場合に関連記事自体が出なくなるため
-  const affiliateProduct = getAffiliateProduct(column.slug);
+  const affiliateProduct = getAffiliateProduct(column.slug, column.category?.[0]);
 
   const relatedCategory = column.category?.[0];
   const relatedTag = parseTags(column.tags)[0];
