@@ -212,7 +212,7 @@ export default async function AnalysisPage() {
             較正した値ではありません。規定打席・規定投球回に到達した選手が対象です。
           </p>
           <div className="grid gap-8 sm:grid-cols-2 min-w-0">
-            <div>
+            <div className="min-w-0">
               {/* eslint-disable-next-line react/no-danger */}
               <script
                 type="application/ld+json"
@@ -261,7 +261,7 @@ export default async function AnalysisPage() {
               </Table>
             </div>
 
-            <div>
+            <div className="min-w-0">
               {/* eslint-disable-next-line react/no-danger */}
               <script
                 type="application/ld+json"
@@ -321,7 +321,7 @@ export default async function AnalysisPage() {
             選球眼やアプローチの傾向を示します。規定打席・規定投球回に到達した選手が対象です。
           </p>
           <div className="grid gap-8 sm:grid-cols-3 min-w-0">
-            <div>
+            <div className="min-w-0">
               {/* eslint-disable-next-line react/no-danger */}
               <script
                 type="application/ld+json"
@@ -370,7 +370,7 @@ export default async function AnalysisPage() {
               </Table>
             </div>
 
-            <div>
+            <div className="min-w-0">
               {/* eslint-disable-next-line react/no-danger */}
               <script
                 type="application/ld+json"
@@ -419,7 +419,7 @@ export default async function AnalysisPage() {
               </Table>
             </div>
 
-            <div>
+            <div className="min-w-0">
               {/* eslint-disable-next-line react/no-danger */}
               <script
                 type="application/ld+json"

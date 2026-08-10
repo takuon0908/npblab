@@ -64,7 +64,7 @@ export default async function ProspectsPage() {
         </p>
       ) : (
         <div className="grid gap-8 sm:grid-cols-2 min-w-0">
-          <div>
+          <div className="min-w-0">
             {/* eslint-disable-next-line react/no-danger */}
             <script
               type="application/ld+json"
@@ -115,7 +115,7 @@ export default async function ProspectsPage() {
             </Table>
           </div>
 
-          <div>
+          <div className="min-w-0">
             {/* eslint-disable-next-line react/no-danger */}
             <script
               type="application/ld+json"

@@ -103,7 +103,7 @@ function LeagueTable({
   const magicNumber = leader && second ? calcMagicNumber(leader.wins, second.losses) : null;
 
   return (
-    <div>
+    <div className="min-w-0">
       <h2 className="font-semibold mb-3">
         {title}
         {magicNumber !== null && (

@@ -163,11 +163,11 @@ export default async function TeamRosterPage({ params }: { params: Promise<{ tea
       </p>
 
       <div className="grid gap-x-8 sm:grid-cols-2 min-w-0">
-        <div>
+        <div className="min-w-0">
           <BattingTable rows={roster.ichigunBatters} level={Level.ICHIGUN} />
           <BattingTable rows={roster.nigunBatters} level={Level.NIGUN} />
         </div>
-        <div>
+        <div className="min-w-0">
           <PitchingTable rows={roster.ichigunPitchers} level={Level.ICHIGUN} />
           <PitchingTable rows={roster.nigunPitchers} level={Level.NIGUN} />
         </div>

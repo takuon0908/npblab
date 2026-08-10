@@ -278,13 +278,13 @@ export default async function TitlesPage() {
                 )}
                 <h2 className="font-semibold mb-3">{CATEGORY_LABELS[category]}</h2>
                 <div className="grid gap-6 sm:grid-cols-2 min-w-0">
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="text-sm font-semibold mb-2" style={{ color: "var(--ink-secondary)" }}>
                       {LEAGUE_LABELS[League.CENTRAL]}
                     </h3>
                     <CountingTitleTable rows={centralRows} unit={unit} />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="text-sm font-semibold mb-2" style={{ color: "var(--ink-secondary)" }}>
                       {LEAGUE_LABELS[League.PACIFIC]}
                     </h3>
@@ -340,7 +340,7 @@ export default async function TitlesPage() {
                   />
                 )}
                 <div className="grid gap-8 sm:grid-cols-2 min-w-0">
-                  <div>
+                  <div className="min-w-0">
                     <h4 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
                       首位打者
                     </h4>
@@ -375,7 +375,7 @@ export default async function TitlesPage() {
                     )}
                   </div>
 
-                  <div>
+                  <div className="min-w-0">
                     <h4 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
                       防御率
                     </h4>
