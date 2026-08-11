@@ -60,7 +60,9 @@ export async function searchRakutenProducts(keyword: string, hits = 5): Promise<
   return (data.Items ?? []).map(({ Item }) => ({
     title: Item.itemName,
     price: Item.itemPrice,
-    imageUrl: Item.mediumImageUrls[0]?.imageUrl ?? "",
+    // mediumImageUrlsは既定で128x128しかなく商品カードで表示するには小さいため、
+    // 同じサムネイルプロキシのサイズ指定(_ex)を400x400に上書きして解像度を上げる
+    imageUrl: (Item.mediumImageUrls[0]?.imageUrl ?? "").replace(/_ex=\d+x\d+/, "_ex=400x400"),
     affiliateUrl: Item.affiliateUrl ?? Item.itemUrl,
     reviewCount: Item.reviewCount,
     reviewAverage: Item.reviewAverage,

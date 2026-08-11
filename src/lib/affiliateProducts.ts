@@ -78,11 +78,16 @@ const CATEGORY_FALLBACK_PRODUCTS: Partial<Record<string, AffiliateProduct>> = {
   },
 };
 
+// 楽天側でその記事にぴったりの商品が別途用意できた場合、テーマの合わないカテゴリ共通の
+// フォームローラーが並んで表示されないよう、Amazon側のカテゴリフォールバックだけ無効にする
+const SKIP_CATEGORY_FALLBACK = new Set(["injury-prevention-heatstroke"]);
+
 export function getAffiliateProduct(slug: string, category?: string): AffiliateProduct | null {
   if (AFFILIATE_PRODUCTS[slug]) return AFFILIATE_PRODUCTS[slug];
   for (const [pattern, product] of PREFIX_FALLBACK_PRODUCTS) {
     if (pattern.test(slug)) return product;
   }
+  if (SKIP_CATEGORY_FALLBACK.has(slug)) return null;
   if (category && CATEGORY_FALLBACK_PRODUCTS[category]) return CATEGORY_FALLBACK_PRODUCTS[category];
   return null;
 }
