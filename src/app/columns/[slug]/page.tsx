@@ -303,13 +303,13 @@ export default async function ColumnPage({
 
         {affiliateProduct && (
           <div className="mt-8 flex justify-center">
-            <AmazonProductCard product={affiliateProduct} />
+            <AmazonProductCard product={affiliateProduct} articleSlug={column.slug} />
           </div>
         )}
 
         {rakutenProduct && (
           <div className="mt-8 flex justify-center">
-            <RakutenProductCard product={rakutenProduct} />
+            <RakutenProductCard product={rakutenProduct} articleSlug={column.slug} />
           </div>
         )}
 
