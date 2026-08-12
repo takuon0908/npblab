@@ -240,11 +240,15 @@ export default async function ColumnPage({
         </div>
 
         {headings.length >= 3 && (
-          <nav className="mb-10 p-5" style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }} aria-label="目次">
-            <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: "var(--ink-muted)" }}>
+          <details className="mb-10 p-5" style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}>
+            <summary
+              className="cursor-pointer text-xs font-semibold tracking-widest uppercase"
+              style={{ color: "var(--ink-muted)" }}
+              aria-label="目次を開閉"
+            >
               目次
-            </p>
-            <ol className="space-y-2 text-sm">
+            </summary>
+            <ol className="space-y-2 text-sm mt-4">
               {headings.map((h, i) => (
                 <li key={h.id}>
                   <a href={`#${h.id}`} className="flex gap-2 hover:underline" style={{ color: "var(--ink-secondary)" }}>
@@ -256,7 +260,7 @@ export default async function ColumnPage({
                 </li>
               ))}
             </ol>
-          </nav>
+          </details>
         )}
 
         <div style={{ borderTop: "1px solid var(--border)" }} className="mb-10" />

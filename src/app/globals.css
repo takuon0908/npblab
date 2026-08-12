@@ -2,20 +2,20 @@
 @plugin "@tailwindcss/typography";
 
 :root {
-  /* デイゲーム：紙のスコアブックのような白基調に、フラッドライトのアンバーを差し色として残す */
-  --page: #faf8f4;
+  /* ニュートラルな白基調＋ブルーのアクセント(QUERYYの配色を参考) */
+  --page: #f5f5f5;
   --surface: #ffffff;
-  --surface-2: #f4f0e7;
-  --ink: #231e17;
-  --ink-secondary: #5c5347;
-  --ink-muted: #8a806f;
-  --border: #e6ded0;
-  --border-strong: #d5c9b3;
-  --gridline: #ece4d4;
+  --surface-2: #f0f0f0;
+  --ink: #1e1e1e;
+  --ink-secondary: #4a4a4a;
+  --ink-muted: #8a8a8a;
+  --border: #e5e5e5;
+  --border-strong: #d0d0d0;
+  --gridline: #ececec;
 
-  --accent: #b3761a;
-  --accent-deep: #8a5a12;
-  --accent-track: rgba(179, 118, 26, 0.12);
+  --accent: #1b75de;
+  --accent-deep: #145bb0;
+  --accent-track: rgba(27, 117, 222, 0.12);
 
   --turf: #3f7a54;
   --turf-track: rgba(63, 122, 84, 0.14);
@@ -27,6 +27,9 @@
 
   --background: var(--page);
   --foreground: var(--ink);
+
+  /* 見出しも本文と同じ書体に統一する(参考サイトに合わせ、見出し専用フォントは使わない) */
+  --font-heading: var(--font-body-ja), var(--font-geist-sans), system-ui, -apple-system, "Hiragino Sans", "Yu Gothic", sans-serif;
 }
 
 @theme inline {
@@ -130,7 +133,7 @@ input:focus-visible {
   inset: 0 auto 0 0;
   border-radius: 999px;
   background: linear-gradient(90deg, var(--accent-deep), var(--accent));
-  box-shadow: 0 0 6px 0 rgba(179, 118, 26, 0.45);
+  box-shadow: 0 0 6px 0 rgba(27, 117, 222, 0.45);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -143,6 +146,15 @@ input:focus-visible {
   from {
     width: 0;
   }
+}
+
+/* 記事本文中で特に重要な一文を強調するマーカー(<mark>タグ)。ブラウザ標準の黄色ではなく
+   サイトのアクセントカラーに寄せた配色にして、太字よりも視認性の高い強調手段として使う */
+.prose mark {
+  background: var(--accent-track);
+  color: var(--ink);
+  padding: 0.05em 0.2em;
+  border-radius: 2px;
 }
 
 /* アフィリエイト広告を含む記事の冒頭に表示するPR表記(ステマ規制対応) */

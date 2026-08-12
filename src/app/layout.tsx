@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Zen_Kaku_Gothic_New, Noto_Sans_JP } from "next/font/google";
+import { Geist, Geist_Mono, Noto_Sans_JP } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -16,13 +16,6 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-// 見出し用。力強いゴシック体
-const headingFont = Zen_Kaku_Gothic_New({
-  variable: "--font-heading",
-  weight: ["500", "700", "900"],
   subsets: ["latin"],
 });
 
@@ -73,7 +66,7 @@ export default function RootLayout({
   return (
     <html
       lang="ja"
-      className={`${geistSans.variable} ${geistMono.variable} ${headingFont.variable} ${bodyFontJa.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${bodyFontJa.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {/* eslint-disable-next-line react/no-danger */}

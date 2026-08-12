@@ -295,7 +295,7 @@ export default async function Home() {
           className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-80"
           style={{
             background:
-              "radial-gradient(ellipse at 50% 0%, rgba(179,118,26,0.12) 0%, rgba(179,118,26,0) 62%)",
+              "radial-gradient(ellipse at 50% 0%, rgba(27,117,222,0.10) 0%, rgba(27,117,222,0) 62%)",
           }}
         />
         <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: "var(--accent)" }}>

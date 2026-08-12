@@ -63,6 +63,18 @@ export default async function ColumnsPage({
   const rest = showHero ? contents.slice(1) : contents;
   const likeCounts = await getLikeCounts(contents.map((c) => c.slug));
 
+  // カテゴリー別のプレビュー(絞り込みなしのトップ表示のときだけ)。カテゴリごとに探しやすい導線を作る
+  const showCategorySections = !category && !tag && page === 1;
+  const categorySections = showCategorySections
+    ? await Promise.all(
+        CATEGORIES.map(async (c) => ({
+          category: c,
+          contents: (await getColumns(3, c)).contents,
+        }))
+      )
+    : [];
+  const nonEmptyCategorySections = categorySections.filter((s) => s.contents.length > 0);
+
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -219,6 +231,66 @@ export default async function ColumnsPage({
             </section>
           )}
         </>
+      )}
+
+      {nonEmptyCategorySections.length > 0 && (
+        <section className="mt-16 pt-10" style={{ borderTop: "1px solid var(--border)" }}>
+          <h2
+            className="text-xl font-black mb-8"
+            style={{ fontFamily: "var(--font-heading)" }}
+          >
+            カテゴリー別記事
+          </h2>
+          <div className="space-y-10">
+            {nonEmptyCategorySections.map(({ category: c, contents: items }) => {
+              const slug = categoryToSlug(c);
+              return (
+                <div key={c}>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="flex items-center gap-2 text-sm font-semibold" style={{ color: "var(--ink)" }}>
+                      <span aria-hidden style={{ width: 9, height: 9, background: "var(--accent)", flex: "none", transform: "rotate(45deg)" }} />
+                      {c}
+                    </h3>
+                    {slug && (
+                      <Link
+                        href={`/columns/category/${slug}`}
+                        className="text-xs font-medium hover:underline"
+                        style={{ color: "var(--accent)" }}
+                      >
+                        もっと見る →
+                      </Link>
+                    )}
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    {items.map((c2) => (
+                      <Link
+                        key={c2.id}
+                        href={`/columns/${c2.slug}`}
+                        className="hover-lift group rounded-none overflow-hidden"
+                        style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
+                      >
+                        <div className="aspect-video">
+                          <ArticleCoverImage slug={c2.slug} text={`${c2.title} ${stripHtml(c2.body)}`} category={c2.category} tags={c2.tags} />
+                        </div>
+                        <div className="p-3">
+                          <p className="text-xs mb-1" style={{ color: "var(--ink-muted)" }}>
+                            {formatDateJa(new Date(c2.publishedAt))}
+                          </p>
+                          <h4
+                            className="text-sm leading-snug group-hover:underline"
+                            style={{ fontFamily: "var(--font-heading)", fontWeight: 700 }}
+                          >
+                            {c2.title}
+                          </h4>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
       )}
 
       {totalPages > 1 && (
