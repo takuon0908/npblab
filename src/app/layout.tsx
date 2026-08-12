@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Zen_Kaku_Gothic_New } from "next/font/google";
+import { Geist, Geist_Mono, Zen_Kaku_Gothic_New, Noto_Sans_JP } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -19,10 +19,19 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// 見出し用。「ナイター」コンセプトの力強いゴシック体
+// 見出し用。力強いゴシック体
 const headingFont = Zen_Kaku_Gothic_New({
   variable: "--font-heading",
   weight: ["500", "700", "900"],
+  subsets: ["latin"],
+});
+
+// 本文用の日本語フォント。指定しないとOSのシステムフォント(Mac=ヒラギノ角ゴ、
+// Windows=游ゴシック)にフォールバックし環境によって見え方が変わってしまうため、
+// Noto Sans JPを読み込んで表示を統一する
+const bodyFontJa = Noto_Sans_JP({
+  variable: "--font-body-ja",
+  weight: ["400", "500", "700"],
   subsets: ["latin"],
 });
 
@@ -64,7 +73,7 @@ export default function RootLayout({
   return (
     <html
       lang="ja"
-      className={`${geistSans.variable} ${geistMono.variable} ${headingFont.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${headingFont.variable} ${bodyFontJa.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {/* eslint-disable-next-line react/no-danger */}
