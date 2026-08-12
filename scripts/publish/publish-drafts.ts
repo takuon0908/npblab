@@ -57,7 +57,11 @@ function parseDraft(raw: string, fileName: string): ParsedDraft {
   if (!fields.title || !fields.slug) {
     throw new Error(`${fileName}: frontmatterにtitle/slugが必要です`);
   }
-  return { title: fields.title, slug: fields.slug, body: body.trim() };
+  const trimmedBody = body.trim();
+  if (/<\/?content>/.test(trimmedBody) || trimmedBody.includes("下書き")) {
+    throw new Error(`${fileName}: 本文に不審なタグ(</content>等)や「下書き」という文言が残っています。公開前に確認してください`);
+  }
+  return { title: fields.title, slug: fields.slug, body: trimmedBody };
 }
 
 async function main() {
