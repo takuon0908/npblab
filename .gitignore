@@ -37,6 +37,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# GA4サービスアカウント等の秘密鍵
+/credentials/
+
 # sqlite dev db
 /prisma/dev.db
 

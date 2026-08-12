@@ -33,6 +33,13 @@ export const RAKUTEN_PRODUCTS: Record<string, RakutenProduct> = {
     affiliateUrl:
       "https://hb.afl.rakuten.co.jp/hgc/g00puy0n.zuxm72dd.g00puy0n.zuxm88fb/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fbbtown%2Fbbch-mlwball9%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fbbtown%2Fi%2F10261275%2F&rafcid=wsc_i_is_aae3259c-1d0c-4997-b2e4-5d50511c7c9d",
   },
+  "injury-prevention-warmup-cooldown": {
+    title: "氷嚢 アイシングバッグ 看護師監修 2個セット クーリング・冷却",
+    price: "980円（税込）",
+    imageUrl: "https://thumbnail.image.rakuten.co.jp/@0_mall/beefine/cabinet/01a-2.jpg?_ex=400x400",
+    affiliateUrl:
+      "https://hb.afl.rakuten.co.jp/hgc/g00ubnan.zuxm7064.g00ubnan.zuxm80c8/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fbeefine%2Fc0166%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Fbeefine%2Fi%2F10000173%2F&rafcid=wsc_i_is_aae3259c-1d0c-4997-b2e4-5d50511c7c9d",
+  },
 };
 
 export function getRakutenProduct(slug: string): RakutenProduct | null {
