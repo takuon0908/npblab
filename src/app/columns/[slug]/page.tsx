@@ -283,18 +283,24 @@ export default async function ColumnPage({
                   <div dangerouslySetInnerHTML={{ __html: section }} />
                   {diagrams
                     .filter((d) => d.afterSection === i)
-                    .map((d) => (
-                      <figure key={d.src} className="not-prose my-8">
-                        <Image
-                          src={d.src}
-                          alt={d.alt}
-                          width={1400}
-                          height={764}
-                          className="w-full h-auto rounded-none"
-                          style={{ border: "1px solid var(--border-strong)" }}
-                        />
-                      </figure>
-                    ))}
+                    .map((d, di) =>
+                      d.component ? (
+                        <figure key={`component-${di}`} className="not-prose my-8 p-4" style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}>
+                          <d.component />
+                        </figure>
+                      ) : (
+                        <figure key={d.src} className="not-prose my-8">
+                          <Image
+                            src={d.src!}
+                            alt={d.alt!}
+                            width={1400}
+                            height={764}
+                            className="w-full h-auto rounded-none"
+                            style={{ border: "1px solid var(--border-strong)" }}
+                          />
+                        </figure>
+                      )
+                    )}
                 </div>
               ))
             : // eslint-disable-next-line react/no-danger

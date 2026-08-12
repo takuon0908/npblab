@@ -1,9 +1,15 @@
+import type { ComponentType } from "react";
+import { CSAdvantageDiagram } from "@/components/diagrams/CSAdvantageDiagram";
+
 // 記事本文に埋め込む解説図解。microCMSのAPI経由でbody(リッチテキスト)に<img>タグを含めても
-// 保存時に除去されてしまうため、画像はpublic/に置きコード側でセクション見出しの直後に挿入する。
-// afterSection は本文中のh2見出しの何番目の直後に挿入するか(1始まり)
+// 保存時に除去されてしまうため、コード側でセクション見出しの直後に挿入する。
+// afterSection は本文中のh2見出しの何番目の直後に挿入するか(1始まり)。
+// 画像ファイル(src)を置く方式と、外部画像を使わず費用ゼロで描画できるSVGコンポーネント方式の
+// どちらかを指定する(componentを指定した場合はsrc/altは不要)
 export interface ArticleDiagram {
-  src: string;
-  alt: string;
+  src?: string;
+  alt?: string;
+  component?: ComponentType;
   afterSection: number;
 }
 
@@ -30,6 +36,7 @@ export const ARTICLE_DIAGRAMS: Record<string, ArticleDiagram[]> = {
       afterSection: 4,
     },
   ],
+  "rules-basics-cs-new-rule-2026": [{ component: CSAdvantageDiagram, afterSection: 2 }],
 };
 
 export function getArticleDiagrams(slug: string): ArticleDiagram[] {
