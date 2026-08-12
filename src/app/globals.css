@@ -2,27 +2,28 @@
 @plugin "@tailwindcss/typography";
 
 :root {
-  /* ナイター：深いネイビーの夜空にフラッドライトのアンバーが灯るスコアラボ */
-  --page: #0d1a26;
-  --surface: #142433;
-  --surface-2: #1b2f40;
-  --ink: #eee8d9;
-  --ink-secondary: #c9c2ae;
-  --ink-muted: #8fa3b0;
-  --border: #2c4152;
-  --border-strong: #3c5568;
-  --gridline: #23384a;
+  /* デイゲーム：紙のスコアブックのような白基調に、フラッドライトのアンバーを差し色として残す */
+  --page: #faf8f4;
+  --surface: #ffffff;
+  --surface-2: #f4f0e7;
+  --ink: #231e17;
+  --ink-secondary: #5c5347;
+  --ink-muted: #8a806f;
+  --border: #e6ded0;
+  --border-strong: #d5c9b3;
+  --gridline: #ece4d4;
 
-  --accent: #f0a83c;
-  --accent-deep: #c9822a;
-  --accent-track: rgba(240, 168, 60, 0.16);
+  --accent: #b3761a;
+  --accent-deep: #8a5a12;
+  --accent-track: rgba(179, 118, 26, 0.12);
 
-  --turf: #5a8f6b;
-  --turf-track: rgba(90, 143, 107, 0.18);
+  --turf: #3f7a54;
+  --turf-track: rgba(63, 122, 84, 0.14);
 
-  --good: #5a8f6b;
-  --good-soft: rgba(90, 143, 107, 0.18);
-  --critical: #e0645a;
+  --good: #3f7a54;
+  --good-soft: rgba(63, 122, 84, 0.14);
+  --critical: #c94f42;
+  --critical-soft: rgba(201, 79, 66, 0.12);
 
   --background: var(--page);
   --foreground: var(--ink);
@@ -35,7 +36,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* サイトのブランドとして常にダークトーン（ネイビー×アンバー）に統一する（OSのダークモード設定に追従しない） */
+/* サイトのブランドとして常に白基調（紙×アンバー）に統一する（OSのダークモード設定に追従しない） */
 
 body {
   background: var(--background);
@@ -129,7 +130,7 @@ input:focus-visible {
   inset: 0 auto 0 0;
   border-radius: 999px;
   background: linear-gradient(90deg, var(--accent-deep), var(--accent));
-  box-shadow: 0 0 6px 0 rgba(240, 168, 60, 0.55);
+  box-shadow: 0 0 6px 0 rgba(179, 118, 26, 0.45);
 }
 
 @media (prefers-reduced-motion: no-preference) {

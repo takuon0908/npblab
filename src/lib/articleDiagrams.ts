@@ -1,5 +1,7 @@
 import type { ComponentType } from "react";
 import { CSAdvantageDiagram } from "@/components/diagrams/CSAdvantageDiagram";
+import { FarmZoneDiagram } from "@/components/diagrams/FarmZoneDiagram";
+import { WindupDeclarationDiagram } from "@/components/diagrams/WindupDeclarationDiagram";
 
 // 記事本文に埋め込む解説図解。microCMSのAPI経由でbody(リッチテキスト)に<img>タグを含めても
 // 保存時に除去されてしまうため、コード側でセクション見出しの直後に挿入する。
@@ -37,6 +39,8 @@ export const ARTICLE_DIAGRAMS: Record<string, ArticleDiagram[]> = {
     },
   ],
   "rules-basics-cs-new-rule-2026": [{ component: CSAdvantageDiagram, afterSection: 2 }],
+  "rules-basics-farm-3zone-2026": [{ component: FarmZoneDiagram, afterSection: 3 }],
+  "rules-basics-windup-declaration-2026": [{ component: WindupDeclarationDiagram, afterSection: 2 }],
 };
 
 export function getArticleDiagrams(slug: string): ArticleDiagram[] {

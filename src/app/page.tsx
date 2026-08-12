@@ -289,13 +289,13 @@ export default async function Home() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
       <div className="relative">
-        {/* ナイター照明が上から柔らかく当たっているような光彩。ヒーロー部分のみの控えめな演出 */}
+        {/* 朝日のような柔らかい光彩。ヒーロー部分のみの控えめな演出 */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-80"
           style={{
             background:
-              "radial-gradient(ellipse at 50% 0%, rgba(240,168,60,0.14) 0%, rgba(240,168,60,0) 62%)",
+              "radial-gradient(ellipse at 50% 0%, rgba(179,118,26,0.12) 0%, rgba(179,118,26,0) 62%)",
           }}
         />
         <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: "var(--accent)" }}>
