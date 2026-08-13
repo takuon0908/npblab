@@ -209,10 +209,21 @@ input:focus-visible {
   border: 1px solid var(--border);
 }
 /* microCMSのリッチエディタは保存時に<thead>タグを取り除いてしまうため、
-   theadの有無に関わらず<th>セル自体をターゲットにする */
+   theadの有無に関わらず<th>セル自体をターゲットにする。
+   Tailwind Typographyのデフォルトpaddingは`thead th`セレクタ前提で定義されており、
+   theadが無いとth側だけpaddingが0になってヘッダー行が詰まって見えるため明示的に指定する */
 .prose table th {
   background-color: var(--ink);
   color: #ffffff;
+  padding: 0.5714286em;
+}
+
+/* microCMSのリッチエディタはセル内テキストを<p>で包んで保存する。
+   Tailwindの通常の段落マージンがそのまま乗ると行の上下に余白が入りすぎるため、
+   セル内の<p>だけはマージンを打ち消す */
+.prose table th p,
+.prose table td p {
+  margin: 0;
 }
 
 /* アフィリエイト広告を含む記事の冒頭に表示するPR表記(ステマ規制対応) */
