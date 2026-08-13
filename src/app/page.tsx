@@ -310,6 +310,27 @@ export default async function Home() {
           野球を科学する。NPBのデータを独自に分析し、優勝確率・タイトル獲得確率を毎日更新します。
         </h1>
 
+        {popularColumns[0] && (
+          <Link
+            href={`/columns/${popularColumns[0].slug}`}
+            className="hover-lift flex items-center gap-3 rounded-lg px-4 py-3 mb-8"
+            style={{ background: "var(--surface-2)", borderLeft: "3px solid var(--accent)" }}
+          >
+            <span
+              className="flex-none text-xs font-bold px-2 py-1 rounded"
+              style={{ background: "var(--accent)", color: "#ffffff" }}
+            >
+              注目
+            </span>
+            <span className="text-sm min-w-0 truncate" style={{ fontWeight: 700, color: "var(--ink)" }}>
+              {popularColumns[0].title}
+            </span>
+            <span className="ml-auto flex-none text-xs" style={{ color: "var(--accent)" }}>
+              読む →
+            </span>
+          </Link>
+        )}
+
         <HeroStatsRow hero={heroStats} />
 
         {teamHighlights.length > 0 && <FavoriteTeamHighlight teams={teamHighlights} />}
