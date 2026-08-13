@@ -240,7 +240,7 @@ export default async function ColumnPage({
         </div>
 
         {headings.length >= 3 && (
-          <details className="mb-10 p-5" style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}>
+          <details className="mb-10 p-5 rounded-lg" style={{ background: "var(--surface)", boxShadow: "var(--shadow-sm)" }}>
             <summary
               className="cursor-pointer text-xs font-semibold tracking-widest uppercase"
               style={{ color: "var(--ink-muted)" }}
@@ -289,7 +289,7 @@ export default async function ColumnPage({
                     .filter((d) => d.afterSection === i)
                     .map((d, di) =>
                       d.component ? (
-                        <figure key={`component-${di}`} className="not-prose my-8 p-4" style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}>
+                        <figure key={`component-${di}`} className="not-prose my-8 p-4 rounded-lg" style={{ background: "var(--surface)", boxShadow: "var(--shadow-sm)" }}>
                           <d.component />
                         </figure>
                       ) : (
@@ -335,7 +335,7 @@ export default async function ColumnPage({
         <Link
           href="/about#author"
           className="hover-lift mt-10 flex items-center gap-4 p-4"
-          style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
+          style={{ background: "var(--surface)" }}
         >
           <Image
             src={SITE_AUTHOR.image}
@@ -359,8 +359,8 @@ export default async function ColumnPage({
       {relatedTeam && relatedTeamTheme && (
         <Link
           href={`/teams/${relatedTeam.slug}`}
-          className="group mt-10 flex items-center justify-between gap-3 rounded-none px-4 py-3 transition-colors hover:bg-white/[0.04]"
-          style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
+          className="hover-lift group mt-10 flex items-center justify-between gap-3 rounded-lg px-4 py-3 transition-colors hover:bg-white/[0.04]"
+          style={{ background: "var(--surface)" }}
         >
           <div className="flex items-center gap-3">
             <span aria-hidden style={{ width: 8, height: 32, background: relatedTeamTheme.accent, flex: "none" }} />
@@ -393,8 +393,8 @@ export default async function ColumnPage({
               <Link
                 key={c.id}
                 href={`/columns/${c.slug}`}
-                className="hover-lift group rounded-none overflow-hidden"
-                style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
+                className="hover-lift group rounded-xl overflow-hidden"
+                style={{ background: "var(--surface)" }}
               >
                 <div className="aspect-video">
                   <ArticleCoverImage slug={c.slug} text={`${c.title} ${c.body.replace(/<[^>]+>/g, "")}`} category={c.category} tags={c.tags} showCategoryBadge />
@@ -427,8 +427,8 @@ export default async function ColumnPage({
               <li key={c.id}>
                 <Link
                   href={`/columns/${c.slug}`}
-                  className="hover-lift group flex items-center gap-3 p-3"
-                  style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
+                  className="hover-lift group flex items-center gap-3 p-3 rounded-lg"
+                  style={{ background: "var(--surface)" }}
                 >
                   <span
                     className="flex-none text-lg font-black tabular-nums"

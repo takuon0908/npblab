@@ -2,20 +2,20 @@
 @plugin "@tailwindcss/typography";
 
 :root {
-  /* ニュートラルな白基調＋ブルーのアクセント(QUERYYの配色を参考) */
-  --page: #f5f5f5;
+  /* ニュートラルな白基調＋ブルーのアクセント(参考テンプレートの配色に準拠) */
+  --page: #f1f5f9;
   --surface: #ffffff;
-  --surface-2: #f0f0f0;
-  --ink: #1e1e1e;
-  --ink-secondary: #4a4a4a;
-  --ink-muted: #8a8a8a;
-  --border: #e5e5e5;
-  --border-strong: #d0d0d0;
+  --surface-2: #eff6ff;
+  --ink: #0f172a;
+  --ink-secondary: #334155;
+  --ink-muted: #64748b;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
   --gridline: #ececec;
 
-  --accent: #1b75de;
-  --accent-deep: #145bb0;
-  --accent-track: rgba(27, 117, 222, 0.12);
+  --accent: #2563eb;
+  --accent-deep: #1d4ed8;
+  --accent-track: rgba(37, 99, 235, 0.12);
 
   --turf: #3f7a54;
   --turf-track: rgba(63, 122, 84, 0.14);
@@ -24,6 +24,9 @@
   --good-soft: rgba(63, 122, 84, 0.14);
   --critical: #c94f42;
   --critical-soft: rgba(201, 79, 66, 0.12);
+
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
 
   --background: var(--page);
   --foreground: var(--ink);
@@ -60,12 +63,13 @@ input:focus-visible {
    枠線の色は各コンポーネント側のinline styleが優先されるため上書きせず、
    わずかな浮き上がり(box-shadow・transform)のみで強弱をつける */
 .hover-lift {
-  transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  box-shadow: var(--shadow-sm);
 }
 
 .hover-lift:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px var(--border);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
 }
 
 /* コラム記事内のAmazon商品カード（アフィリエイトリンク） */
@@ -73,17 +77,20 @@ input:focus-visible {
   display: flex;
   align-items: center;
   gap: 16px;
-  border: 1px solid var(--border-strong);
+  border-radius: 10px;
   background: var(--surface);
+  box-shadow: var(--shadow-sm);
   padding: 14px;
   margin: 20px 0;
   max-width: 460px;
   text-decoration: none;
   color: inherit;
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
 }
 
 .amazon-product-card:hover {
-  border-color: var(--accent);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
 }
 
 .amazon-product-card img {
@@ -155,6 +162,57 @@ input:focus-visible {
   color: var(--ink);
   padding: 0.05em 0.2em;
   border-radius: 2px;
+}
+
+/* 記事本文(.prose)のH2見出し直下に、アクセントカラーから透明へ抜けるグラデーションの
+   区切り線を自動で敷く。マークアップ側で<hr>を挟む必要はない */
+.prose h2::after {
+  content: "";
+  display: block;
+  height: 3px;
+  margin-top: 0.75rem;
+  background: linear-gradient(90deg, var(--accent) 0%, #38bdf8 60%, transparent 100%);
+}
+
+/* 本文中の太字(<strong>)にマーカーで下線を引いたような強調効果を自動で付ける。
+   ライター側は<strong>を使うだけでよく、個別にスタイルを指定する必要はない */
+.prose strong {
+  color: var(--accent-deep);
+  background: linear-gradient(transparent 65%, var(--surface-2) 65%);
+  font-weight: 700;
+}
+
+/* 引用(<blockquote>)をポイント・注意点のコールアウト枠として表示する */
+.prose blockquote {
+  background: var(--surface-2);
+  border-left: 5px solid var(--accent);
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  border-radius: 0 6px 6px 0;
+  font-style: normal;
+  quotes: none;
+}
+.prose blockquote p {
+  margin: 0;
+}
+.prose blockquote p::before,
+.prose blockquote p::after {
+  content: none;
+}
+
+/* テーブルのヘッダー行を濃色にして視認性を上げる。列数が多く横幅が収まらない場合のみ
+   横スクロールできるようにする(セル内の文章はnowrapにせず、通常通り折り返す) */
+.prose table {
+  display: block;
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+/* microCMSのリッチエディタは保存時に<thead>タグを取り除いてしまうため、
+   theadの有無に関わらず<th>セル自体をターゲットにする */
+.prose table th {
+  background-color: var(--ink);
+  color: #ffffff;
 }
 
 /* アフィリエイト広告を含む記事の冒頭に表示するPR表記(ステマ規制対応) */

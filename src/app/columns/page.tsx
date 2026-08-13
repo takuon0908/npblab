@@ -159,8 +159,8 @@ export default async function ColumnsPage({
           {hero && (
             <Link
               href={`/columns/${hero.slug}`}
-              className="hover-lift group grid gap-0 sm:grid-cols-2 mb-12 rounded-none overflow-hidden"
-              style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
+              className="hover-lift group grid gap-0 sm:grid-cols-2 mb-12 rounded-xl overflow-hidden"
+              style={{ background: "var(--surface)" }}
             >
               <div className="aspect-video sm:aspect-auto sm:h-full">
                 <ArticleCoverImage slug={hero.slug} text={`${hero.title} ${stripHtml(hero.body)}`} category={hero.category} tags={hero.tags} showCategoryBadge priority />
@@ -199,8 +199,8 @@ export default async function ColumnsPage({
                   <Link
                     key={c.id}
                     href={`/columns/${c.slug}`}
-                    className="hover-lift group rounded-none overflow-hidden"
-                    style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
+                    className="hover-lift group rounded-xl overflow-hidden"
+                    style={{ background: "var(--surface)" }}
                   >
                     <div className="aspect-video">
                       <ArticleCoverImage slug={c.slug} text={`${c.title} ${stripHtml(c.body)}`} category={c.category} tags={c.tags} showCategoryBadge />
@@ -266,8 +266,8 @@ export default async function ColumnsPage({
                       <Link
                         key={c2.id}
                         href={`/columns/${c2.slug}`}
-                        className="hover-lift group rounded-none overflow-hidden"
-                        style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
+                        className="hover-lift group rounded-xl overflow-hidden"
+                        style={{ background: "var(--surface)" }}
                       >
                         <div className="aspect-video">
                           <ArticleCoverImage slug={c2.slug} text={`${c2.title} ${stripHtml(c2.body)}`} category={c2.category} tags={c2.tags} />
