@@ -5,6 +5,7 @@ import { getLatestDayGames, getScheduledGames, pickClosestGame } from "@/lib/gam
 import { GamesTabSwitcher } from "@/components/GamesTabSwitcher";
 import { FavoriteTeamHighlight } from "@/components/FavoriteTeamHighlight";
 import { getColumns } from "@/lib/microcms";
+import { getPopularColumns } from "@/lib/columnViews";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 import { TEAM_THEME } from "@/lib/teamTheme";
 import { prisma } from "@/lib/prisma";
@@ -275,12 +276,13 @@ function HighlightGame({ game }: { game: NonNullable<Awaited<ReturnType<typeof g
 }
 
 export default async function Home() {
-  const [latestGames, scheduledGames, latestColumns, heroStats, teamHighlights] = await Promise.all([
+  const [latestGames, scheduledGames, latestColumns, heroStats, teamHighlights, popularColumns] = await Promise.all([
     getLatestDayGames(),
     getScheduledGames(),
     getLatestColumnsSafely(),
     getHeroStats(),
     getTeamHighlights(),
+    getPopularColumns("", 3),
   ]);
   const teasers = buildSectionTeasers(heroStats);
   const highlightGame = latestGames ? pickClosestGame(latestGames.games) : null;
@@ -332,6 +334,37 @@ export default async function Home() {
           </section>
         )}
       </div>
+
+      {popularColumns.length > 0 && (
+        <section className="mb-10">
+          <div className="flex items-baseline justify-between mb-3">
+            <h2 className="flex items-center gap-2 font-semibold text-sm" style={{ color: "var(--ink)" }}>
+              <span aria-hidden style={{ width: 9, height: 9, background: "var(--accent)", flex: "none", transform: "rotate(45deg)" }} />
+              人気記事
+            </h2>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {popularColumns.map((c, i) => (
+              <Link
+                key={c.id}
+                href={`/columns/${c.slug}`}
+                className="hover-lift rounded-lg p-4 flex gap-3 items-start"
+                style={{ background: "var(--surface)" }}
+              >
+                <span
+                  className="flex-none text-lg leading-none"
+                  style={{ fontFamily: "var(--font-heading)", fontWeight: 900, color: "var(--accent)" }}
+                >
+                  {i + 1}
+                </span>
+                <p className="text-sm leading-snug" style={{ fontWeight: 700, textWrap: "balance" }}>
+                  {c.title}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {latestColumns.length > 0 && (
         <section className="mb-10">
