@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getColumnBySlug, getColumns, getAllColumns, parseTags, excerptForMeta, withHeadingAnchors, splitBodyIntoSections } from "@/lib/microcms";
+import { getColumnBySlug, getColumns, getAllColumns, parseTags, excerptForMeta, withHeadingAnchors, splitBodyIntoSections, wrapTables } from "@/lib/microcms";
 import { getArticleDiagrams } from "@/lib/articleDiagrams";
 import { formatDateJa } from "@/lib/date";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
@@ -71,7 +71,8 @@ export default async function ColumnPage({
 
   const publishedDate = new Date(column.publishedAt);
   const bodyWithPlayerLinks = linkPlayerNames(column.body, activePlayers);
-  const { html: bodyWithAnchors, headings } = withHeadingAnchors(bodyWithPlayerLinks);
+  const { html: bodyWithAnchorsRaw, headings } = withHeadingAnchors(bodyWithPlayerLinks);
+  const bodyWithAnchors = wrapTables(bodyWithAnchorsRaw);
   const pointSummary = excerptForMeta(column.body);
   const diagrams = getArticleDiagrams(column.slug);
   const bodySections = diagrams.length > 0 ? splitBodyIntoSections(bodyWithAnchors) : null;

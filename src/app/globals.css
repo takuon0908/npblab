@@ -200,14 +200,22 @@ input:focus-visible {
   content: none;
 }
 
-/* テーブルのヘッダー行を濃色にして視認性を上げる。列数が多く横幅が収まらない場合のみ
-   横スクロールできるようにする(セル内の文章はnowrapにせず、通常通り折り返す) */
-.prose table {
-  display: block;
-  width: 100%;
+/* 横スクロール用のラッパー(記事ページ側でwrapTables()により<table>を包む)。
+   横スクロールと角丸・枠線はこのラッパー側が担当する。
+   以前は.prose table自体にdisplay:blockを当てていたが、それだと表の内部グリッド
+   (行・セル)がテーブル要素自身の幅指定を受け取れず中身の幅に縮んでしまい、
+   ラッパーの右側に余白ができる不具合があったため、ラッパーを分離した */
+.prose .table-scroll {
   overflow-x: auto;
   border-radius: 8px;
   border: 1px solid var(--border);
+  margin: 1.5em 0;
+}
+
+/* テーブルのヘッダー行を濃色にして視認性を上げる（セル内の文章はnowrapにせず、通常通り折り返す） */
+.prose .table-scroll table {
+  width: 100%;
+  margin: 0;
 }
 /* microCMSのリッチエディタは保存時に<thead>タグを取り除いてしまうため、
    theadの有無に関わらず<th>セル自体をターゲットにする。

@@ -125,6 +125,15 @@ export function withHeadingAnchors(bodyHtml: string): { html: string; headings: 
   return { html, headings };
 }
 
+// <table>を横スクロール用のラッパーdivで包む。表自体にoverflow-x/display:blockを
+// 直接当てると、テーブルの内部グリッド(行・セル)が中身の幅に縮んでラッパーの右側に
+// 余白ができてしまう(display:blockにした時点でtableの「幅を100%にする」効果が
+// 内部グリッドに伝わらなくなるため)。ラッパー側で横スクロールを担当させ、
+// <table>自体はwidth:100%の通常のtable表示のままにしておくのが安全
+export function wrapTables(bodyHtml: string): string {
+  return bodyHtml.replace(/<table>[\s\S]*?<\/table>/g, (match) => `<div class="table-scroll">${match}</div>`);
+}
+
 // 記事本文をh2見出しの境界でセクションに分割する。図解画像をmicroCMSのbody(リッチテキスト)に
 // 直接埋め込めない(API経由の<img>は保存時に除去される)ため、指定セクションの直後にReactコンポーネント
 // として画像を挿入できるようにするための下準備。戻り値のsegments[0]は最初のh2より前の導入部、
