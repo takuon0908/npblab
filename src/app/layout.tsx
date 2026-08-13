@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { AdSense } from "@/components/AdSense";
+import { A8LinkManager } from "@/components/A8LinkManager";
 import { siteUrl } from "@/lib/siteUrl";
 import "./globals.css";
 
@@ -78,6 +79,7 @@ export default function RootLayout({
         <SpeedInsights />
         <GoogleAnalytics />
         <AdSense />
+        <A8LinkManager />
       </body>
     </html>
   );
