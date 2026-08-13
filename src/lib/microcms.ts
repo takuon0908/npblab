@@ -94,7 +94,13 @@ function decodeHtmlEntities(text: string): string {
 // meta descriptionをHTML本文から生成する。単純な文字数カットだと文の途中で
 // 切れて読みにくくなるため、「。」の文境界を優先して150字前後に収める
 export function excerptForMeta(bodyHtml: string, maxLength = 150): string {
-  const text = decodeHtmlEntities(bodyHtml.replace(/<[^>]+>/g, "")).trim();
+  // ブロック要素(<p>等)の区切りはスペースとして残し、別々の段落の文字列が
+  // 隙間なく連結されてしまう(例: PR表記の直後に導入文が続いて繋がって見える)のを防ぐ。
+  // インラインタグ(<strong>等)はスペースを入れずそのまま除去し、文中の余計な空白を避ける
+  const withBreaks = bodyHtml.replace(/<\/(p|div|h[1-6]|li|blockquote|tr)>|<br\s*\/?>/gi, " ");
+  const text = decodeHtmlEntities(withBreaks.replace(/<[^>]+>/g, ""))
+    .replace(/\s+/g, " ")
+    .trim();
   if (text.length <= maxLength) return text;
 
   const sentences = text.split("。");
