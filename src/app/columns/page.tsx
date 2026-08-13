@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getColumns, parseTags, CATEGORIES } from "@/lib/microcms";
+import Image from "next/image";
+import { getColumns, getAllColumns, parseTags, CATEGORIES } from "@/lib/microcms";
 import { categoryToSlug } from "@/lib/categorySlug";
 import { formatDateJa } from "@/lib/date";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 import { getLikeCounts } from "@/lib/columnLikes";
+import { getViewCounts } from "@/lib/columnViews";
 import { siteUrl } from "@/lib/siteUrl";
+import { SITE_AUTHOR } from "@/lib/author";
 
 // 記事の即時反映は公開時のオンデマンドrevalidation(/api/revalidate)で行うため、これはあくまでフォールバック値(Vercel ISR Writes枠対策)
 export const revalidate = 86400;
@@ -75,6 +78,15 @@ export default async function ColumnsPage({
     : [];
   const nonEmptyCategorySections = categorySections.filter((s) => s.contents.length > 0);
 
+  // サイドバーの人気記事ランキング(トップページ表示時のみ取得する軽い処理)
+  const rankingColumns = showCategorySections ? await getAllColumns() : [];
+  const rankingViewCounts = showCategorySections ? await getViewCounts(rankingColumns.map((c) => c.slug)) : {};
+  const topRanking = rankingColumns
+    .map((c) => ({ ...c, views: rankingViewCounts[c.slug] ?? 0 }))
+    .filter((c) => c.views > 0)
+    .sort((a, b) => b.views - a.views)
+    .slice(0, 5);
+
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -85,7 +97,7 @@ export default async function ColumnsPage({
   };
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-16">
+    <main className="mx-auto max-w-6xl px-4 py-16">
       {/* eslint-disable-next-line react/no-danger */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
@@ -112,6 +124,9 @@ export default async function ColumnsPage({
           人気記事ランキングを見る →
         </Link>
       </p>
+
+      <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+      <div className="min-w-0">
 
       <div className="flex flex-wrap gap-2 mb-10">
         <Link
@@ -314,6 +329,65 @@ export default async function ColumnsPage({
           )}
         </nav>
       )}
+
+      </div>
+
+      <aside className="space-y-6">
+        <div className="p-5 rounded-lg" style={{ background: "var(--surface)", boxShadow: "var(--shadow-sm)" }}>
+          <h3
+            className="text-base font-bold mb-3 pb-2"
+            style={{ borderBottom: "2px solid var(--accent)" }}
+          >
+            運営者プロフィール
+          </h3>
+          <Link href="/about#author" className="flex items-center gap-3 hover:underline">
+            <Image
+              src={SITE_AUTHOR.image}
+              alt={SITE_AUTHOR.name}
+              width={48}
+              height={48}
+              className="flex-none rounded-full object-cover"
+              style={{ width: 48, height: 48 }}
+            />
+            <span>
+              <span className="block text-sm font-semibold">
+                {SITE_AUTHOR.name}({SITE_AUTHOR.nickname})
+              </span>
+              <span className="block text-xs" style={{ color: "var(--ink-muted)" }}>
+                {SITE_AUTHOR.jobTitle}
+              </span>
+            </span>
+          </Link>
+        </div>
+
+        {topRanking.length > 0 && (
+          <div className="p-5 rounded-lg" style={{ background: "var(--surface)", boxShadow: "var(--shadow-sm)" }}>
+            <h3
+              className="text-base font-bold mb-3 pb-2"
+              style={{ borderBottom: "2px solid var(--accent)" }}
+            >
+              人気記事アクセスランキング
+            </h3>
+            <ol className="space-y-3">
+              {topRanking.map((c, i) => (
+                <li key={c.id}>
+                  <Link href={`/columns/${c.slug}`} className="flex items-start gap-2 hover:underline">
+                    <span className="flex-none text-sm font-black tabular-nums" style={{ color: "var(--accent)" }}>
+                      {i + 1}
+                    </span>
+                    <span className="text-sm leading-snug">{c.title}</span>
+                  </Link>
+                </li>
+              ))}
+            </ol>
+            <Link href="/columns/ranking" className="block text-xs font-medium mt-3 hover:underline" style={{ color: "var(--accent)" }}>
+              もっと見る →
+            </Link>
+          </div>
+        )}
+      </aside>
+
+      </div>
     </main>
   );
 }
