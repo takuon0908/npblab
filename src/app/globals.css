@@ -204,6 +204,7 @@ input:focus-visible {
    横スクロールできるようにする(セル内の文章はnowrapにせず、通常通り折り返す) */
 .prose table {
   display: block;
+  width: 100%;
   overflow-x: auto;
   border-radius: 8px;
   border: 1px solid var(--border);
