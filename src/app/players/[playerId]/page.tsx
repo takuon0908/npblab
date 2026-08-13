@@ -13,7 +13,7 @@ import { getPlayerSocialLinks } from "@/lib/playerSocialLinks";
 import { PlayerSocialLinksRow } from "@/components/PlayerSocialLinks";
 import { PlayerPortrait } from "@/components/PlayerPortrait";
 import { ShareButton } from "@/components/ShareButton";
-import { RakutenWidget } from "@/components/RakutenWidget";
+import { A8Banner } from "@/components/A8Banner";
 import { getColumns } from "@/lib/microcms";
 import { formatDateJa } from "@/lib/date";
 
@@ -505,7 +505,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
         </div>
       )}
 
-      <RakutenWidget pageUrl={`${siteUrl}/players/${playerId}`} />
+      <A8Banner />
 
       {player.teammates.length > 0 && (
         <div className="mt-12">

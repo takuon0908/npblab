@@ -21,7 +21,7 @@ import { getTeamSocialLinks } from "@/lib/teamSocialLinks";
 import { TeamSocialLinksRow } from "@/components/TeamSocialLinks";
 import { getTeamReporter } from "@/lib/teamReporters";
 import { TeamReporterBadge } from "@/components/TeamReporterBadge";
-import { RakutenWidget } from "@/components/RakutenWidget";
+import { A8Banner } from "@/components/A8Banner";
 
 const MIN_AT_BATS_FOR_AVG_LEADER = 10;
 const MIN_INNINGS_FOR_ERA_LEADER = 10;
@@ -530,7 +530,7 @@ export default async function TeamPage({
         </>
       )}
 
-      <RakutenWidget pageUrl={`${siteUrl}/teams/${team.slug}`} />
+      <A8Banner />
 
       {relatedColumns.length > 0 && (
         <section className="mt-10 pt-8" style={{ borderTop: "1px solid var(--border)" }}>

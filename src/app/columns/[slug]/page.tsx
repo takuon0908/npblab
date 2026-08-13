@@ -9,7 +9,7 @@ import { GoodButton } from "@/components/GoodButton";
 import { ShareButton } from "@/components/ShareButton";
 import { getLikeCount } from "@/lib/columnLikes";
 import { ViewTracker } from "@/components/ViewTracker";
-import { RakutenWidget } from "@/components/RakutenWidget";
+import { A8Banner } from "@/components/A8Banner";
 import { AmazonProductCard } from "@/components/AmazonProductCard";
 import { getAffiliateProduct } from "@/lib/affiliateProducts";
 import { RakutenProductCard } from "@/components/RakutenProductCard";
@@ -325,7 +325,7 @@ export default async function ColumnPage({
         )}
 
         <div className="mt-8 flex justify-center">
-          <RakutenWidget pageUrl={`${siteUrl}/columns/${column.slug}`} />
+          <A8Banner />
         </div>
 
         <div className="mt-6 flex justify-center gap-3">
