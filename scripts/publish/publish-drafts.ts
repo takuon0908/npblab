@@ -31,6 +31,7 @@ const CATEGORY_RULES: [RegExp, string][] = [
   [/^rules-basics-/, "ルール・基礎知識"],
   [/^injury-prevention-/, "体づくり・怪我予防"],
   [/^gear-guide-/, "用具選び"],
+  [/^skyperfectv-/, "用具選び"],
   [/^pennant-race-/, "ペナントレース速報"],
   [/^(satoh|murakami|taira)-/, "選手フィーチャー"],
   [/^mlb-japanese-/, "選手フィーチャー"],
