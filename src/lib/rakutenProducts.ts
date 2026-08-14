@@ -124,13 +124,6 @@ const CATEGORY_FALLBACK_PRODUCTS: Partial<Record<string, RakutenProduct>> = {
     affiliateUrl:
       "https://hb.afl.rakuten.co.jp/hgc/g00to08n.zuxm7e9b.g00to08n.zuxm813c/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Flively777%2Fformroller%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Flively777%2Fi%2F10000143%2F&rafcid=wsc_i_is_aae3259c-1d0c-4997-b2e4-5d50511c7c9d",
   },
-  "野球理論（科学的検証）": {
-    title: "Gruper フォームローラー2in1 筋膜リリース グリッドローラー",
-    price: "1,980円（税込）",
-    imageUrl: "https://thumbnail.image.rakuten.co.jp/@0_mall/lively777/cabinet/uyjiazhu/2025/2025top.jpg?_ex=400x400",
-    affiliateUrl:
-      "https://hb.afl.rakuten.co.jp/hgc/g00to08n.zuxm7e9b.g00to08n.zuxm813c/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Flively777%2Fformroller%2F&m=http%3A%2F%2Fm.rakuten.co.jp%2Flively777%2Fi%2F10000143%2F&rafcid=wsc_i_is_aae3259c-1d0c-4997-b2e4-5d50511c7c9d",
-  },
 };
 
 export function getRakutenProduct(slug: string, category?: string): RakutenProduct | null {
