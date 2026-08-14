@@ -22,6 +22,8 @@ import { TeamSocialLinksRow } from "@/components/TeamSocialLinks";
 import { getTeamReporter } from "@/lib/teamReporters";
 import { TeamReporterBadge } from "@/components/TeamReporterBadge";
 import { A8Banner } from "@/components/A8Banner";
+import { RakutenProductCard } from "@/components/RakutenProductCard";
+import { getTeamGoods } from "@/lib/teamGoods";
 
 const MIN_AT_BATS_FOR_AVG_LEADER = 10;
 const MIN_INNINGS_FOR_ERA_LEADER = 10;
@@ -191,6 +193,7 @@ export default async function TeamPage({
   };
 
   const teamSocialLinks = getTeamSocialLinks(team.slug);
+  const teamGoods = getTeamGoods(team.slug);
   const teamSameAs = [
     teamSocialLinks?.x?.url,
     teamSocialLinks?.instagram?.url,
@@ -528,6 +531,12 @@ export default async function TeamPage({
             </div>
           )}
         </>
+      )}
+
+      {teamGoods && (
+        <div className="mt-8 flex justify-center">
+          <RakutenProductCard product={teamGoods} articleSlug={`team-${team.slug}`} />
+        </div>
       )}
 
       <A8Banner />
