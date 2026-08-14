@@ -47,6 +47,7 @@ model Team {
   insights              TeamInsight[]
   prospectRatings       ProspectRating[]
   valueRatings          PlayerValueRating[]
+  draftPicks            DraftPick[]
 }
 
 model Game {
@@ -291,4 +292,34 @@ model ColumnLike {
 model ColumnView {
   slug  String @id
   count Int    @default(0)
+}
+
+// 球団ごとのドラフト指名を遡って評価するための記録。
+// 当サイトのシーズン別成績DBは2026年分しか持っていないため(過去シーズンを
+// season単位で再構築するコストが大きい)、指名選手ごとの通算成績は
+// 「シーズンごとの積み上げ」ではなくリサーチベースの軽量サマリーとして持つ。
+// これにより、指名年ごとの評価・球団の通算ドラフト力ランキングの両方を
+// 同じレコードから算出できる
+model DraftPick {
+  id                  String  @id @default(cuid())
+  year                Int // ドラフト実施年(例: 2024年オフに行われたものは2024)
+  round               Int // 指名順位。育成指名も1位・2位…と数える(isDevelopmentalで区別)
+  isDevelopmental     Boolean @default(false)
+  teamId              String
+  playerName          String
+  playerId            String? // 選手ページ(/players/[playerId])の形式に合わせたID。判明していれば紐付ける
+  position            String // 投手/捕手/内野手/外野手 など指名時のポジション
+  previousAffiliation String? // 出身(高校/大学/社会人/独立リーグ名など)
+
+  // 通算成績の軽量サマリー(リサーチに基づき手入力。season別データは持たない)
+  npbDebutMade     Boolean @default(false) // 一軍出場歴があるか
+  careerGames      Int? // 通算試合数(打者)または通算登板数(投手)のおおよその数値
+  qualifiedSeasons Int     @default(0) // 規定打席/規定投球回に到達したシーズン数
+  titles           String? // タイトル・表彰歴の自由記述(複数は読点区切り)
+  isActive         Boolean @default(true) // 執筆/更新時点で現役かどうか
+  note             String? // 補足(移籍・引退時期など)
+
+  team Team @relation(fields: [teamId], references: [id])
+
+  @@unique([year, round, isDevelopmental, teamId, playerName])
 }
