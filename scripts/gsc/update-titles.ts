@@ -16,10 +16,7 @@ function getClient() {
 // (「新ルール」「サスペンデッドゲーム」等)より先に来てしまい、肝心な部分が
 // 切れて表示されにくくなっていた。検索されているキーワードを前方に出す形に組み替える
 const TITLE_UPDATES: Record<string, string> = {
-  "rules-basics-cs-new-rule-2026": "CS新ルール「2勝」アドバンテージとは？2026年から何が変わったか",
-  "rules-basics-suspended-game": "サスペンデッドゲーム(中断試合)とは何か ― 野球のルール入門",
-  "rules-basics-farm-3zone-2026": "ファーム3地区制とは何か ― イースタン・ウエスタン制度が変わった理由",
-  "rules-basics-registered-vs-development": "「支配下選手」と「育成選手」の違いとは？支配下選手登録と7月31日の期限",
+  "rules-basics-intentional-walk": "申告敬遠とは何か ― なぜ4球投げなくてよくなったのか【野球のルール入門】",
 };
 
 async function main() {
