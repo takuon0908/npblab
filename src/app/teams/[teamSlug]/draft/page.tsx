@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import { Fragment } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { Table, Th, Td } from "@/components/Table";
+import { Table, Th } from "@/components/Table";
 import { calcDraftPickScore } from "@/lib/draftScore";
 
 export const revalidate = 86400;
@@ -102,29 +103,45 @@ export default async function TeamDraftPage({ params }: { params: Promise<{ team
             </p>
           </div>
 
-          {years.map(({ year, picks, total }) => (
-            <section key={year} className="mb-10">
-              <div className="flex items-baseline justify-between mb-3">
-                <h2 className="font-semibold" style={{ fontFamily: "var(--font-heading)" }}>
-                  {year}年ドラフト
-                </h2>
-                <span className="text-sm" style={{ color: "var(--ink-muted)" }}>
-                  年度合計 <span style={{ color: "var(--accent)", fontWeight: 700 }}>{total}点</span>
-                </span>
-              </div>
-              <Table>
-                <thead>
+          {/* 年度ごとに別々の<table>にすると、それぞれ独立して列幅を計算してしまい
+              スクロールしていくと列がズレて見える。1つの連続したテーブルにまとめ、
+              年度は区切り行(colSpan)で表現することで列幅を全体で揃えている */}
+          <Table>
+            <colgroup>
+              <col style={{ width: "64px" }} />
+              <col />
+              <col style={{ width: "72px" }} />
+              <col style={{ width: "64px" }} />
+              <col style={{ width: "64px" }} />
+              <col style={{ width: "180px" }} />
+              <col style={{ width: "56px" }} />
+            </colgroup>
+            <thead>
+              <tr>
+                <Th>順位</Th>
+                <Th>選手</Th>
+                <Th>ポジション</Th>
+                <Th align="right">一軍出場</Th>
+                <Th align="right">規定到達</Th>
+                <Th>タイトル</Th>
+                <Th align="right">スコア</Th>
+              </tr>
+            </thead>
+            <tbody>
+              {years.map(({ year, picks, total }) => (
+                <Fragment key={year}>
                   <tr>
-                    <Th>順位</Th>
-                    <Th>選手</Th>
-                    <Th>ポジション</Th>
-                    <Th align="right">一軍出場</Th>
-                    <Th align="right">規定到達</Th>
-                    <Th>タイトル</Th>
-                    <Th align="right">スコア</Th>
+                    <td
+                      colSpan={7}
+                      className="px-3 py-2 text-sm"
+                      style={{ background: "var(--surface-2)", fontFamily: "var(--font-heading)", fontWeight: 700 }}
+                    >
+                      {year}年ドラフト
+                      <span className="ml-3 font-normal" style={{ color: "var(--ink-muted)" }}>
+                        年度合計 <span style={{ color: "var(--accent)", fontWeight: 700 }}>{total}点</span>
+                      </span>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
                   {picks.map((p) => (
                     <tr key={p.id}>
                       <td className="px-3 py-2 align-top" style={{ color: "var(--ink-secondary)" }}>
@@ -151,10 +168,10 @@ export default async function TeamDraftPage({ params }: { params: Promise<{ team
                       </td>
                     </tr>
                   ))}
-                </tbody>
-              </Table>
-            </section>
-          ))}
+                </Fragment>
+              ))}
+            </tbody>
+          </Table>
 
           <p className="text-xs mt-4" style={{ color: "var(--ink-muted)" }}>
             スコアは一軍出場+10点、規定打席/規定投球回到達シーズン1回につき+20点、タイトル・表彰歴1件につき+30点で算出した当サイト独自の試算です。NPB公式の評価ではありません。通算成績は執筆時点のスナップショットであり、以後の活躍によって変動します。
