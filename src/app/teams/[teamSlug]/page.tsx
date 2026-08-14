@@ -272,7 +272,11 @@ export default async function TeamPage({
               <div className="text-sm mb-2" style={{ color: "var(--ink-muted)" }}>
                 スカウティングレポート
               </div>
-              <p className="leading-relaxed">{insight.summary}</p>
+              <p className="leading-relaxed">
+                {insight.summary}
+                {championship &&
+                  `${team.name}の現在の優勝確率は当サイトの独自シミュレーションで${(championship.probability * 100).toFixed(1)}%と試算されている。`}
+              </p>
             </div>
           )}
 
