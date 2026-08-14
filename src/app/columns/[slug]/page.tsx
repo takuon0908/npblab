@@ -378,7 +378,7 @@ export default async function ColumnPage({
             className="whitespace-nowrap text-sm font-medium group-hover:underline"
             style={{ color: "var(--accent)" }}
           >
-            球団ページを見る →
+            {relatedTeam.name}の優勝確率を見る →
           </span>
         </Link>
       )}
