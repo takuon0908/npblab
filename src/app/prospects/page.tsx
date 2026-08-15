@@ -6,6 +6,7 @@ import { Table, Th, Td } from "@/components/Table";
 import { RankBar } from "@/components/RankBar";
 import { teamAbbr } from "@/lib/teamAbbr";
 import { siteUrl } from "@/lib/siteUrl";
+import { formatAvg } from "@/lib/format";
 
 // データは1日1回(日次パイプライン)しか更新されないため24時間に緩めている(Supabase egress/Vercel ISR Writes対策)
 export const revalidate = 86400;
@@ -101,11 +102,11 @@ export default async function ProspectsPage() {
                       </Link>
                     </Td>
                     <Td align="right" muted>
-                      {p.nigunValue.toFixed(3)}
+                      {formatAvg(p.nigunValue)}
                     </Td>
                     <Td align="right">
                       <div className="flex flex-col items-end gap-1.5">
-                        <span className="font-semibold">{p.translatedValue.toFixed(3)}</span>
+                        <span className="font-semibold">{formatAvg(p.translatedValue)}</span>
                         <RankBar ratio={p.translatedValue / data.batters[0].translatedValue} />
                       </div>
                     </Td>

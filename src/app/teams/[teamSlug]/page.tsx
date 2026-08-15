@@ -24,6 +24,7 @@ import { TeamReporterBadge } from "@/components/TeamReporterBadge";
 import { A8Banner } from "@/components/A8Banner";
 import { RakutenProductCard } from "@/components/RakutenProductCard";
 import { getTeamGoods } from "@/lib/teamGoods";
+import { formatAvg } from "@/lib/format";
 
 const MIN_AT_BATS_FOR_AVG_LEADER = 10;
 const MIN_INNINGS_FOR_ERA_LEADER = 10;
@@ -290,7 +291,7 @@ export default async function TeamPage({
                 </>
               }
             />
-            <StatTile label="勝率" value={standing.winPct.toFixed(3)} />
+            <StatTile label="勝率" value={formatAvg(standing.winPct)} />
             <StatTile label="差" value={standing.gamesBehind === 0 ? "--" : String(standing.gamesBehind)} />
             <StatTile label="残り試合" value={`${remainingGames}試合`} />
             {magicNumber !== null && <StatTile label="マジックナンバー" value={String(magicNumber)} />}
@@ -304,7 +305,7 @@ export default async function TeamPage({
                   label="直近10試合"
                   value={`${insight.last10Wins}勝${insight.last10Losses}敗${insight.last10Draws}分`}
                 />
-                <StatTile label="ピタゴラス勝率" value={insight.pythagoreanWinPct.toFixed(3)} />
+                <StatTile label="ピタゴラス勝率" value={formatAvg(insight.pythagoreanWinPct)} />
               </>
             )}
           </dl>
@@ -325,7 +326,7 @@ export default async function TeamPage({
                         </Link>
                       </Td>
                       <Td align="right">
-                        <span className="font-semibold">{teamLeaders.avg.avg.toFixed(3)}</span>
+                        <span className="font-semibold">{formatAvg(teamLeaders.avg.avg)}</span>
                       </Td>
                     </tr>
                   )}
@@ -526,7 +527,7 @@ export default async function TeamPage({
                         {s.wins}勝{s.losses}敗{s.draws}分
                       </Td>
                       <Td align="right">
-                        <span className="font-semibold">{s.winPct.toFixed(3)}</span>
+                        <span className="font-semibold">{formatAvg(s.winPct)}</span>
                       </Td>
                     </tr>
                   ))}

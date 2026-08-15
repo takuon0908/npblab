@@ -16,6 +16,7 @@ import { ShareButton } from "@/components/ShareButton";
 import { A8Banner } from "@/components/A8Banner";
 import { getColumns } from "@/lib/microcms";
 import { formatDateJa } from "@/lib/date";
+import { formatAvg } from "@/lib/format";
 
 // データは1日1回(日次パイプライン)しか更新されないため24時間に緩めている(Supabase egress/Vercel ISR Writes対策)
 export const revalidate = 86400;
@@ -299,12 +300,12 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
             今シーズン打撃成績（1軍）
           </h2>
           <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4 mb-4">
-            <StatTile label="打率" value={player.currentBatting.avg.toFixed(3)} />
+            <StatTile label="打率" value={formatAvg(player.currentBatting.avg)} />
             <StatTile label="本塁打" value={`${player.currentBatting.homeRuns}本`} />
             <StatTile label="打点" value={`${player.currentBatting.rbi}打点`} />
             <StatTile label="盗塁" value={`${player.currentBatting.stolenBases}盗塁`} />
-            <StatTile label="OPS" value={(player.currentBatting.obp + player.currentBatting.slg).toFixed(3)} />
-            {woba !== null && <StatTile label="wOBA" value={woba.toFixed(3)} />}
+            <StatTile label="OPS" value={formatAvg(player.currentBatting.obp + player.currentBatting.slg)} />
+            {woba !== null && <StatTile label="wOBA" value={formatAvg(woba)} />}
             {kPercent !== null && <StatTile label="K%" value={`${(kPercent * 100).toFixed(1)}%`} />}
             {bbPercent !== null && <StatTile label="BB%" value={`${(bbPercent * 100).toFixed(1)}%`} />}
           </dl>
@@ -387,7 +388,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
           </h2>
           {player.currentNigunBatting && (
             <p className="text-sm mb-2">
-              打率 <span className="font-semibold">{player.currentNigunBatting.avg.toFixed(3)}</span>　本塁打{" "}
+              打率 <span className="font-semibold">{formatAvg(player.currentNigunBatting.avg)}</span>　本塁打{" "}
               {player.currentNigunBatting.homeRuns}本　打点 {player.currentNigunBatting.rbi}
             </p>
           )}
@@ -455,7 +456,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
                         </span>
                       </Td>
                       <Td align="right">
-                        <span className="font-semibold">{b.avg.toFixed(3)}</span>
+                        <span className="font-semibold">{formatAvg(b.avg)}</span>
                       </Td>
                       <Td align="right" muted>
                         {b.homeRuns}本

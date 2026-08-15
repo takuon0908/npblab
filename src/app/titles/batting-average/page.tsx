@@ -5,6 +5,7 @@ import { Level } from "@prisma/client";
 import { Table, Th, Td } from "@/components/Table";
 import { latestPerPlayer } from "@/lib/latestPerPlayer";
 import { teamAbbr } from "@/lib/teamAbbr";
+import { formatAvg } from "@/lib/format";
 
 // データは1日1回(日次パイプライン)しか更新されないため24時間に緩めている(Supabase egress/Vercel ISR Writes対策)
 export const revalidate = 86400;
@@ -70,7 +71,7 @@ export default async function BattingAverageRankingPage() {
                 </Link>
               </Td>
               <Td align="right">
-                <span className="font-semibold">{b.avg.toFixed(3)}</span>
+                <span className="font-semibold">{formatAvg(b.avg)}</span>
               </Td>
               <Td align="right" muted>
                 {b.atBats}

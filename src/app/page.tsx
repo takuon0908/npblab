@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { formatDateJa } from "@/lib/date";
+import { formatAvg } from "@/lib/format";
 import { getLatestDayGames, getScheduledGames, pickClosestGame } from "@/lib/games";
 import { GamesTabSwitcher } from "@/components/GamesTabSwitcher";
 import { FavoriteTeamHighlight } from "@/components/FavoriteTeamHighlight";
@@ -100,7 +101,7 @@ function buildSectionTeasers(hero: HeroStats): Record<string, string | null> {
     teams: hero.topTeam ? `首位 ${hero.topTeam.team.name} 優勝確率${(hero.topTeam.probability * 100).toFixed(1)}%` : null,
     titles: hero.topTitle ? `本塁打王 ${hero.topTitle.playerName} ${hero.topTitle.currentValue}本` : null,
     prospects: hero.topProspect
-      ? `1位 ${hero.topProspect.playerName} 換算OPS ${hero.topProspect.translatedValue.toFixed(3)}`
+      ? `1位 ${hero.topProspect.playerName} 換算OPS ${formatAvg(hero.topProspect.translatedValue)}`
       : null,
     analysis: hero.topValue ? `MVP ${hero.topValue.playerName} LABバリュー${hero.topValue.value.toFixed(2)}` : null,
     columns: null,
@@ -152,7 +153,7 @@ function HeroStatsRow({ hero }: { hero: HeroStats }) {
     },
     hero.topProspect && {
       label: "2軍注目 換算OPS",
-      value: hero.topProspect.translatedValue.toFixed(3),
+      value: formatAvg(hero.topProspect.translatedValue),
       sub: hero.topProspect.playerName,
       href: "/prospects",
     },

@@ -8,6 +8,7 @@ import { PlayerSocialIcons } from "@/components/PlayerSocialLinks";
 import { getPlayerSocialLinks } from "@/lib/playerSocialLinks";
 import { latestPerPlayer } from "@/lib/latestPerPlayer";
 import { TEAM_THEME } from "@/lib/teamTheme";
+import { formatAvg } from "@/lib/format";
 import { siteUrl } from "@/lib/siteUrl";
 import { PlayerPortrait } from "@/components/PlayerPortrait";
 import { RankBadge } from "@/components/RankBadge";
@@ -364,7 +365,7 @@ export default async function TitlesPage() {
                               </Td>
                               <Td align="right">
                                 <div className="flex flex-col items-end gap-1.5">
-                                  <span className="font-semibold text-base">{b.avg.toFixed(3)}</span>
+                                  <span className="font-semibold text-base">{formatAvg(b.avg)}</span>
                                   <RankBar ratio={b.avg / batters[0].avg} />
                                 </div>
                               </Td>

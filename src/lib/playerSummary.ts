@@ -2,6 +2,8 @@
 // 球団ページのTeamInsight(scripts/analytics/summary.ts)と同じ考え方: Wikipedia等からの転載ではなく、
 // 当サイトが保有する実データから独自に組み立てた文章にすることで、選手ページの薄さを解消する
 
+import { formatAvg } from "./format";
+
 export interface BatterSummaryInput {
   avg: number;
   homeRuns: number;
@@ -28,13 +30,13 @@ export function generateBatterSummary(input: BatterSummaryInput): string {
   }
 
   if (input.avg >= 0.3) {
-    parts.push(`打率${input.avg.toFixed(3)}はリーグでも屈指の高水準`);
+    parts.push(`打率${formatAvg(input.avg)}はリーグでも屈指の高水準`);
   } else if (input.avg >= 0.27) {
-    parts.push(`打率${input.avg.toFixed(3)}は平均を上回る水準`);
+    parts.push(`打率${formatAvg(input.avg)}は平均を上回る水準`);
   } else if (input.avg >= 0.23) {
-    parts.push(`打率${input.avg.toFixed(3)}は平均的な水準`);
+    parts.push(`打率${formatAvg(input.avg)}は平均的な水準`);
   } else if (input.atBats >= 50) {
-    parts.push(`打率${input.avg.toFixed(3)}にとどまり打撃面では苦しんでいる`);
+    parts.push(`打率${formatAvg(input.avg)}にとどまり打撃面では苦しんでいる`);
   }
 
   if (input.avgRank && input.totalQualified && input.avgRank <= input.totalQualified) {

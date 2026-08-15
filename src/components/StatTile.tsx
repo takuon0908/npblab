@@ -7,7 +7,7 @@ export function StatTile({ label, value }: { label: string; value: React.ReactNo
       <dt className="text-xs" style={{ color: "var(--ink-muted)" }}>
         {label}
       </dt>
-      <dd className="text-xl font-semibold mt-1" style={{ color: "var(--ink)" }}>
+      <dd className="text-xl font-semibold tabular-nums mt-1" style={{ color: "var(--ink)" }}>
         {value}
       </dd>
     </div>

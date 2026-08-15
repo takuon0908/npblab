@@ -28,6 +28,14 @@
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
 
+  /* 指標のリーグ内パーセンタイル(0-100)を色分けするための5段階スケール。
+     数値が良いほど暖色(赤)、悪いほど寒色(青)に寄せる配色 */
+  --percentile-elite: #dc2626; /* 90-100 */
+  --percentile-great: #ea580c; /* 70-89 */
+  --percentile-aboveavg: #fbbf24; /* 50-69 */
+  --percentile-belowavg: #94a3b8; /* 30-49 */
+  --percentile-poor: #0284c7; /* 0-29 */
+
   --background: var(--page);
   --foreground: var(--ink);
 

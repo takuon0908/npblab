@@ -8,6 +8,7 @@ import { latestPerPlayer } from "@/lib/latestPerPlayer";
 import { calcFipConstant, calcFip, calcWoba, calcWhip, calcKPercent, calcBBPercent } from "@/lib/sabermetrics";
 import { teamAbbr } from "@/lib/teamAbbr";
 import { siteUrl } from "@/lib/siteUrl";
+import { formatAvg } from "@/lib/format";
 
 const QUALIFYING_PA_PER_GAME = 3.1;
 const QUALIFYING_IP_PER_GAME = 1;
@@ -189,7 +190,7 @@ export default async function AnalysisPage() {
                   </Link>
                 </Td>
                 <Td align="right" muted>
-                  {r.category === ProspectCategory.BATTING ? r.rawStat.toFixed(3) : r.rawStat.toFixed(2)}
+                  {r.category === ProspectCategory.BATTING ? formatAvg(r.rawStat) : r.rawStat.toFixed(2)}
                 </Td>
                 <Td align="right">
                   <div className="flex flex-col items-end gap-1.5">
@@ -221,7 +222,7 @@ export default async function AnalysisPage() {
               <h3 className="flex items-baseline justify-between text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
                 <span>wOBA（打者）</span>
                 <span className="text-xs font-normal" style={{ color: "var(--ink-muted)" }}>
-                  リーグ平均 {sabermetrics.leagueAverages.woba.toFixed(3)}
+                  リーグ平均 {formatAvg(sabermetrics.leagueAverages.woba)}
                 </span>
               </h3>
               <Table>
@@ -251,7 +252,7 @@ export default async function AnalysisPage() {
                       </Td>
                       <Td align="right">
                         <div className="flex flex-col items-end gap-1.5">
-                          <span className="font-semibold text-base">{b.woba.toFixed(3)}</span>
+                          <span className="font-semibold text-base">{formatAvg(b.woba)}</span>
                           <RankBar ratio={b.woba / sabermetrics.wobaLeaders[0].woba} />
                         </div>
                       </Td>
