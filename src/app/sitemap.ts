@@ -27,17 +27,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   const now = new Date();
+  // 「実際にデータが更新された日」をlastModifiedに使う(サイトマップ生成時刻ではなく)。
+  // ビルド時刻をそのまま使うと、日次パイプラインが動かなかった日でもGoogleに
+  // 「今日更新された」と伝えてしまい、更新頻度の信号として不正確になるため
+  const latestStandings = await prisma.standingsSnapshot.aggregate({ _max: { date: true } });
+  const dataUpdatedAt = latestStandings._max.date ?? now;
 
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: siteUrl, changeFrequency: "daily", priority: 1, lastModified: now },
-    { url: `${siteUrl}/games`, changeFrequency: "daily", priority: 0.9, lastModified: now },
-    { url: `${siteUrl}/teams`, changeFrequency: "daily", priority: 0.9, lastModified: now },
-    { url: `${siteUrl}/titles`, changeFrequency: "daily", priority: 0.9, lastModified: now },
-    { url: `${siteUrl}/titles/batting-average`, changeFrequency: "daily", priority: 0.7, lastModified: now },
-    { url: `${siteUrl}/titles/era`, changeFrequency: "daily", priority: 0.7, lastModified: now },
-    { url: `${siteUrl}/prospects`, changeFrequency: "daily", priority: 0.8, lastModified: now },
-    { url: `${siteUrl}/analysis`, changeFrequency: "daily", priority: 0.8, lastModified: now },
-    { url: `${siteUrl}/analysis/innings`, changeFrequency: "daily", priority: 0.7, lastModified: now },
+    { url: siteUrl, changeFrequency: "daily", priority: 1, lastModified: dataUpdatedAt },
+    { url: `${siteUrl}/games`, changeFrequency: "daily", priority: 0.9, lastModified: dataUpdatedAt },
+    { url: `${siteUrl}/teams`, changeFrequency: "daily", priority: 0.9, lastModified: dataUpdatedAt },
+    { url: `${siteUrl}/titles`, changeFrequency: "daily", priority: 0.9, lastModified: dataUpdatedAt },
+    { url: `${siteUrl}/titles/batting-average`, changeFrequency: "daily", priority: 0.7, lastModified: dataUpdatedAt },
+    { url: `${siteUrl}/titles/era`, changeFrequency: "daily", priority: 0.7, lastModified: dataUpdatedAt },
+    { url: `${siteUrl}/prospects`, changeFrequency: "daily", priority: 0.8, lastModified: dataUpdatedAt },
+    { url: `${siteUrl}/analysis`, changeFrequency: "daily", priority: 0.8, lastModified: dataUpdatedAt },
+    { url: `${siteUrl}/analysis/innings`, changeFrequency: "daily", priority: 0.7, lastModified: dataUpdatedAt },
     { url: `${siteUrl}/columns`, changeFrequency: "daily", priority: 0.7, lastModified: now },
     { url: `${siteUrl}/columns/ranking`, changeFrequency: "daily", priority: 0.6, lastModified: now },
     { url: `${siteUrl}/about`, changeFrequency: "monthly", priority: 0.4, lastModified: now },
@@ -46,15 +51,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const teamRoutes: MetadataRoute.Sitemap = teams.flatMap((t) => [
-    { url: `${siteUrl}/teams/${t.slug}`, changeFrequency: "daily" as const, priority: 0.8, lastModified: now },
-    { url: `${siteUrl}/teams/${t.slug}/roster`, changeFrequency: "daily" as const, priority: 0.6, lastModified: now },
+    { url: `${siteUrl}/teams/${t.slug}`, changeFrequency: "daily" as const, priority: 0.8, lastModified: dataUpdatedAt },
+    { url: `${siteUrl}/teams/${t.slug}/roster`, changeFrequency: "daily" as const, priority: 0.6, lastModified: dataUpdatedAt },
   ]);
 
   const playerRoutes: MetadataRoute.Sitemap = playerIds.map((playerId) => ({
     url: `${siteUrl}/players/${encodeURIComponent(playerId)}`,
     changeFrequency: "daily",
     priority: 0.6,
-    lastModified: now,
+    lastModified: dataUpdatedAt,
   }));
 
   const columnRoutes: MetadataRoute.Sitemap = columns.map((c) => ({

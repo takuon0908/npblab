@@ -102,7 +102,7 @@ export async function generateMetadata({
   if (!team) return {};
 
   return {
-    title: `${team.name} 優勝確率・戦力分析`,
+    title: `${team.name} 順位・優勝確率・戦力分析`,
     description: `${team.name}の最新順位、貯金借金、優勝確率、パワーランキング、補強シミュレーションを毎日更新。データに基づく戦力分析でチームの現在地がわかります。`,
     alternates: { canonical: `/teams/${teamSlug}` },
   };
@@ -147,6 +147,20 @@ export default async function TeamPage({
       prisma.standingsSnapshot.findMany({ where: { teamId: team.id }, orderBy: { date: "desc" } }),
       getRelatedColumns(team.slug),
     ]);
+
+  // 「優勝確率」だけでなく「現在○位」という検索需要の大きいワードもページ内に
+  // 明示するため、リーグ内の現在順位を算出する
+  let leagueRank: { rank: number; total: number } | null = null;
+  if (standing) {
+    const latestDatePerTeam = await prisma.standingsSnapshot.findMany({
+      where: { team: { league: team.league } },
+      orderBy: { date: "desc" },
+      distinct: ["teamId"],
+    });
+    const sorted = [...latestDatePerTeam].sort((a, b) => b.winPct - a.winPct);
+    const rank = sorted.findIndex((s) => s.teamId === team.id) + 1;
+    if (rank > 0) leagueRank = { rank, total: sorted.length };
+  }
 
   const yearlyStandings = summarizeByYear(allStandings);
   const trendData = championshipTrend.map((c) => ({
@@ -275,6 +289,7 @@ export default async function TeamPage({
               </div>
               <p className="leading-relaxed">
                 {insight.summary}
+                {leagueRank && `${team.name}は現在、${team.league === "CENTRAL" ? "セ" : "パ"}・リーグ${leagueRank.rank}位につけている。`}
                 {championship &&
                   `${team.name}の現在の優勝確率は当サイトの独自シミュレーションで${(championship.probability * 100).toFixed(1)}%と試算されている。`}
               </p>
@@ -282,6 +297,12 @@ export default async function TeamPage({
           )}
 
           <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4 mb-8">
+            {leagueRank && (
+              <StatTile
+                label={`${team.league === "CENTRAL" ? "セ" : "パ"}・リーグ順位`}
+                value={`${leagueRank.rank}位`}
+              />
+            )}
             <StatTile
               label="成績"
               value={
