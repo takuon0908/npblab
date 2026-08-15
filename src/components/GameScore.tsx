@@ -213,21 +213,14 @@ function ScoreboardRow({
   return (
     <tr>
       <th
-        className="sticky left-0 py-1 pr-3 text-left text-sm font-normal whitespace-nowrap"
+        className="sticky left-0 py-1 pr-3 text-left text-xs font-normal whitespace-nowrap"
         style={{
           background: "inherit",
           color: isWinner ? "var(--ink)" : "var(--ink-muted)",
           fontWeight: isWinner ? 700 : 400,
         }}
       >
-        <Link href={`/teams/${team.slug}`} className="hover:underline inline-flex items-center gap-1.5">
-          <span
-            aria-hidden
-            className="rounded-full"
-            style={{ width: 7, height: 7, flex: "none", background: TEAM_THEME[team.slug]?.accent ?? "var(--ink-muted)" }}
-          />
-          {team.name ?? teamAbbr(team.slug)}
-        </Link>
+        {teamAbbr(team.slug)}
       </th>
       {Array.from({ length: inningCount }).map((_, i) => (
         <td key={i} className="px-1.5 py-1 text-center" style={{ color: "var(--ink-secondary)" }}>
@@ -299,6 +292,12 @@ function ScoreboardGameScore({
           ))}
         </div>
       )}
+      {/* 最終スコア: イニング表が横スクロールで見切れても、最終結果だけは必ず見える位置に出す */}
+      <div className="flex flex-col gap-1 mb-3">
+        <FinalScoreRow team={awayTeam} score={awayScore} accent={awayAccent} isWinner={!homeWin} />
+        <FinalScoreRow team={homeTeam} score={homeScore} accent={homeAccent} isWinner={homeWin} />
+      </div>
+      <div className="relative">
       <div className="overflow-x-auto">
         <table className="w-full text-sm" style={{ borderCollapse: "collapse" }}>
           <thead>
@@ -342,6 +341,13 @@ function ScoreboardGameScore({
           </tbody>
         </table>
       </div>
+        {/* イニング表が横に見切れているのに気づけない問題への対処(モバイルのみ) */}
+        <div
+          aria-hidden
+          className="sm:hidden pointer-events-none absolute right-0 top-0 bottom-0 w-6"
+          style={{ background: "linear-gradient(to right, transparent, var(--surface))" }}
+        />
+      </div>
       {(winningPitcher || savePitcher) && (
         <div className="mt-2 text-xs" style={{ color: "var(--ink-muted)" }}>
           {winningPitcher && <>(勝){winningPitcher} </>}
@@ -350,5 +356,32 @@ function ScoreboardGameScore({
         </div>
       )}
     </div>
+  );
+}
+
+function FinalScoreRow({
+  team,
+  score,
+  accent,
+  isWinner,
+}: {
+  team: TeamRef;
+  score: number | null;
+  accent: string;
+  isWinner: boolean;
+}) {
+  return (
+    <Link href={`/teams/${team.slug}`} className="flex items-center justify-between gap-3 hover:underline">
+      <span
+        className="inline-flex items-center gap-2 text-[15px]"
+        style={{ color: isWinner ? "var(--ink)" : "var(--ink-muted)", fontWeight: isWinner ? 700 : 400 }}
+      >
+        <span aria-hidden className="rounded-full" style={{ width: 8, height: 8, flex: "none", background: accent }} />
+        {team.name ?? teamAbbr(team.slug)}
+      </span>
+      <span className="text-xl font-black" style={{ color: isWinner ? "var(--accent)" : "var(--ink-secondary)" }}>
+        {score ?? "-"}
+      </span>
+    </Link>
   );
 }

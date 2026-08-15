@@ -10,15 +10,15 @@ export async function SiteHeader() {
   return (
     <header style={{ borderTop: "4px solid var(--ink)", borderBottom: "2px solid var(--ink)" }}>
       <div className="mx-auto max-w-4xl px-4 py-3 sm:py-4">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           <Link href="/" className="whitespace-nowrap flex-none">
-            <Image src="/logo.png" alt="プロ野球LAB" width={500} height={174} style={{ height: 40, width: "auto" }} priority />
+            <Image src="/logo.png" alt="プロ野球LAB" width={500} height={174} style={{ height: 36, width: "auto" }} priority />
           </Link>
           <div className="relative min-w-0 flex-1">
             <SiteNav />
-            {/* ナビがスクロール可能なことを示すフェード（右端が見切れて隠れているのに気づけない問題への対処） */}
+            {/* デスクトップ横並びナビがスクロール可能なことを示すフェード（右端が見切れて隠れているのに気づけない問題への対処） */}
             <div
-              className="pointer-events-none absolute right-0 top-0 h-full w-12"
+              className="hidden sm:block pointer-events-none absolute right-0 top-0 h-full w-12"
               style={{ background: "linear-gradient(to right, transparent, var(--page))" }}
             />
           </div>
