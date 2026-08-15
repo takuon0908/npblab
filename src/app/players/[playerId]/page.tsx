@@ -17,6 +17,9 @@ import { A8Banner } from "@/components/A8Banner";
 import { getColumns } from "@/lib/microcms";
 import { formatDateJa } from "@/lib/date";
 import { formatAvg } from "@/lib/format";
+import { calcPercentile } from "@/lib/percentile";
+import { PercentileBar } from "@/components/PercentileBar";
+import { StatTooltip } from "@/components/StatTooltip";
 
 // データは1日1回(日次パイプライン)しか更新されないため24時間に緩めている(Supabase egress/Vercel ISR Writes対策)
 export const revalidate = 86400;
@@ -30,6 +33,22 @@ const LEVEL_LABEL: Record<Level, string> = {
   [Level.ICHIGUN]: "1軍",
   [Level.NIGUN]: "2軍",
 };
+
+// パーセンタイル評価(0-100)。今季1軍で規定条件を満たした選手プール内での相対位置
+interface BattingPercentiles {
+  avg: number;
+  iso: number;
+  woba: number;
+  kPercent: number;
+  bbPercent: number;
+}
+interface PitchingPercentiles {
+  era: number;
+  fip: number;
+  whip: number;
+  kPercent: number;
+  bbPercent: number;
+}
 
 // 同一シーズン・同一レベルの中で最新日のスナップショットだけを年度別成績として残す
 function latestBySeasonLevel<T extends { season: number; level: Level; date: Date }>(rows: T[]): T[] {
@@ -61,9 +80,10 @@ async function getPlayer(playerId: string) {
   const currentNigunPitching = pitchingRows.find((p) => p.season === season && p.level === Level.NIGUN) ?? null;
 
   // FIPはリーグ全体の防御率に較正する定数が必要なため、現シーズンの1軍投手陣全体を取得する
-  // ついでに同じデータから防御率の順位も算出し、選手ページの要約文(スカウティングレポート)に使う
+  // ついでに同じデータから防御率の順位・パーセンタイル評価を算出し、選手ページで使う
   let fipConstant: number | null = null;
   let pitchingRank: { rank: number; total: number } | null = null;
+  let pitchingPercentiles: PitchingPercentiles | null = null;
   if (currentPitching) {
     const seasonPitchers = await prisma.playerPitchingStat.findMany({ where: { season, level: Level.ICHIGUN } });
     const latestSeasonPitchers = latestPerPlayer(seasonPitchers);
@@ -73,16 +93,60 @@ async function getPlayer(playerId: string) {
     const byEra = [...qualified].sort((a, b) => a.era - b.era);
     const rank = byEra.findIndex((p) => p.playerId === playerId) + 1;
     if (rank > 0) pitchingRank = { rank, total: qualified.length };
+
+    if (qualified.length >= 5 && qualified.some((p) => p.playerId === playerId)) {
+      // 打者対戦数(打席数)そのものはDBに無いため、投球回から簡易推定する
+      // (1イニングあたり平均4.3打席という一般的な近似値を使用)
+      const withDerived = qualified.map((p) => {
+        const estimatedBattersFaced = p.inningsPitched * 4.3;
+        return {
+          playerId: p.playerId,
+          era: p.era,
+          fip: calcFip(p, fipConstant!),
+          whip: calcWhip(p),
+          kPercent: calcKPercent({ strikeouts: p.strikeouts, plateAppearances: estimatedBattersFaced }),
+          bbPercent: calcBBPercent({ walks: p.walks + p.hitByPitch, plateAppearances: estimatedBattersFaced }),
+        };
+      });
+      const me = withDerived.find((p) => p.playerId === playerId)!;
+      pitchingPercentiles = {
+        era: calcPercentile(me.era, withDerived.map((p) => p.era), false),
+        fip: calcPercentile(me.fip, withDerived.map((p) => p.fip), false),
+        whip: calcPercentile(me.whip, withDerived.map((p) => p.whip), false),
+        kPercent: calcPercentile(me.kPercent, withDerived.map((p) => p.kPercent), true),
+        bbPercent: calcPercentile(me.bbPercent, withDerived.map((p) => p.bbPercent), false),
+      };
+    }
   }
 
-  // 打率の順位も同様に、今季1軍で打数のある選手全体の中での位置づけを算出する
+  // 打率の順位・パーセンタイル評価も同様に、今季1軍で打数のある選手全体の中での位置づけを算出する
   let battingRank: { rank: number; total: number } | null = null;
+  let battingPercentiles: BattingPercentiles | null = null;
   if (currentBatting) {
     const seasonBatters = await prisma.playerBattingStat.findMany({ where: { season, level: Level.ICHIGUN } });
     const qualified = latestPerPlayer(seasonBatters).filter((b) => b.atBats > 0);
     const byAvg = [...qualified].sort((a, b) => b.avg - a.avg);
     const rank = byAvg.findIndex((b) => b.playerId === playerId) + 1;
     if (rank > 0) battingRank = { rank, total: qualified.length };
+
+    if (qualified.length >= 5 && qualified.some((b) => b.playerId === playerId)) {
+      const withDerived = qualified.map((b) => ({
+        playerId: b.playerId,
+        avg: b.avg,
+        iso: b.slg - b.avg,
+        woba: calcWoba(b),
+        kPercent: calcKPercent(b),
+        bbPercent: calcBBPercent(b),
+      }));
+      const me = withDerived.find((b) => b.playerId === playerId)!;
+      battingPercentiles = {
+        avg: calcPercentile(me.avg, withDerived.map((b) => b.avg), true),
+        iso: calcPercentile(me.iso, withDerived.map((b) => b.iso), true),
+        woba: calcPercentile(me.woba, withDerived.map((b) => b.woba), true),
+        kPercent: calcPercentile(me.kPercent, withDerived.map((b) => b.kPercent), false),
+        bbPercent: calcPercentile(me.bbPercent, withDerived.map((b) => b.bbPercent), true),
+      };
+    }
   }
 
   // 選手ページが行き止まりにならないよう、同球団のLABバリュー上位選手を関連選手として案内する
@@ -106,6 +170,8 @@ async function getPlayer(playerId: string) {
     fipConstant,
     battingRank,
     pitchingRank,
+    battingPercentiles,
+    pitchingPercentiles,
     battingHistory: latestBySeasonLevel(battingRows),
     pitchingHistory: latestBySeasonLevel(pitchingRows),
     valueRatings,
@@ -309,6 +375,40 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
             {kPercent !== null && <StatTile label="K%" value={`${(kPercent * 100).toFixed(1)}%`} />}
             {bbPercent !== null && <StatTile label="BB%" value={`${(bbPercent * 100).toFixed(1)}%`} />}
           </dl>
+
+          {player.battingPercentiles && (
+            <div
+              className="grid gap-x-6 gap-y-4 sm:grid-cols-2 mb-4 rounded-lg p-4"
+              style={{ background: "var(--surface)", boxShadow: "var(--shadow-sm)" }}
+            >
+              <PercentileBar
+                label={<StatTooltip label="打率" definition="打数に占める安打の割合。純粋なコンタクト力の指標" />}
+                percentile={player.battingPercentiles.avg}
+                displayValue={formatAvg(player.currentBatting.avg)}
+              />
+              <PercentileBar
+                label={<StatTooltip label="長打力(ISO)" definition="長打率-打率。単打を除いた長打だけの力を示す" />}
+                percentile={player.battingPercentiles.iso}
+                displayValue={formatAvg(player.currentBatting.slg - player.currentBatting.avg)}
+              />
+              <PercentileBar
+                label={<StatTooltip label="wOBA" definition="出塁の質を単打・長打・四死球で重みづけした総合打撃指標" />}
+                percentile={player.battingPercentiles.woba}
+                displayValue={woba !== null ? formatAvg(woba) : "―"}
+              />
+              <PercentileBar
+                label={<StatTooltip label="選球眼(BB%)" definition="打席に占める四球の割合。高いほど選球眼が良い" />}
+                percentile={player.battingPercentiles.bbPercent}
+                displayValue={bbPercent !== null ? `${(bbPercent * 100).toFixed(1)}%` : "―"}
+              />
+              <PercentileBar
+                label={<StatTooltip label="コンタクト(K%)" definition="打席に占める三振の割合。低いほど当てる技術が高い(逆順で評価)" />}
+                percentile={player.battingPercentiles.kPercent}
+                displayValue={kPercent !== null ? `${(kPercent * 100).toFixed(1)}%` : "―"}
+              />
+            </div>
+          )}
+
           <Table>
             <thead>
               <tr>
@@ -354,6 +454,40 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
             {whip !== null && <StatTile label="WHIP" value={whip.toFixed(2)} />}
             {fip !== null && <StatTile label="FIP" value={fip.toFixed(2)} />}
           </dl>
+
+          {player.pitchingPercentiles && (
+            <div
+              className="grid gap-x-6 gap-y-4 sm:grid-cols-2 mb-4 rounded-lg p-4"
+              style={{ background: "var(--surface)", boxShadow: "var(--shadow-sm)" }}
+            >
+              <PercentileBar
+                label={<StatTooltip label="防御率" definition="9イニングあたりの自責点。低いほど良い(逆順で評価)" />}
+                percentile={player.pitchingPercentiles.era}
+                displayValue={player.currentPitching.era.toFixed(2)}
+              />
+              <PercentileBar
+                label={<StatTooltip label="FIP" definition="本塁打・四死球・奪三振だけから算出する、守備に依存しない投手指標" />}
+                percentile={player.pitchingPercentiles.fip}
+                displayValue={fip !== null ? fip.toFixed(2) : "―"}
+              />
+              <PercentileBar
+                label={<StatTooltip label="WHIP" definition="1イニングあたりの与四球+被安打数。低いほど良い(逆順で評価)" />}
+                percentile={player.pitchingPercentiles.whip}
+                displayValue={whip !== null ? whip.toFixed(2) : "―"}
+              />
+              <PercentileBar
+                label={<StatTooltip label="奪三振力(K%)" definition="投球回から推定した、対戦打者に占める奪三振の割合" />}
+                percentile={player.pitchingPercentiles.kPercent}
+                displayValue={`${player.currentPitching.strikeouts}奪三振`}
+              />
+              <PercentileBar
+                label={<StatTooltip label="制球力(BB%)" definition="投球回から推定した、対戦打者に占める与四死球の割合。低いほど良い(逆順で評価)" />}
+                percentile={player.pitchingPercentiles.bbPercent}
+                displayValue={`${player.currentPitching.walks + player.currentPitching.hitByPitch}与四死球`}
+              />
+            </div>
+          )}
+
           <Table>
             <thead>
               <tr>
