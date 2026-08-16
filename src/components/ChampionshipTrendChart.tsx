@@ -137,12 +137,13 @@ export function ChampionshipTrendChart({
 
         {hovered && (
           <div
-            className="pointer-events-none absolute top-0 z-10 rounded-none px-2 py-1 text-xs whitespace-nowrap"
+            className="pointer-events-none absolute top-0 z-10 rounded-lg px-2 py-1 text-xs whitespace-nowrap"
             style={{
               left: `${(hovered.x / VIEW_WIDTH) * 100}%`,
               transform: tooltipOnLeft ? "translateX(-100%)" : "translateX(0)",
               background: "var(--surface)",
-              border: "1px solid var(--border-strong)",
+              border: "1px solid var(--border)",
+              boxShadow: "var(--shadow-md)",
               color: "var(--ink)",
             }}
           >

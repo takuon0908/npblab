@@ -45,7 +45,7 @@ export default async function DraftIndexPage() {
     <main className="mx-auto max-w-4xl px-4 py-16">
       <h1 className="text-2xl font-black mb-2">12球団 ドラフト指名を採点</h1>
       <p className="text-sm mb-8" style={{ color: "var(--ink-secondary)" }}>
-        過去のドラフト指名選手を、一軍定着度・規定到達シーズン数・タイトル獲得歴をもとに当サイト独自の基準で採点し、球団ごとに合計しています。指名順位による重み付けはしていません。データは球団ごとに順次追加中です。
+        2021〜2025年のドラフト指名選手を、一軍定着度・規定到達シーズン数・タイトル獲得歴をもとに当サイト独自の基準で採点し、球団ごとに合計しています。指名順位による重み付けはしていません。球団名をクリックすると指名選手ごとのスコアを確認できます。
       </p>
 
       <div className="grid gap-8 sm:grid-cols-2 min-w-0">
