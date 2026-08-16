@@ -457,9 +457,15 @@ export default async function TeamPage({
             </div>
           </div>
 
-          <p className="text-xs mb-8" style={{ color: "var(--ink-muted)" }}>
+          <p className="text-xs mb-8 flex flex-wrap gap-x-4 gap-y-1" style={{ color: "var(--ink-muted)" }}>
             <Link href={`/teams/${team.slug}/roster`} className="hover:underline" style={{ color: "var(--accent)" }}>
               全選手の成績を見る →
+            </Link>
+            <Link href={`/teams/${team.slug}/draft`} className="hover:underline" style={{ color: "var(--accent)" }}>
+              ドラフト指名を採点で見る →
+            </Link>
+            <Link href="/compare" className="hover:underline" style={{ color: "var(--accent)" }}>
+              選手を比較する →
             </Link>
           </p>
 
