@@ -43,13 +43,13 @@ export function FavoriteAwareGameGrid({
   const sorted = favoriteTeam ? [...games].sort((a, b) => Number(isFavorite(b)) - Number(isFavorite(a))) : games;
 
   return (
-    <div className={className ?? "grid grid-cols-2 sm:grid-cols-3 gap-1.5"}>
+    <div className={className ?? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"}>
       {sorted.map((g) => (
         <div
           key={g.id}
           style={
             isFavorite(g)
-              ? { borderRadius: 4, boxShadow: "0 0 0 1.5px var(--accent)" }
+              ? { borderRadius: 16, boxShadow: "0 0 0 1.5px var(--accent)" }
               : undefined
           }
         >

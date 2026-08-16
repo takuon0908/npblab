@@ -25,6 +25,15 @@
   --critical: #c94f42;
   --critical-soft: rgba(201, 79, 66, 0.12);
 
+  /* TOPページの「注目データ」4カード([優勝確率/タイトルレース/独自指標/2軍注目])を
+     バッジ色で見分けるためのカテゴリカラー。固定の割り当てで使い回し、意味を変えない */
+  --category-amber: #d97706;
+  --category-amber-soft: #fffbeb;
+  --category-purple: #9333ea;
+  --category-purple-soft: #faf5ff;
+  --category-emerald: #059669;
+  --category-emerald-soft: #ecfdf5;
+
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
 

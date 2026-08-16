@@ -10,6 +10,7 @@ import { getPopularColumns } from "@/lib/columnViews";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 import { TEAM_THEME } from "@/lib/teamTheme";
 import { RankBar } from "@/components/RankBar";
+import { teamAbbr } from "@/lib/teamAbbr";
 import { prisma } from "@/lib/prisma";
 import { TitleCategory, ProspectCategory } from "@prisma/client";
 
@@ -24,19 +25,6 @@ export const revalidate = 86400;
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
-
-const sections: {
-  href: string;
-  label: string;
-  desc: string;
-  teaserKey: "teams" | "titles" | "prospects" | "analysis" | "columns";
-}[] = [
-  { href: "/teams", label: "球団別 優勝確率", desc: "残り試合シミュレーションによる優勝確率の推移", teaserKey: "teams" },
-  { href: "/titles", label: "タイトルレース", desc: "打者・投手タイトルの獲得確率を日次更新", teaserKey: "titles" },
-  { href: "/prospects", label: "2軍注目選手", desc: "2軍成績を1軍換算した昇格候補ランキング", teaserKey: "prospects" },
-  { href: "/analysis", label: "LABバリュー", desc: "セイバーメトリクスで算出する独自のMVPランキング", teaserKey: "analysis" },
-  { href: "/columns", label: "コラム", desc: "分析記事・考察", teaserKey: "columns" },
-];
 
 async function getLatestColumnsSafely() {
   try {
@@ -71,18 +59,21 @@ async function getHeroStats() {
         ? prisma.titleRaceProbability.findFirst({
             where: { date: titleDate._max.date, category: TitleCategory.HOME_RUNS },
             orderBy: { currentValue: "desc" },
+            include: { team: true },
           })
         : null,
       prospectDate._max.date
         ? prisma.prospectRating.findFirst({
             where: { date: prospectDate._max.date, category: ProspectCategory.BATTING },
             orderBy: { rank: "asc" },
+            include: { team: true },
           })
         : null,
       valueDate._max.date
         ? prisma.playerValueRating.findFirst({
             where: { date: valueDate._max.date },
             orderBy: { rank: "asc" },
+            include: { team: true },
           })
         : null,
     ]);
@@ -96,114 +87,208 @@ async function getHeroStats() {
 
 type HeroStats = Awaited<ReturnType<typeof getHeroStats>>;
 
-// ナビカードに添える「今の一番」の一行テキストを、ヒーロー統計と同じ生データから組み立てる
-function buildSectionTeasers(hero: HeroStats): Record<string, string | null> {
-  return {
-    teams: hero.topTeam ? `首位 ${hero.topTeam.team.name} 優勝確率${(hero.topTeam.probability * 100).toFixed(1)}%` : null,
-    titles: hero.topTitle ? `本塁打王 ${hero.topTitle.playerName} ${hero.topTitle.currentValue}本` : null,
-    prospects: hero.topProspect
-      ? `1位 ${hero.topProspect.playerName} 換算OPS ${formatAvg(hero.topProspect.translatedValue)}`
-      : null,
-    analysis: hero.topValue ? `MVP ${hero.topValue.playerName} LABバリュー${hero.topValue.value.toFixed(2)}` : null,
-    columns: null,
-  };
-}
-
-// ヒーロー最上部に並べる「キラーデータ」カード。数字の力を最初に見せるため、
-// 文章に埋め込まず大きな数字として独立させる(dataviz原則: 見出しは数字、文脈は添え書き)。
-// ratio/deltaが渡された場合(=優勝確率カード)は、進捗バーと前日比を添えて
-// 「今どのくらい強いか」「昨日から動いたか」を一目で伝える
-function HeroStatCard({
-  label,
+// 「注目データダッシュボード」共通カード枠。バッジ・右上の添え情報・本体・フッターの
+// 4段構成に統一し、種類が違うデータ(確率/タイトル/独自指標/2軍)でも同じ視線の動きで読めるようにする
+function DashboardCard({
+  badgeLabel,
+  badgeColor,
+  badgeBg,
+  corner,
+  teamLine,
   value,
-  sub,
-  href,
-  accent,
+  valueUnit,
   ratio,
-  delta,
+  footer,
+  href,
 }: {
-  label: string;
+  badgeLabel: string;
+  badgeColor: string;
+  badgeBg: string;
+  corner?: React.ReactNode;
+  teamLine: string;
   value: string;
-  sub: string;
-  href: string;
-  accent?: string;
+  valueUnit?: string;
   ratio?: number;
-  delta?: number | null;
+  footer: React.ReactNode;
+  href: string;
 }) {
   return (
     <Link
       href={href}
-      className="hover-lift block p-4"
-      style={{ background: "var(--surface)", border: "1px solid var(--border-strong)", borderTop: `3px solid ${accent ?? "var(--accent)"}` }}
+      className="hover-lift flex flex-col justify-between rounded-2xl p-5 transition-shadow"
+      style={{ background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow-sm)" }}
     >
-      <p className="text-xs mb-1.5" style={{ color: "var(--ink-muted)" }}>
-        {label}
-      </p>
-      <div className="flex items-baseline gap-2 mb-1">
-        <p className="text-2xl font-black tabular-nums" style={{ fontFamily: "var(--font-heading)", color: "var(--accent)" }}>
-          {value}
-        </p>
-        {delta !== undefined && delta !== null && Math.abs(delta) >= 0.001 && (
+      <div>
+        <div className="flex items-center justify-between gap-2 mb-2">
           <span
-            className="text-xs font-semibold tabular-nums whitespace-nowrap"
-            style={{ color: delta > 0 ? "var(--good)" : "var(--critical)" }}
+            className="text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap"
+            style={{ color: badgeColor, background: badgeBg }}
           >
-            {delta > 0 ? "▲" : "▼"}
-            {Math.abs(delta * 100).toFixed(1)}pt
+            {badgeLabel}
           </span>
+          {corner}
+        </div>
+        <div className="text-sm font-semibold truncate" style={{ color: "var(--ink-secondary)" }}>
+          {teamLine}
+        </div>
+        <div
+          className="tabular-nums my-2"
+          style={{ fontFamily: "var(--font-mono)", fontWeight: 800, fontSize: "1.75rem", color: "var(--ink)", lineHeight: 1.1 }}
+        >
+          {value}
+          {valueUnit && (
+            <span className="text-base font-bold ml-1" style={{ color: "var(--ink-muted)" }}>
+              {valueUnit}
+            </span>
+          )}
+        </div>
+        {ratio !== undefined && (
+          <div className="mb-1">
+            <RankBar ratio={ratio} widthClassName="w-full" />
+          </div>
         )}
       </div>
-      {ratio !== undefined && (
-        <div className="mb-1.5">
-          <RankBar ratio={ratio} widthClassName="w-full" />
-        </div>
-      )}
-      <p className="text-xs" style={{ color: "var(--ink-secondary)" }}>
-        {sub}
-      </p>
+      <div
+        className="text-xs pt-2 mt-2"
+        style={{ borderTop: "1px solid var(--border)", color: "var(--ink-muted)" }}
+      >
+        {footer}
+      </div>
     </Link>
   );
 }
 
+function DeltaBadge({ delta }: { delta: number | null }) {
+  if (delta === null || Math.abs(delta) < 0.001) return null;
+  return (
+    <span
+      className="text-xs font-bold whitespace-nowrap tabular-nums"
+      style={{ color: delta > 0 ? "var(--good)" : "var(--critical)" }}
+    >
+      {delta > 0 ? "↑" : "↓"} {Math.abs(delta * 100).toFixed(1)}%
+    </span>
+  );
+}
+
 function HeroStatsRow({ hero, topTeamDelta }: { hero: HeroStats; topTeamDelta: number | null }) {
-  const cards = [
-    hero.topTeam && {
-      label: "優勝確率 首位",
-      value: `${(hero.topTeam.probability * 100).toFixed(1)}%`,
-      sub: hero.topTeam.team.name,
-      href: "/teams",
-      accent: TEAM_THEME[hero.topTeam.team.slug]?.accent,
-      ratio: hero.topTeam.probability,
-      delta: topTeamDelta,
-    },
-    hero.topTitle && {
-      label: "本塁打王争い",
-      value: `${hero.topTitle.currentValue}本`,
-      sub: hero.topTitle.playerName,
-      href: "/titles",
-    },
-    hero.topValue && {
-      label: "LABバリュー MVP",
-      value: hero.topValue.value.toFixed(2),
-      sub: hero.topValue.playerName,
-      href: "/analysis",
-    },
-    hero.topProspect && {
-      label: "2軍注目 換算OPS",
-      value: formatAvg(hero.topProspect.translatedValue),
-      sub: hero.topProspect.playerName,
-      href: "/prospects",
-    },
-  ].filter((c): c is NonNullable<typeof c> => Boolean(c));
+  const cards: React.ReactNode[] = [];
+
+  if (hero.topTeam) {
+    cards.push(
+      <DashboardCard
+        key="champ"
+        badgeLabel="優勝確率 首位"
+        badgeColor="var(--accent)"
+        badgeBg="var(--accent-track)"
+        corner={<DeltaBadge delta={topTeamDelta} />}
+        teamLine={hero.topTeam.team.name}
+        value={`${(hero.topTeam.probability * 100).toFixed(1)}`}
+        valueUnit="%"
+        ratio={hero.topTeam.probability}
+        footer={
+          <div className="flex justify-between">
+            <span>順位表を見る</span>
+            <span className="font-bold" style={{ color: TEAM_THEME[hero.topTeam.team.slug]?.accent ?? "var(--accent)" }}>
+              →
+            </span>
+          </div>
+        }
+        href="/teams"
+      />,
+    );
+  }
+
+  if (hero.topTitle) {
+    cards.push(
+      <DashboardCard
+        key="title"
+        badgeLabel="タイトルレース"
+        badgeColor="var(--category-amber)"
+        badgeBg="var(--category-amber-soft)"
+        corner={
+          <span className="text-xs" style={{ color: "var(--ink-muted)" }}>
+            本塁打王
+          </span>
+        }
+        teamLine={`${hero.topTitle.playerName}（${teamAbbr(hero.topTitle.team.slug)}）`}
+        value={`${hero.topTitle.currentValue}`}
+        valueUnit="本"
+        footer={
+          <div className="flex justify-between">
+            <span>獲得確率</span>
+            <span className="font-bold tabular-nums" style={{ color: "var(--ink)" }}>
+              {(hero.topTitle.probability * 100).toFixed(1)}%
+            </span>
+          </div>
+        }
+        href="/titles"
+      />,
+    );
+  }
+
+  if (hero.topValue) {
+    cards.push(
+      <DashboardCard
+        key="value"
+        badgeLabel="独自指標 MVP"
+        badgeColor="var(--category-purple)"
+        badgeBg="var(--category-purple-soft)"
+        corner={
+          <span className="text-xs" style={{ color: "var(--ink-muted)" }}>
+            LABバリュー
+          </span>
+        }
+        teamLine={`${hero.topValue.playerName}（${teamAbbr(hero.topValue.team.slug)}）`}
+        value={hero.topValue.value.toFixed(2)}
+        footer="総合貢献度の独自試算トップ"
+        href="/analysis"
+      />,
+    );
+  }
+
+  if (hero.topProspect) {
+    cards.push(
+      <DashboardCard
+        key="prospect"
+        badgeLabel="2軍ブレイク候補"
+        badgeColor="var(--category-emerald)"
+        badgeBg="var(--category-emerald-soft)"
+        corner={
+          <span className="text-xs tracking-tight" style={{ color: "var(--category-amber)" }} aria-label="期待度: 最高評価">
+            ★★★★★
+          </span>
+        }
+        teamLine={`${hero.topProspect.playerName}（${teamAbbr(hero.topProspect.team.slug)}）`}
+        value={formatAvg(hero.topProspect.translatedValue)}
+        valueUnit="OPS"
+        footer={
+          <div className="flex justify-between">
+            <span>1軍昇格期待度</span>
+            <span className="font-bold" style={{ color: "var(--category-emerald)" }}>
+              極めて高い
+            </span>
+          </div>
+        }
+        href="/prospects"
+      />,
+    );
+  }
 
   if (cards.length === 0) return null;
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 mb-10">
-      {cards.map((c) => (
-        <HeroStatCard key={c.label} {...c} />
-      ))}
-    </div>
+    <section className="mb-10">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="flex items-center gap-2 text-lg font-bold" style={{ color: "var(--ink)" }}>
+          <span aria-hidden className="w-2.5 h-6 rounded-full inline-block" style={{ background: "var(--accent)" }} />
+          NPB LAB 注目データ
+        </h2>
+        <span className="text-xs font-medium" style={{ color: "var(--ink-muted)" }}>
+          毎日更新
+        </span>
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">{cards}</div>
+    </section>
   );
 }
 
@@ -305,19 +390,36 @@ function HighlightGame({ game }: { game: NonNullable<Awaited<ReturnType<typeof g
   return (
     <Link
       href={`/teams/${winner.slug}`}
-      className="hover-lift group block p-4 mb-4"
-      style={{ background: "var(--surface)", border: "1px solid var(--border-strong)", borderLeft: `4px solid ${TEAM_THEME[winner.slug]?.accent ?? "var(--accent)"}` }}
+      className="hover-lift group block rounded-2xl p-5 mb-4"
+      style={{ background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow-sm)" }}
     >
-      <p className="text-xs font-semibold mb-1.5" style={{ color: "var(--accent)" }}>
-        今日の一戦 ・ {label}
-      </p>
-      <p className="text-base font-bold group-hover:underline" style={{ fontFamily: "var(--font-heading)" }}>
-        {game.awayTeam.name} {game.awayScore}-{game.homeScore} {game.homeTeam.name}
-      </p>
+      <div className="flex items-center justify-between text-[11px] font-bold mb-3">
+        <span className="px-2 py-0.5 rounded" style={{ background: "var(--page)", color: "var(--ink-secondary)" }}>
+          今日の一戦
+        </span>
+        <span style={{ color: "var(--ink-muted)" }}>{label}</span>
+      </div>
+      <div className="flex items-center justify-between py-1">
+        <div className="flex-1 text-left font-bold truncate" style={{ color: "var(--ink)" }}>
+          {game.awayTeam.name}
+        </div>
+        <div
+          className="px-4 tabular-nums tracking-wider group-hover:underline"
+          style={{ fontFamily: "var(--font-mono)", fontWeight: 800, fontSize: "1.5rem", color: "var(--ink)" }}
+        >
+          {game.awayScore} - {game.homeScore}
+        </div>
+        <div className="flex-1 text-right font-bold truncate" style={{ color: "var(--ink-secondary)" }}>
+          {game.homeTeam.name}
+        </div>
+      </div>
       {game.winningPitcher && (
-        <p className="text-xs mt-1" style={{ color: "var(--ink-muted)" }}>
-          勝投手: {game.winningPitcher}
-          {game.savePitcher && ` ・ セーブ: ${game.savePitcher}`}
+        <p
+          className="text-xs mt-3 pt-2 flex justify-between"
+          style={{ borderTop: "1px solid var(--border)", color: "var(--ink-muted)" }}
+        >
+          <span>(勝) {game.winningPitcher}</span>
+          {game.savePitcher && <span>(Ｓ) {game.savePitcher}</span>}
         </p>
       )}
     </Link>
@@ -333,7 +435,6 @@ export default async function Home() {
     getTeamHighlights(),
     getPopularColumns("", 3),
   ]);
-  const teasers = buildSectionTeasers(heroStats);
   const highlightGame = latestGames ? pickClosestGame(latestGames.games) : null;
   const [heroColumn, ...restColumns] = latestColumns;
 
@@ -386,12 +487,11 @@ export default async function Home() {
 
         {latestGames && latestGames.games.length > 0 && (
           <section className="mb-10">
-            <div className="flex items-baseline justify-between mb-1">
-              <h2 className="flex items-center gap-2 font-semibold text-sm" style={{ color: "var(--ink)" }}>
-                <span aria-hidden style={{ width: 9, height: 9, background: "var(--accent)", flex: "none", transform: "rotate(45deg)" }} />
-                試合結果
+            <div className="flex items-baseline justify-between mb-3">
+              <h2 className="text-lg font-bold" style={{ color: "var(--ink)" }}>
+                {formatDateJa(latestGames.date).replace(/^\d+年/, "")}の試合結果
               </h2>
-              <Link href="/games" className="text-xs hover:underline" style={{ color: "var(--accent)" }}>
+              <Link href="/games" className="text-xs font-bold hover:underline" style={{ color: "var(--accent)" }}>
                 もっと見る →
               </Link>
             </div>
@@ -508,33 +608,6 @@ export default async function Home() {
         </section>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        {sections.map((s) => {
-          const teaser = teasers[s.teaserKey];
-          return (
-            <Link
-              key={s.href}
-              href={s.href}
-              className="hover-lift group block rounded-none p-5"
-              style={{ background: "var(--surface)", border: "1px solid var(--border-strong)" }}
-            >
-              <div className="flex items-center gap-2 font-semibold">
-                <span aria-hidden style={{ width: 9, height: 9, background: "var(--accent)", flex: "none", transform: "rotate(45deg)" }} />
-                <span className="group-hover:underline">{s.label}</span>
-              </div>
-              {teaser ? (
-                <div className="text-sm mt-1.5 font-semibold tabular-nums" style={{ color: "var(--accent)" }}>
-                  {teaser}
-                </div>
-              ) : (
-                <div className="text-sm mt-1.5" style={{ color: "var(--ink-secondary)" }}>
-                  {s.desc}
-                </div>
-              )}
-            </Link>
-          );
-        })}
-      </div>
     </main>
   );
 }
