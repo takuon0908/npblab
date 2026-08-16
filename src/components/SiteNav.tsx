@@ -11,6 +11,7 @@ const NAV = [
   { href: "/titles", label: "タイトルレース" },
   { href: "/prospects", label: "2軍注目選手" },
   { href: "/analysis", label: "LABバリュー" },
+  { href: "/compare", label: "選手比較" },
   { href: "/columns", label: "コラム" },
 ];
 
@@ -29,6 +30,7 @@ const NAV_GROUPS = [
       { href: "/teams", label: "球団一覧" },
       { href: "/draft", label: "ドラフト" },
       { href: "/prospects", label: "2軍注目選手" },
+      { href: "/compare", label: "選手比較" },
     ],
   },
   {

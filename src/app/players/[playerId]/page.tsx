@@ -333,8 +333,15 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
           <PlayerSocialLinksRow links={socialLinks} />
         </div>
       </div>
-      <div className="mt-3">
+      <div className="mt-3 flex items-center gap-3">
         <ShareButton title={`${player.playerName}(${player.team.name})の成績・データ`} url={`${siteUrl}/players/${playerId}`} />
+        <Link
+          href={`/compare?p1=${encodeURIComponent(playerId)}`}
+          className="text-xs hover:underline"
+          style={{ color: "var(--accent)" }}
+        >
+          他の選手と比較する →
+        </Link>
       </div>
       <div className="mb-8" />
 
