@@ -1,0 +1,54 @@
+import type { DraftPickInput } from "../seed";
+
+// 中日ドラゴンズ 2021〜2025年ドラフト指名選手(支配下・育成)。
+// NPB公式サイト(ドラフト結果・個人年度別成績)を一次情報とし、退団・移籍・トレード等の経緯は
+// 報道で補強してリサーチ(2026年8月15日時点のスナップショット)。
+export const picks: DraftPickInput[] = [
+  { year: 2021, round: 1, playerName: "ブライト健太", position: "外野手", previousAffiliation: "上武大学", npbDebutMade: true, careerGames: 156, qualifiedSeasons: 0, titles: "", isActive: true, note: "2025年に自己最多83試合に出場し打率.259。通算156試合(2023〜2026年)、規定打席には未到達。" },
+  { year: 2021, round: 2, playerName: "鵜飼航丞", position: "外野手", previousAffiliation: "駒澤大学", npbDebutMade: true, careerGames: 196, qualifiedSeasons: 0, titles: "", isActive: true, note: "通算196試合、打率.201前後。2026年は54試合出場・打率.235と持ち直しつつある。" },
+  { year: 2021, round: 3, playerName: "石森大誠", position: "投手", previousAffiliation: "火の国サラマンダーズ", npbDebutMade: false, careerGames: 0, qualifiedSeasons: 0, titles: "", isActive: false, note: "一軍登板なし。2024年10月に戦力外通告を受け現役引退し、中日の球団職員(広報担当)に転身。" },
+  { year: 2021, round: 4, playerName: "味谷大誠", position: "捕手", previousAffiliation: "花咲徳栄高", npbDebutMade: true, careerGames: 16, qualifiedSeasons: 0, titles: "", isActive: true, note: "強肩を生かした捕手。通算16試合、打率.211。二軍中心のキャリアが続く。" },
+  { year: 2021, round: 5, playerName: "星野真生", position: "内野手", previousAffiliation: "豊橋中央高", npbDebutMade: false, careerGames: 0, qualifiedSeasons: 0, titles: "", isActive: false, note: "一軍出場歴なし。2025年10月2日に戦力外通告を受け、2026年から社会人野球「三京アムコ」でプレー。" },
+  { year: 2021, round: 6, playerName: "福元悠真", position: "外野手", previousAffiliation: "大阪商業大学", npbDebutMade: true, careerGames: 1, qualifiedSeasons: 0, titles: "", isActive: true, note: "プロ1年目の2022年に一軍1試合出場。2023年オフに右肩手術を受け育成契約となったが、2026年7月に3年ぶり支配下登録。" },
+
+  { year: 2022, round: 1, playerName: "仲地礼亜", position: "投手", previousAffiliation: "沖縄大学", npbDebutMade: true, careerGames: 15, qualifiedSeasons: 0, titles: "", isActive: true, note: "沖縄県内の大学からドラフト1位指名を受けた史上初の選手。通算15登板、2勝5敗、防御率5.50前後。" },
+  { year: 2022, round: 2, playerName: "村松開人", position: "内野手", previousAffiliation: "明治大学", npbDebutMade: true, careerGames: 365, qualifiedSeasons: 1, titles: "", isActive: true, note: "2024年に規定打席に到達し打率.275。堅実な守備と勝負強い打撃でレギュラーに定着。" },
+  { year: 2022, round: 3, playerName: "森山暁生", position: "投手", previousAffiliation: "阿南光高", npbDebutMade: false, careerGames: 0, qualifiedSeasons: 0, titles: "", isActive: true, note: "2026年8月時点で一軍公式戦出場なし。左腕として二軍で経験を積む。" },
+  { year: 2022, round: 4, playerName: "山浅龍之介", position: "捕手", previousAffiliation: "聖光学院高", npbDebutMade: true, careerGames: 10, qualifiedSeasons: 0, titles: "", isActive: true, note: "通算10試合出場も無安打。インサイドワークに定評があり二軍で経験を積む段階。" },
+  { year: 2022, round: 5, playerName: "濱将乃介", position: "外野手", previousAffiliation: "福井ネクサスエレファンツ", npbDebutMade: true, careerGames: 5, qualifiedSeasons: 0, titles: "", isActive: true, note: "2025年に一軍デビュー(5試合)。同年12月の現役ドラフトでDeNAへ移籍(中日は知野直人を獲得)。" },
+  { year: 2022, round: 6, playerName: "田中幹也", position: "内野手", previousAffiliation: "亜細亜大学", npbDebutMade: true, careerGames: 280, qualifiedSeasons: 0, titles: "", isActive: true, note: "俊足巧打の遊撃手として二遊間に定着。通算280試合、打率.244前後。" },
+  { year: 2022, round: 7, playerName: "福永裕基", position: "内野手", previousAffiliation: "日本新薬", npbDebutMade: true, careerGames: 306, qualifiedSeasons: 1, titles: "", isActive: true, note: "2024年に規定打席到達・打率.306。広角に打ち分ける巧打が持ち味で、2026年も打率.279前後と好調。" },
+  { year: 2022, round: 1, isDevelopmental: true, playerName: "松山晋也", position: "投手", previousAffiliation: "八戸学院大学", npbDebutMade: true, careerGames: 179, qualifiedSeasons: 0, titles: "2024年最優秀中継ぎ投手、2025年最多セーブ投手(46セーブ、セ・リーグ記録タイ)、2024年・2026年オールスターゲーム選出", isActive: true, note: "育成出身選手として史上初のセーブ王(2025年)。2023年6月に支配下登録され、以降クローザーとして活躍。" },
+  { year: 2022, round: 2, isDevelopmental: true, playerName: "野中天翔", position: "投手", previousAffiliation: "ノースアジア大学明桜高", npbDebutMade: false, careerGames: 0, qualifiedSeasons: 0, titles: "", isActive: false, note: "一軍出場歴なし。育成契約3年目の2025年10月に戦力外通告を受け、現役続行を希望している。" },
+  { year: 2022, round: 3, isDevelopmental: true, playerName: "樋口正修", position: "内野手", previousAffiliation: "埼玉武蔵ヒートベアーズ", npbDebutMade: true, careerGames: 59, qualifiedSeasons: 0, titles: "", isActive: true, note: "2023年7月に支配下登録。俊足を生かした代走・守備固めが持ち味。通算59試合。" },
+
+  { year: 2023, round: 1, playerName: "草加勝", position: "投手", previousAffiliation: "亜細亜大学", npbDebutMade: true, careerGames: 18, qualifiedSeasons: 0, titles: "", isActive: true, note: "右肘手術のリハビリを経て2025年に一軍デビュー。2026年は17登板・防御率1.02前後と好投。" },
+  { year: 2023, round: 2, playerName: "津田啓史", position: "内野手", previousAffiliation: "三菱重工East", npbDebutMade: true, careerGames: 5, qualifiedSeasons: 0, titles: "", isActive: true, note: "2025年に一軍デビュー(5試合、無安打)。同年オフに育成契約となり、二軍で再アピールを続ける。" },
+  { year: 2023, round: 3, playerName: "辻本倫太郎", position: "内野手", previousAffiliation: "仙台大学", npbDebutMade: true, careerGames: 57, qualifiedSeasons: 0, titles: "", isActive: true, note: "通算57試合、打率.148。二軍では長打力を発揮するが一軍定着には至っていない。" },
+  { year: 2023, round: 4, playerName: "福田幸之介", position: "投手", previousAffiliation: "履正社高", npbDebutMade: true, careerGames: 1, qualifiedSeasons: 0, titles: "", isActive: true, note: "最速151キロの直球が武器の左腕。2025年9月に一軍デビュー(通算1登板)。" },
+  { year: 2023, round: 5, playerName: "土生翔太", position: "投手", previousAffiliation: "茨城アストロプラネッツ", npbDebutMade: true, careerGames: 7, qualifiedSeasons: 0, titles: "", isActive: true, note: "2024年に一軍デビュー(7試合、防御率6.00前後)。2025年以降は一軍登板がない。" },
+  { year: 2023, round: 6, playerName: "加藤竜馬", position: "投手", previousAffiliation: "東邦ガス", npbDebutMade: false, careerGames: 0, qualifiedSeasons: 0, titles: "", isActive: false, note: "一軍出場歴なし。2024年オフに育成契約へ転換し投手から外野手に転向するも、2025年10月に戦力外通告を受け現役引退。" },
+  { year: 2023, round: 1, isDevelopmental: true, playerName: "日渡騰輝", position: "捕手", previousAffiliation: "茨城アストロプラネッツ", npbDebutMade: false, careerGames: 0, qualifiedSeasons: 0, titles: "", isActive: true, note: "一軍出場歴なし。2026年7月、日本ハム・宮内春輝投手との育成選手同士の交換トレードで日本ハムへ移籍(NPB史上初の育成選手間トレード)。" },
+  { year: 2023, round: 2, isDevelopmental: true, playerName: "菊田翔友", position: "投手", previousAffiliation: "愛媛マンダリンパイレーツ", npbDebutMade: false, careerGames: 0, qualifiedSeasons: 0, titles: "", isActive: false, note: "一軍出場歴なし。2025年10月に戦力外通告。同年12月、九州アジアリーグ宮崎サンシャインズへ入団。" },
+  { year: 2023, round: 3, isDevelopmental: true, playerName: "尾田剛樹", position: "外野手", previousAffiliation: "栃木ゴールデンブレーブス", npbDebutMade: true, careerGames: 128, qualifiedSeasons: 0, titles: "", isActive: true, note: "俊足が武器の外野手。通算128試合出場も打率.042と打撃は低迷しており、二軍で盗塁数を伸ばしている。" },
+  { year: 2023, round: 4, isDevelopmental: true, playerName: "川上理偉", position: "内野手", previousAffiliation: "大分B-リングス", npbDebutMade: false, careerGames: 0, qualifiedSeasons: 0, titles: "", isActive: true, note: "一軍出場歴なし。独立リーグ出身。二軍では長打力を発揮し、2023年ウエスタン・リーグ打点王を獲得。" },
+
+  { year: 2024, round: 1, playerName: "金丸夢斗", position: "投手", previousAffiliation: "関西大学", npbDebutMade: true, careerGames: 34, qualifiedSeasons: 1, titles: "", isActive: true, note: "プロ2年目の2026年に規定投球回到達(19登板、5勝9敗、防御率2.67前後)。先発ローテーションに定着。" },
+  { year: 2024, round: 2, playerName: "吉田聖弥", position: "投手", previousAffiliation: "西濃運輸", npbDebutMade: true, careerGames: 42, qualifiedSeasons: 0, titles: "", isActive: true, note: "2026年は37試合登板・防御率1.82前後とセットアッパーとして台頭。" },
+  { year: 2024, round: 3, playerName: "森駿太", position: "内野手", previousAffiliation: "桐光学園高", npbDebutMade: true, careerGames: 6, qualifiedSeasons: 0, titles: "", isActive: true, note: "2025年9月にプロ初出場・初安打(対ヤクルト)。二軍では長打力が持ち味。" },
+  { year: 2024, round: 4, playerName: "石伊雄太", position: "捕手", previousAffiliation: "日本生命", npbDebutMade: true, careerGames: 165, qualifiedSeasons: 0, titles: "", isActive: true, note: "新人年からチーム最多の捕手起用を受け、通算165試合・打率.244前後。強肩とパンチ力のある打撃が持ち味。" },
+  { year: 2024, round: 5, playerName: "高橋幸佑", position: "投手", previousAffiliation: "北照高", npbDebutMade: false, careerGames: 0, qualifiedSeasons: 0, titles: "", isActive: true, note: "2026年8月時点で一軍公式戦出場なし。高卒2年目で二軍で経験を積む。" },
+  { year: 2024, round: 6, playerName: "有馬恵叶", position: "投手", previousAffiliation: "聖カタリナ学園高", npbDebutMade: false, careerGames: 0, qualifiedSeasons: 0, titles: "", isActive: true, note: "2026年8月時点で一軍公式戦出場なし。191cmの長身から投げ下ろす直球が武器。" },
+  { year: 2024, round: 1, isDevelopmental: true, playerName: "中村奈一輝", position: "内野手", previousAffiliation: "宮崎商業高", npbDebutMade: false, careerGames: 0, qualifiedSeasons: 0, titles: "", isActive: true, note: "一軍出場歴なし。二軍で経験を積みながら打撃強化に取り組む。" },
+  { year: 2024, round: 2, isDevelopmental: true, playerName: "井上剣也", position: "投手", previousAffiliation: "鹿児島実業高", npbDebutMade: false, careerGames: 0, qualifiedSeasons: 0, titles: "", isActive: true, note: "一軍出場歴なし。最速151キロの直球が武器で、支配下登録を目指し二軍で調整中。" },
+
+  { year: 2025, round: 1, playerName: "中西聖輝", position: "投手", previousAffiliation: "青山学院大学", npbDebutMade: true, careerGames: 7, qualifiedSeasons: 0, titles: "", isActive: true, note: "ドラフト1位ルーキー。2026年に一軍デビューし7登板・2勝3敗、防御率5.71前後。" },
+  { year: 2025, round: 2, playerName: "櫻井頼之介", position: "投手", previousAffiliation: "東北福祉大学", npbDebutMade: true, careerGames: 10, qualifiedSeasons: 0, titles: "", isActive: true, note: "2026年3月に一軍デビューし開幕ローテーション入り。通算10登板・2勝4敗。" },
+  { year: 2025, round: 3, playerName: "篠﨑国忠", position: "投手", previousAffiliation: "徳島インディゴソックス", npbDebutMade: true, careerGames: 3, qualifiedSeasons: 0, titles: "", isActive: true, note: "最速158キロの本格派右腕。2026年6月に一軍初昇格(通算3登板)。二軍では実戦初登板から10試合連続無失点を記録。" },
+  { year: 2025, round: 4, playerName: "能戸輝夢", position: "外野手", previousAffiliation: "明秀学園日立高", npbDebutMade: false, careerGames: 0, qualifiedSeasons: 0, titles: "", isActive: true, note: "2026年8月時点で一軍公式戦出場なし。6月に一軍に初帯同し、巧打の外野手として二軍で成長中。" },
+  { year: 2025, round: 5, playerName: "新保茉良", position: "内野手", previousAffiliation: "東北福祉大学", npbDebutMade: false, careerGames: 0, qualifiedSeasons: 0, titles: "", isActive: true, note: "2026年8月時点で一軍公式戦出場なし。二軍では打率3割台をマークし一軍デビューを目指す。" },
+  { year: 2025, round: 6, playerName: "花田旭", position: "外野手", previousAffiliation: "東洋大学", npbDebutMade: true, careerGames: 19, qualifiedSeasons: 0, titles: "", isActive: true, note: "2026年4月に一軍デビューし2試合連続マルチ安打も、同月に左膝を負傷し離脱。通算19試合。" },
+  { year: 2025, round: 1, isDevelopmental: true, playerName: "牧野憲伸", position: "投手", previousAffiliation: "オイシックス新潟アルビレックス・ベースボール・クラブ", npbDebutMade: false, careerGames: 0, qualifiedSeasons: 0, titles: "", isActive: true, note: "2026年8月時点で一軍出場歴なし。6月に一軍に合流したが出場選手登録は見送られている。" },
+  { year: 2025, round: 2, isDevelopmental: true, playerName: "石川大峨", position: "内野手", previousAffiliation: "掛川西高", npbDebutMade: false, careerGames: 0, qualifiedSeasons: 0, titles: "", isActive: true, note: "一軍出場歴なし。高卒1年目から二軍で一塁・三塁・DHを経験し、通算9試合出場。" },
+  { year: 2025, round: 3, isDevelopmental: true, playerName: "三上愛介", position: "外野手", previousAffiliation: "愛媛マンダリンパイレーツ", npbDebutMade: false, careerGames: 0, qualifiedSeasons: 0, titles: "", isActive: true, note: "一軍出場歴なし。強肩・俊足が武器で、独立リーグ時代に盗塁43個(リーグ2位)を記録。" },
+];
