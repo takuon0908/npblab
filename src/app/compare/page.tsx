@@ -5,6 +5,9 @@ import { CompareForm } from "@/components/CompareForm";
 import { PercentileBar } from "@/components/PercentileBar";
 import { StatTooltip } from "@/components/StatTooltip";
 import { formatAvg } from "@/lib/format";
+import { prisma } from "@/lib/prisma";
+import { Level } from "@prisma/client";
+import { latestPerPlayer } from "@/lib/latestPerPlayer";
 
 export const revalidate = 3600;
 
@@ -47,6 +50,74 @@ const PITCHING_METRICS: { key: string; label: string; definition: string; format
   { key: "kPercent", label: "奪三振力(K%)", definition: "打者対戦数に占める奪三振の割合。高いほど良い。", format: (v) => `${(v * 100).toFixed(1)}%` },
   { key: "bbPercent", label: "制球力(BB%)", definition: "打者対戦数に占める与四球の割合。低いほど良い。", format: (v) => `${(v * 100).toFixed(1)}%` },
 ];
+
+// トップページと同じ「実データから機械的に選ぶ」方針。現在の本塁打王争い上位2名・
+// 防御率争い上位2名(規定投球回相当に達している投手のみ)を比較ページへの導線として提示する
+async function getSuggestedMatchups() {
+  const season = new Date().getFullYear();
+  const [battingRows, pitchingRows] = await Promise.all([
+    prisma.playerBattingStat.findMany({ where: { level: Level.ICHIGUN, season }, include: { team: true } }),
+    prisma.playerPitchingStat.findMany({ where: { level: Level.ICHIGUN, season }, include: { team: true } }),
+  ]);
+
+  const hrLeaders = [...latestPerPlayer(battingRows)]
+    .sort((a, b) => b.homeRuns - a.homeRuns)
+    .slice(0, 2);
+
+  const eraLeaders = [...latestPerPlayer(pitchingRows)]
+    .filter((p) => p.inningsPitched >= 40)
+    .sort((a, b) => a.era - b.era)
+    .slice(0, 2);
+
+  const matchups: { title: string; sub: string; p1: string; p2: string; p1Name: string; p2Name: string }[] = [];
+  if (hrLeaders.length === 2) {
+    matchups.push({
+      title: "本塁打王争い",
+      sub: `${hrLeaders[0].playerName} ${hrLeaders[0].homeRuns}本 vs ${hrLeaders[1].playerName} ${hrLeaders[1].homeRuns}本`,
+      p1: hrLeaders[0].playerId,
+      p2: hrLeaders[1].playerId,
+      p1Name: hrLeaders[0].playerName,
+      p2Name: hrLeaders[1].playerName,
+    });
+  }
+  if (eraLeaders.length === 2) {
+    matchups.push({
+      title: "防御率争い",
+      sub: `${eraLeaders[0].playerName} ${eraLeaders[0].era.toFixed(2)} vs ${eraLeaders[1].playerName} ${eraLeaders[1].era.toFixed(2)}`,
+      p1: eraLeaders[0].playerId,
+      p2: eraLeaders[1].playerId,
+      p1Name: eraLeaders[0].playerName,
+      p2Name: eraLeaders[1].playerName,
+    });
+  }
+  return matchups;
+}
+
+function SuggestedMatchups({ matchups }: { matchups: Awaited<ReturnType<typeof getSuggestedMatchups>> }) {
+  if (matchups.length === 0) return null;
+  return (
+    <div className="mt-8">
+      <h2 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-secondary)" }}>
+        人気の比較
+      </h2>
+      <div className="grid gap-3 sm:grid-cols-2">
+        {matchups.map((m) => (
+          <Link
+            key={m.title}
+            href={`/compare?p1=${encodeURIComponent(m.p1)}&p2=${encodeURIComponent(m.p2)}`}
+            className="hover-lift rounded-2xl p-4 block"
+            style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+          >
+            <div className="text-xs font-semibold mb-1" style={{ color: "var(--accent)" }}>
+              {m.title}
+            </div>
+            <div className="text-sm font-medium tabular-nums">{m.sub}</div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function MetricRow({
   metric,
@@ -105,6 +176,7 @@ export default async function ComparePage({
 
   const bothFound = a && b;
   const sameType = bothFound && a.type === b.type;
+  const matchups = bothFound ? [] : await getSuggestedMatchups();
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
@@ -121,6 +193,7 @@ export default async function ComparePage({
               選手が見つかりませんでした。もう一度検索して選び直してください。
             </p>
           )}
+          <SuggestedMatchups matchups={matchups} />
         </>
       )}
 

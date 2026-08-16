@@ -75,7 +75,10 @@ export default async function TeamsPage() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-16">
-      <h1 className="text-2xl font-black mb-6">球団別 優勝確率</h1>
+      <h1 className="text-2xl font-black mb-2">球団別 優勝確率</h1>
+      <p className="text-sm mb-8" style={{ color: "var(--ink-secondary)" }}>
+        セ・パ12球団の最新順位と貯金借金、残り試合シミュレーションによる優勝確率を毎日更新。球団名をクリックすると個別ページで詳細な分析が見られます。
+      </p>
 
       {rows.every((r) => !r.standing) ? (
         <p className="text-sm" style={{ color: "var(--ink-secondary)" }}>
