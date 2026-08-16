@@ -44,8 +44,8 @@ export default function AboutPage() {
       <section id="author" className="mb-10 scroll-mt-20">
         <h2 className="font-semibold text-lg mb-4">運営者について</h2>
         <div
-          className="flex flex-col sm:flex-row items-start gap-5 p-5"
-          style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
+          className="flex flex-col sm:flex-row items-start gap-5 rounded-2xl p-5"
+          style={{ border: "1px solid var(--border)", background: "var(--surface)", boxShadow: "var(--shadow-sm)" }}
         >
           <Image
             src={SITE_AUTHOR.image}
