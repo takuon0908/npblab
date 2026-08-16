@@ -35,3 +35,7 @@ export function trackFavoriteTeamSelect(teamSlug: string | null): void {
 export function trackContactSubmit(): void {
   send("contact_submit", {});
 }
+
+export function trackSearchSelect(resultType: "player" | "team" | "column", query: string): void {
+  send("search_select", { result_type: resultType, query });
+}

@@ -3,6 +3,7 @@ import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { FavoriteTeamPicker } from "@/components/FavoriteTeamPicker";
 import { SiteNav } from "@/components/SiteNav";
+import { CommandPalette } from "@/components/CommandPalette";
 
 export async function SiteHeader() {
   const teams = await prisma.team.findMany({ select: { slug: true, name: true }, orderBy: { name: "asc" } });
@@ -17,6 +18,7 @@ export async function SiteHeader() {
           <div className="min-w-0 flex-1">
             <SiteNav />
           </div>
+          <CommandPalette />
           <FavoriteTeamPicker teams={teams} />
         </div>
       </div>

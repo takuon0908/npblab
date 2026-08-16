@@ -43,6 +43,14 @@ export function parseTags(tags?: string): string[] {
     .filter(Boolean);
 }
 
+// コマンドパレット(⌘K)向けのタイトル全文検索。microCMSのq(全文検索)パラメータを使う
+export async function searchColumns(q: string, limit = 5) {
+  return getClient().getList<Column>({
+    endpoint: "columns",
+    queries: { q, limit, fields: "id,slug,title,category" },
+  });
+}
+
 export async function getColumns(limit = 20, category?: string, tag?: string, offset = 0) {
   const filters = [
     category ? `category[contains]${category}` : null,
