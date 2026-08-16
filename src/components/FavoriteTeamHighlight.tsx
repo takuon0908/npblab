@@ -28,8 +28,8 @@ export function FavoriteTeamHighlight({ teams }: { teams: TeamHighlight[] }) {
   return (
     <Link
       href={`/teams/${team.slug}`}
-      className="hover-lift group block p-4 mb-8"
-      style={{ background: "var(--surface)", border: "1px solid var(--border-strong)", borderLeft: `4px solid ${accent}` }}
+      className="hover-lift group block rounded-lg p-4 mb-8"
+      style={{ background: "var(--surface)", border: "1px solid var(--border)", borderLeft: `4px solid ${accent}`, boxShadow: "var(--shadow-sm)" }}
     >
       <p className="text-xs font-semibold mb-1.5" style={{ color: accent }}>
         あなたの球団

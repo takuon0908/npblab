@@ -550,8 +550,8 @@ export default async function Home() {
           {heroColumn && (
             <Link
               href={`/columns/${heroColumn.slug}`}
-              className="hover-lift group grid gap-0 sm:grid-cols-2 mb-4 rounded-none overflow-hidden"
-              style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
+              className="hover-lift group grid gap-0 sm:grid-cols-2 mb-4 rounded-2xl overflow-hidden"
+              style={{ border: "1px solid var(--border)", background: "var(--surface)", boxShadow: "var(--shadow-sm)" }}
             >
               <div className="aspect-video sm:aspect-auto sm:h-full">
                 <ArticleCoverImage
@@ -583,8 +583,8 @@ export default async function Home() {
                 <Link
                   key={c.id}
                   href={`/columns/${c.slug}`}
-                  className="hover-lift group flex gap-3 rounded-none overflow-hidden p-3"
-                  style={{ background: "var(--surface)", border: "1px solid var(--border-strong)" }}
+                  className="hover-lift group flex gap-3 rounded-2xl overflow-hidden p-3"
+                  style={{ background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow-sm)" }}
                 >
                   <div className="w-20 aspect-square flex-none">
                     <ArticleCoverImage slug={c.slug} text={`${c.title} ${stripHtml(c.body)}`} category={c.category} tags={c.tags} />

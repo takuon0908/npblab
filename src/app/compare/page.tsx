@@ -214,8 +214,8 @@ export default async function ComparePage({
               <Link
                 key={p.playerId}
                 href={`/players/${encodeURIComponent(p.playerId)}`}
-                className="rounded-lg p-4 hover:opacity-80 transition-opacity"
-                style={{ background: "var(--surface)", border: "1px solid var(--border-strong)" }}
+                className="hover-lift rounded-2xl p-4"
+                style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
               >
                 <div className="text-lg font-bold">{p.playerName}</div>
                 <div className="text-xs" style={{ color: "var(--ink-muted)" }}>

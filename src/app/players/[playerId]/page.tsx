@@ -663,8 +663,8 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
               <Link
                 key={t.playerId}
                 href={`/players/${t.playerId}`}
-                className="hover-lift flex items-center justify-between gap-2 px-3 py-2 text-sm"
-                style={{ background: "var(--surface)", border: "1px solid var(--border-strong)" }}
+                className="hover-lift flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm"
+                style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
               >
                 <span className="hover:underline">{t.playerName}</span>
                 <span className="text-xs tabular-nums" style={{ color: "var(--ink-muted)" }}>
@@ -691,8 +691,8 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
               <Link
                 key={c.id}
                 href={`/columns/${c.slug}`}
-                className="hover-lift flex items-baseline justify-between gap-3 px-3 py-2 text-sm"
-                style={{ background: "var(--surface)", border: "1px solid var(--border-strong)" }}
+                className="hover-lift flex items-baseline justify-between gap-3 rounded-lg px-3 py-2 text-sm"
+                style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
               >
                 <span className="hover:underline">{c.title}</span>
                 <span className="text-xs whitespace-nowrap" style={{ color: "var(--ink-muted)" }}>

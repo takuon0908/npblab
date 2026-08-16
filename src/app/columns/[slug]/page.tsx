@@ -300,8 +300,8 @@ export default async function ColumnPage({
                             alt={d.alt!}
                             width={1400}
                             height={764}
-                            className="w-full h-auto rounded-none"
-                            style={{ border: "1px solid var(--border-strong)" }}
+                            className="w-full h-auto rounded-lg"
+                            style={{ border: "1px solid var(--border)" }}
                           />
                         </figure>
                       )

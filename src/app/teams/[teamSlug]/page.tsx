@@ -587,8 +587,8 @@ export default async function TeamPage({
               <Link
                 key={c.id}
                 href={`/columns/${c.slug}`}
-                className="hover-lift group rounded-none overflow-hidden"
-                style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
+                className="hover-lift group rounded-2xl overflow-hidden"
+                style={{ border: "1px solid var(--border)", background: "var(--surface)", boxShadow: "var(--shadow-sm)" }}
               >
                 <div className="aspect-video">
                   <ArticleCoverImage slug={c.slug} text={`${c.title} ${c.body.replace(/<[^>]+>/g, "")}`} category={c.category} tags={c.tags} showCategoryBadge />
