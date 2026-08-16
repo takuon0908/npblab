@@ -106,10 +106,10 @@ export default async function TeamDraftPage({ params }: { params: Promise<{ team
           {/* 年度ごとに別々の<table>にすると、それぞれ独立して列幅を計算してしまい
               スクロールしていくと列がズレて見える。1つの連続したテーブルにまとめ、
               年度は区切り行(colSpan)で表現することで列幅を全体で揃えている */}
-          <Table>
+          <Table fixedLayout>
             <colgroup>
               <col style={{ width: "64px" }} />
-              <col />
+              <col style={{ width: "140px" }} />
               <col style={{ width: "72px" }} />
               <col style={{ width: "64px" }} />
               <col style={{ width: "64px" }} />
@@ -119,7 +119,7 @@ export default async function TeamDraftPage({ params }: { params: Promise<{ team
             <thead>
               <tr>
                 <Th>順位</Th>
-                <Th>選手</Th>
+                <Th sticky>選手</Th>
                 <Th>ポジション</Th>
                 <Th align="right">一軍出場</Th>
                 <Th align="right">規定到達</Th>
@@ -147,7 +147,7 @@ export default async function TeamDraftPage({ params }: { params: Promise<{ team
                       <td className="px-3 py-2 align-top" style={{ color: "var(--ink-secondary)" }}>
                         {p.isDevelopmental ? `育成${p.round}位` : `${p.round}位`}
                       </td>
-                      <td className="px-3 py-2 align-top">
+                      <td className="px-3 py-2 align-top sticky left-0 z-10" style={{ background: "var(--surface)" }}>
                         <div style={{ fontWeight: 700 }}>{p.playerName}</div>
                         <div className="text-xs" style={{ color: "var(--ink-muted)" }}>
                           {p.previousAffiliation ?? "―"}

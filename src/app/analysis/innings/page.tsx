@@ -162,7 +162,7 @@ export default async function InningsAnalysisPage() {
           <Table>
             <thead>
               <tr>
-                <Th>球団</Th>
+                <Th sticky>球団</Th>
                 {INNING_LABELS.map((label) => (
                   <Th key={label} align="right">
                     {label}
@@ -173,7 +173,7 @@ export default async function InningsAnalysisPage() {
             <tbody>
               {sorted.map((t) => (
                 <tr key={t.teamId}>
-                  <Td>
+                  <Td sticky>
                     <Link href={`/teams/${t.teamSlug}`} className="hover:underline inline-flex items-center gap-1.5">
                       <span
                         aria-hidden
@@ -209,7 +209,7 @@ export default async function InningsAnalysisPage() {
           <Table>
             <thead>
               <tr>
-                <Th>球団</Th>
+                <Th sticky>球団</Th>
                 {INNING_LABELS.map((label) => (
                   <Th key={label} align="right">
                     {label}
@@ -220,7 +220,7 @@ export default async function InningsAnalysisPage() {
             <tbody>
               {sorted.map((t) => (
                 <tr key={t.teamId}>
-                  <Td>
+                  <Td sticky>
                     <Link href={`/teams/${t.teamSlug}`} className="hover:underline inline-flex items-center gap-1.5">
                       <span
                         aria-hidden
