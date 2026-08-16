@@ -9,6 +9,7 @@ import { getColumns } from "@/lib/microcms";
 import { getPopularColumns } from "@/lib/columnViews";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
 import { TEAM_THEME } from "@/lib/teamTheme";
+import { RankBar } from "@/components/RankBar";
 import { prisma } from "@/lib/prisma";
 import { TitleCategory, ProspectCategory } from "@prisma/client";
 
@@ -109,8 +110,26 @@ function buildSectionTeasers(hero: HeroStats): Record<string, string | null> {
 }
 
 // ヒーロー最上部に並べる「キラーデータ」カード。数字の力を最初に見せるため、
-// 文章に埋め込まず大きな数字として独立させる(dataviz原則: 見出しは数字、文脈は添え書き)
-function HeroStatCard({ label, value, sub, href, accent }: { label: string; value: string; sub: string; href: string; accent?: string }) {
+// 文章に埋め込まず大きな数字として独立させる(dataviz原則: 見出しは数字、文脈は添え書き)。
+// ratio/deltaが渡された場合(=優勝確率カード)は、進捗バーと前日比を添えて
+// 「今どのくらい強いか」「昨日から動いたか」を一目で伝える
+function HeroStatCard({
+  label,
+  value,
+  sub,
+  href,
+  accent,
+  ratio,
+  delta,
+}: {
+  label: string;
+  value: string;
+  sub: string;
+  href: string;
+  accent?: string;
+  ratio?: number;
+  delta?: number | null;
+}) {
   return (
     <Link
       href={href}
@@ -120,9 +139,25 @@ function HeroStatCard({ label, value, sub, href, accent }: { label: string; valu
       <p className="text-xs mb-1.5" style={{ color: "var(--ink-muted)" }}>
         {label}
       </p>
-      <p className="text-2xl font-black tabular-nums mb-1" style={{ fontFamily: "var(--font-heading)", color: "var(--accent)" }}>
-        {value}
-      </p>
+      <div className="flex items-baseline gap-2 mb-1">
+        <p className="text-2xl font-black tabular-nums" style={{ fontFamily: "var(--font-heading)", color: "var(--accent)" }}>
+          {value}
+        </p>
+        {delta !== undefined && delta !== null && Math.abs(delta) >= 0.001 && (
+          <span
+            className="text-xs font-semibold tabular-nums whitespace-nowrap"
+            style={{ color: delta > 0 ? "var(--good)" : "var(--critical)" }}
+          >
+            {delta > 0 ? "▲" : "▼"}
+            {Math.abs(delta * 100).toFixed(1)}pt
+          </span>
+        )}
+      </div>
+      {ratio !== undefined && (
+        <div className="mb-1.5">
+          <RankBar ratio={ratio} widthClassName="w-full" />
+        </div>
+      )}
       <p className="text-xs" style={{ color: "var(--ink-secondary)" }}>
         {sub}
       </p>
@@ -130,7 +165,7 @@ function HeroStatCard({ label, value, sub, href, accent }: { label: string; valu
   );
 }
 
-function HeroStatsRow({ hero }: { hero: HeroStats }) {
+function HeroStatsRow({ hero, topTeamDelta }: { hero: HeroStats; topTeamDelta: number | null }) {
   const cards = [
     hero.topTeam && {
       label: "優勝確率 首位",
@@ -138,6 +173,8 @@ function HeroStatsRow({ hero }: { hero: HeroStats }) {
       sub: hero.topTeam.team.name,
       href: "/teams",
       accent: TEAM_THEME[hero.topTeam.team.slug]?.accent,
+      ratio: hero.topTeam.probability,
+      delta: topTeamDelta,
     },
     hero.topTitle && {
       label: "本塁打王争い",
@@ -186,6 +223,7 @@ export interface TeamHighlight {
   slug: string;
   name: string;
   probability: number;
+  probabilityDelta: number | null;
   rank: number;
   wins: number;
   losses: number;
@@ -198,19 +236,26 @@ export interface TeamHighlight {
 // 「どの球団が選ばれても対応できるデータ」を先に渡し、選別はクライアント側で行う)
 async function getTeamHighlights(): Promise<TeamHighlight[]> {
   try {
-    const [champDate, standingsDate, titleDate] = await Promise.all([
-      prisma.championshipProbability.aggregate({ _max: { date: true } }),
+    const [champDates, standingsDate, titleDate] = await Promise.all([
+      prisma.championshipProbability.findMany({
+        distinct: ["date"],
+        select: { date: true },
+        orderBy: { date: "desc" },
+        take: 2,
+      }),
       prisma.standingsSnapshot.aggregate({ _max: { date: true } }),
       prisma.titleRaceProbability.aggregate({ _max: { date: true } }),
     ]);
-    if (!champDate._max.date || !standingsDate._max.date) return [];
+    const [latestDate, previousDate] = [champDates[0]?.date, champDates[1]?.date];
+    if (!latestDate || !standingsDate._max.date) return [];
 
-    const [probs, standings, titleRows] = await Promise.all([
+    const [probs, previousProbs, standings, titleRows] = await Promise.all([
       prisma.championshipProbability.findMany({
-        where: { date: champDate._max.date },
+        where: { date: latestDate },
         include: { team: true },
         orderBy: { probability: "desc" },
       }),
+      previousDate ? prisma.championshipProbability.findMany({ where: { date: previousDate } }) : Promise.resolve([]),
       prisma.standingsSnapshot.findMany({ where: { date: standingsDate._max.date } }),
       titleDate._max.date
         ? prisma.titleRaceProbability.findMany({ where: { date: titleDate._max.date }, orderBy: { probability: "desc" } })
@@ -218,6 +263,7 @@ async function getTeamHighlights(): Promise<TeamHighlight[]> {
     ]);
 
     const standingsByTeam = new Map(standings.map((s) => [s.teamId, s]));
+    const previousProbByTeam = new Map(previousProbs.map((p) => [p.teamId, p]));
     const bestTitleByTeam = new Map<string, (typeof titleRows)[number]>();
     for (const row of titleRows) {
       if (!bestTitleByTeam.has(row.teamId)) bestTitleByTeam.set(row.teamId, row);
@@ -226,10 +272,12 @@ async function getTeamHighlights(): Promise<TeamHighlight[]> {
     return probs.map((p, i) => {
       const standing = standingsByTeam.get(p.teamId);
       const title = bestTitleByTeam.get(p.teamId);
+      const previous = previousProbByTeam.get(p.teamId);
       return {
         slug: p.team.slug,
         name: p.team.name,
         probability: p.probability,
+        probabilityDelta: previous ? p.probability - previous.probability : null,
         rank: i + 1,
         wins: standing?.wins ?? 0,
         losses: standing?.losses ?? 0,
@@ -332,7 +380,7 @@ export default async function Home() {
           </Link>
         )}
 
-        <HeroStatsRow hero={heroStats} />
+        <HeroStatsRow hero={heroStats} topTeamDelta={teamHighlights[0]?.probabilityDelta ?? null} />
 
         {teamHighlights.length > 0 && <FavoriteTeamHighlight teams={teamHighlights} />}
 

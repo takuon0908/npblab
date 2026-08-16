@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { FAVORITE_TEAM_EVENT, getFavoriteTeam } from "@/lib/favoriteTeam";
 import { TEAM_THEME } from "@/lib/teamTheme";
+import { RankBar } from "@/components/RankBar";
 import type { TeamHighlight } from "@/app/page";
 
 // お気に入り球団を選んでいるのに何も変わらないと機能の意味が薄いため、選択直後から
@@ -36,10 +37,22 @@ export function FavoriteTeamHighlight({ teams }: { teams: TeamHighlight[] }) {
       <p className="text-base font-bold group-hover:underline" style={{ fontFamily: "var(--font-heading)" }}>
         {team.name}　優勝確率{" "}
         <span className="tabular-nums">{(team.probability * 100).toFixed(1)}%</span>
+        {team.probabilityDelta !== null && Math.abs(team.probabilityDelta) >= 0.001 && (
+          <span
+            className="text-xs font-semibold tabular-nums ml-1.5"
+            style={{ color: team.probabilityDelta > 0 ? "var(--good)" : "var(--critical)" }}
+          >
+            {team.probabilityDelta > 0 ? "▲" : "▼"}
+            {Math.abs(team.probabilityDelta * 100).toFixed(1)}pt
+          </span>
+        )}
         <span className="text-xs font-normal ml-2" style={{ color: "var(--ink-muted)" }}>
           {team.rank}位 / {team.wins}勝{team.losses}敗（{team.gamesBehind.toFixed(1)}差）
         </span>
       </p>
+      <div className="mt-2 mb-1 max-w-[240px]">
+        <RankBar ratio={team.probability} widthClassName="w-full" />
+      </div>
       {team.topTitleCandidate && (
         <p className="text-xs mt-1.5" style={{ color: "var(--ink-muted)" }}>
           タイトル候補: {team.topTitleCandidate.playerName}（{team.topTitleCandidate.label}{" "}
