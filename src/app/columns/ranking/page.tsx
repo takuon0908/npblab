@@ -63,11 +63,13 @@ export default async function ColumnsRankingPage() {
                   {i + 1}
                 </Td>
                 <Td>
-                  <Link href={`/columns/${c.slug}`} className="hover:underline">
-                    {c.title}
-                  </Link>
-                  <div className="text-xs mt-0.5" style={{ color: "var(--ink-muted)" }}>
-                    {formatDateJa(new Date(c.publishedAt))}
+                  <div className="whitespace-normal" style={{ maxWidth: 420 }}>
+                    <Link href={`/columns/${c.slug}`} className="hover:underline">
+                      {c.title}
+                    </Link>
+                    <div className="text-xs mt-0.5" style={{ color: "var(--ink-muted)" }}>
+                      {formatDateJa(new Date(c.publishedAt))}
+                    </div>
                   </div>
                 </Td>
                 <Td align="right">
