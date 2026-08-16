@@ -13,10 +13,10 @@ export function Table({
 }) {
   return (
     <div
-      className="relative rounded-none min-w-0"
-      style={{ border: "1px solid var(--border-strong)", background: "var(--surface)" }}
+      className="relative overflow-hidden min-w-0"
+      style={{ border: "1px solid var(--border)", borderRadius: 16, background: "var(--surface)", boxShadow: "var(--shadow-sm)" }}
     >
-      <div className="overflow-x-auto rounded-none [&_tbody_tr]:transition-colors [&_tbody_tr:hover]:bg-[var(--page)]">
+      <div className="overflow-x-auto [&_tbody_tr]:transition-colors [&_tbody_tr:hover]:bg-[var(--page)]">
         <table
           className="w-full text-sm border-collapse"
           style={fixedLayout ? { tableLayout: "fixed" } : undefined}
@@ -25,7 +25,7 @@ export function Table({
         </table>
       </div>
       <div
-        className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 rounded-r-lg"
+        className="pointer-events-none absolute right-0 top-0 bottom-0 w-8"
         style={{ background: "linear-gradient(to right, transparent, var(--surface))" }}
       />
     </div>
@@ -47,7 +47,7 @@ export function Th({
   return (
     <th
       className={`px-3 py-2 text-xs font-medium whitespace-nowrap ${align === "right" ? "text-right" : "text-left"} ${sticky ? "sticky left-0 z-10" : ""}`}
-      style={{ color: "var(--ink-muted)", borderBottom: "1px solid var(--border)", background: sticky ? "var(--surface)" : undefined }}
+      style={{ color: "var(--ink-muted)", borderBottom: "1px solid var(--border)", background: "var(--page)" }}
     >
       {children}
     </th>
