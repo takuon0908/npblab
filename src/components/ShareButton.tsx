@@ -1,6 +1,18 @@
+"use client";
+
+import { trackShareClick } from "@/lib/trackEvent";
+
 // X(旧Twitter)への共有リンク。GoodButtonと横並びで馴染むよう同系のピル型ボタンにし、
 // ホバー時だけ号外風のアクセントカラーを効かせる
-export function ShareButton({ title, url }: { title: string; url: string }) {
+export function ShareButton({
+  title,
+  url,
+  contentType,
+}: {
+  title: string;
+  url: string;
+  contentType: "player" | "team" | "column";
+}) {
   const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`;
 
   return (
@@ -8,6 +20,7 @@ export function ShareButton({ title, url }: { title: string; url: string }) {
       href={shareUrl}
       target="_blank"
       rel="noopener noreferrer"
+      onClick={() => trackShareClick(contentType, title)}
       className="group inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors"
       style={{
         border: "1px solid var(--border-strong)",

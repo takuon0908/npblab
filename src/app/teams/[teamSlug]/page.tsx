@@ -565,7 +565,7 @@ export default async function TeamPage({
         </div>
       )}
 
-      <A8Banner />
+      <A8Banner placement={`team:${team.slug}`} />
 
       {relatedColumns.length > 0 && (
         <section className="mt-10 pt-8" style={{ borderTop: "1px solid var(--border)" }}>

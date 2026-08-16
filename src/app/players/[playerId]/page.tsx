@@ -334,7 +334,11 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
         </div>
       </div>
       <div className="mt-3 flex items-center gap-3">
-        <ShareButton title={`${player.playerName}(${player.team.name})の成績・データ`} url={`${siteUrl}/players/${playerId}`} />
+        <ShareButton
+          title={`${player.playerName}(${player.team.name})の成績・データ`}
+          url={`${siteUrl}/players/${playerId}`}
+          contentType="player"
+        />
         <Link
           href={`/compare?p1=${encodeURIComponent(playerId)}`}
           className="text-xs hover:underline"
@@ -647,7 +651,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
         </div>
       )}
 
-      <A8Banner />
+      <A8Banner placement={`player:${playerId}`} />
 
       {player.teammates.length > 0 && (
         <div className="mt-12">

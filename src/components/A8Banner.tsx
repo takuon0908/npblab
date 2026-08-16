@@ -1,7 +1,13 @@
+"use client";
+
+import { trackAffiliateClick } from "@/lib/trackEvent";
+
 // A8.net静的バナー広告。RakutenWidget(document.write方式でiframeが必要)と違い、
 // <a><img></a>+計測用1x1画像だけの単純な構成なので追加のiframeは不要。
 // クリック計測用のURL・画像URLはA8管理画面で発行されたコードをそのまま使うこと(改変すると計測が壊れる)。
-export function A8Banner() {
+// A8側の計測ピクセルとは別に、GA4側でも「どのページ配置からクリックされたか」を
+// 追えるようplacement(掲出場所)を必ず渡す
+export function A8Banner({ placement }: { placement: string }) {
   return (
     <div
       className="rounded-none"
@@ -20,7 +26,12 @@ export function A8Banner() {
       </div>
       <div className="p-3 flex justify-center">
         {/* eslint-disable-next-line @next/next/no-img-element -- A8計測タグは素の<img>である必要がある(next/imageだとURLが書き換わり計測が壊れる) */}
-        <a href="https://px.a8.net/svt/ejp?a8mat=4BA4TD+GE0L9U+461Y+6DRLT" rel="nofollow" target="_blank">
+        <a
+          href="https://px.a8.net/svt/ejp?a8mat=4BA4TD+GE0L9U+461Y+6DRLT"
+          rel="nofollow"
+          target="_blank"
+          onClick={() => trackAffiliateClick("a8", "スカパー", placement)}
+        >
           <img
             style={{ border: 0 }}
             width={300}

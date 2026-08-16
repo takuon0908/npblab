@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { hasLiked, toggleLiked } from "@/lib/likedColumns";
+import { trackArticleLike } from "@/lib/trackEvent";
 
 export function GoodButton({ slug, initialCount }: { slug: string; initialCount: number }) {
   const [count, setCount] = useState(initialCount);
@@ -17,6 +18,7 @@ export function GoodButton({ slug, initialCount }: { slug: string; initialCount:
     const next = toggleLiked(slug);
     setLiked(next);
     setCount((c) => c + (next ? 1 : -1));
+    trackArticleLike(slug, next ? "like" : "unlike");
 
     try {
       await fetch("/api/columns/like", {

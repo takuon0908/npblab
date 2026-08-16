@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getFavoriteTeam, setFavoriteTeam } from "@/lib/favoriteTeam";
+import { trackFavoriteTeamSelect } from "@/lib/trackEvent";
 
 export function FavoriteTeamPicker({ teams }: { teams: { slug: string; name: string }[] }) {
   const [selected, setSelected] = useState("");
@@ -18,6 +19,7 @@ export function FavoriteTeamPicker({ teams }: { teams: { slug: string; name: str
           const value = e.target.value;
           setSelected(value);
           setFavoriteTeam(value || null);
+          trackFavoriteTeamSelect(value || null);
         }}
         className="appearance-none cursor-pointer truncate max-w-[92px] sm:max-w-none text-xs rounded-none pl-2 pr-6 py-1 bg-transparent border-[1px] border-solid border-[color:var(--border-strong)] hover:border-[color:var(--accent)] focus:border-[color:var(--accent)] transition-colors"
         style={{ color: "var(--ink-secondary)" }}

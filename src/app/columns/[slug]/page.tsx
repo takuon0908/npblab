@@ -325,12 +325,12 @@ export default async function ColumnPage({
         )}
 
         <div className="mt-8 flex justify-center">
-          <A8Banner />
+          <A8Banner placement={`column:${column.slug}`} />
         </div>
 
         <div className="mt-6 flex justify-center gap-3">
           <GoodButton slug={column.slug} initialCount={likeCount} />
-          <ShareButton title={column.title} url={`${siteUrl}/columns/${column.slug}`} />
+          <ShareButton title={column.title} url={`${siteUrl}/columns/${column.slug}`} contentType="column" />
         </div>
 
         <Link

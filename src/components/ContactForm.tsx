@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { trackContactSubmit } from "@/lib/trackEvent";
 
 export function ContactForm() {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
@@ -23,6 +24,7 @@ export function ContactForm() {
       });
       if (!res.ok) throw new Error("failed");
       setStatus("sent");
+      trackContactSubmit();
       form.reset();
     } catch {
       setStatus("error");
