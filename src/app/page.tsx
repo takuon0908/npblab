@@ -8,11 +8,10 @@ import { FavoriteTeamHighlight } from "@/components/FavoriteTeamHighlight";
 import { getColumns } from "@/lib/microcms";
 import { getPopularColumns } from "@/lib/columnViews";
 import { ArticleCoverImage } from "@/components/ArticleCoverImage";
-import { TEAM_THEME } from "@/lib/teamTheme";
 import { RankBar } from "@/components/RankBar";
 import { teamAbbr } from "@/lib/teamAbbr";
 import { prisma } from "@/lib/prisma";
-import { TitleCategory, ProspectCategory } from "@prisma/client";
+import { TitleCategory, ProspectCategory, League } from "@prisma/client";
 
 function stripHtml(html: string): string {
   return html.replace(/<[^>]+>/g, "").trim();
@@ -36,32 +35,53 @@ async function getLatestColumnsSafely() {
   }
 }
 
+// リーグ別上位1件を取り出す共通ヘルパー。配列は事前に目的の指標でソート済みである前提
+function firstInLeague<T extends { team: { league: League } }>(rows: T[], league: League): T | null {
+  return rows.find((r) => r.team.league === league) ?? null;
+}
+
 // TOPページの導線カードとヒーローの「キラーデータ」カードの両方に使う「今の一番」の生きた数字。
+// 優勝確率・本塁打王・独自指標MVP・新人王候補はセ/パ別に見たいという要望のため、リーグ別に取得する。
 // 同じクエリ結果を使い回し、DB問い合わせを1回で済ませる
 async function getHeroStats() {
   try {
-    const [champDate, titleDate, prospectDate, valueDate] = await Promise.all([
-      prisma.championshipProbability.aggregate({ _max: { date: true } }),
+    const season = new Date().getFullYear();
+    const [champDates, titleDate, prospectDate, valueDate] = await Promise.all([
+      prisma.championshipProbability.findMany({
+        distinct: ["date"],
+        select: { date: true },
+        orderBy: { date: "desc" },
+        take: 2,
+      }),
       prisma.titleRaceProbability.aggregate({ _max: { date: true } }),
       prisma.prospectRating.aggregate({ _max: { date: true } }),
       prisma.playerValueRating.aggregate({ _max: { date: true } }),
     ]);
+    const [latestChampDate, previousChampDate] = [champDates[0]?.date, champDates[1]?.date];
 
-    const [topTeam, topTitle, topProspect, topValue] = await Promise.all([
-      champDate._max.date
-        ? prisma.championshipProbability.findFirst({
-            where: { date: champDate._max.date },
+    const [champRows, previousChampRows, titleRows, valueRows, topProspect, rookiePicks] = await Promise.all([
+      latestChampDate
+        ? prisma.championshipProbability.findMany({
+            where: { date: latestChampDate },
+            include: { team: true },
             orderBy: { probability: "desc" },
-            include: { team: true },
           })
-        : null,
+        : [],
+      previousChampDate ? prisma.championshipProbability.findMany({ where: { date: previousChampDate } }) : [],
       titleDate._max.date
-        ? prisma.titleRaceProbability.findFirst({
+        ? prisma.titleRaceProbability.findMany({
             where: { date: titleDate._max.date, category: TitleCategory.HOME_RUNS },
-            orderBy: { currentValue: "desc" },
             include: { team: true },
+            orderBy: { currentValue: "desc" },
           })
-        : null,
+        : [],
+      valueDate._max.date
+        ? prisma.playerValueRating.findMany({
+            where: { date: valueDate._max.date },
+            include: { team: true },
+            orderBy: { value: "desc" },
+          })
+        : [],
       prospectDate._max.date
         ? prisma.prospectRating.findFirst({
             where: { date: prospectDate._max.date, category: ProspectCategory.BATTING },
@@ -69,19 +89,54 @@ async function getHeroStats() {
             include: { team: true },
           })
         : null,
-      valueDate._max.date
-        ? prisma.playerValueRating.findFirst({
-            where: { date: valueDate._max.date },
-            orderBy: { rank: "asc" },
-            include: { team: true },
-          })
-        : null,
+      // 新人王候補の母集団: 直近3年のドラフト指名選手(ドラフトDBにplayerId列は無いため、
+      // 選手ページと同じ「球団slug-選手名」形式で決定的に算出したIDでLABバリューと突き合わせる)
+      prisma.draftPick.findMany({
+        where: { year: { gte: season - 3, lte: season - 1 } },
+        include: { team: true },
+      }),
     ]);
 
-    return { topTeam, topTitle, topProspect, topValue };
+    const previousChampByTeam = new Map(previousChampRows.map((p) => [p.teamId, p]));
+    function champDelta(teamId: string, probability: number): number | null {
+      const previous = previousChampByTeam.get(teamId);
+      return previous ? probability - previous.probability : null;
+    }
+
+    const rookieIds = new Set(rookiePicks.map((p) => `${p.team.slug}-${p.playerName.replace(/\s+/g, "")}`));
+    const rookieRows = valueRows.filter((r) => rookieIds.has(r.playerId));
+
+    const champCentral = firstInLeague(champRows, League.CENTRAL);
+    const champPacific = firstInLeague(champRows, League.PACIFIC);
+
+    return {
+      champCentral,
+      champPacific,
+      champCentralDelta: champCentral ? champDelta(champCentral.teamId, champCentral.probability) : null,
+      champPacificDelta: champPacific ? champDelta(champPacific.teamId, champPacific.probability) : null,
+      titleCentral: firstInLeague(titleRows, League.CENTRAL),
+      titlePacific: firstInLeague(titleRows, League.PACIFIC),
+      valueCentral: firstInLeague(valueRows, League.CENTRAL),
+      valuePacific: firstInLeague(valueRows, League.PACIFIC),
+      rookieCentral: firstInLeague(rookieRows, League.CENTRAL),
+      rookiePacific: firstInLeague(rookieRows, League.PACIFIC),
+      topProspect,
+    };
   } catch {
     // DB未接続のビルド環境でも失敗させない
-    return { topTeam: null, topTitle: null, topProspect: null, topValue: null };
+    return {
+      champCentral: null,
+      champPacific: null,
+      champCentralDelta: null,
+      champPacificDelta: null,
+      titleCentral: null,
+      titlePacific: null,
+      valueCentral: null,
+      valuePacific: null,
+      rookieCentral: null,
+      rookiePacific: null,
+      topProspect: null,
+    };
   }
 }
 
@@ -158,37 +213,121 @@ function DashboardCard({
   );
 }
 
-function DeltaBadge({ delta }: { delta: number | null }) {
-  if (delta === null || Math.abs(delta) < 0.001) return null;
+// セ・パ両リーグの値を1枚のカードで見せる「注目データ」カード。優勝確率・タイトルレース・
+// 独自指標MVP・新人王のように「リーグごとに別の答えがある」指標はDashboardCardの単一値ではなく
+// こちらを使い、セ/パの2行を1カードにまとめることでカード数を無闇に増やさないようにしている
+function SplitLeagueCard({
+  badgeLabel,
+  badgeColor,
+  badgeBg,
+  cornerNote,
+  central,
+  pacific,
+  footer,
+  href,
+}: {
+  badgeLabel: string;
+  badgeColor: string;
+  badgeBg: string;
+  cornerNote?: string;
+  central: { name: string; value: string; delta?: number | null } | null;
+  pacific: { name: string; value: string; delta?: number | null } | null;
+  footer: React.ReactNode;
+  href: string;
+}) {
+  const rows: { leagueLabel: string; row: { name: string; value: string; delta?: number | null } }[] = [];
+  if (central) rows.push({ leagueLabel: "セ", row: central });
+  if (pacific) rows.push({ leagueLabel: "パ", row: pacific });
+  if (rows.length === 0) return null;
+
   return (
-    <span
-      className="text-xs font-bold whitespace-nowrap tabular-nums"
-      style={{ color: delta > 0 ? "var(--good)" : "var(--critical)" }}
+    <Link
+      href={href}
+      className="hover-lift flex flex-col justify-between rounded-2xl p-5 transition-shadow"
+      style={{ background: "var(--surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow-sm)" }}
     >
-      {delta > 0 ? "↑" : "↓"} {Math.abs(delta * 100).toFixed(1)}%
-    </span>
+      <div>
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <span
+            className="text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap"
+            style={{ color: badgeColor, background: badgeBg }}
+          >
+            {badgeLabel}
+          </span>
+          {cornerNote && (
+            <span className="text-xs" style={{ color: "var(--ink-muted)" }}>
+              {cornerNote}
+            </span>
+          )}
+        </div>
+        {rows.map(({ leagueLabel, row }, i) => (
+          <div
+            key={leagueLabel}
+            className="flex items-center justify-between gap-2 py-1.5"
+            style={i > 0 ? { borderTop: "1px solid var(--border)" } : undefined}
+          >
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span
+                className="flex-none flex items-center justify-center text-[10px] font-bold rounded-full"
+                style={{ width: 20, height: 20, background: "var(--page)", color: "var(--ink-secondary)" }}
+              >
+                {leagueLabel}
+              </span>
+              <span className="text-sm font-semibold truncate" style={{ color: "var(--ink)" }}>
+                {row.name}
+              </span>
+            </div>
+            <div className="flex-none flex items-baseline gap-1">
+              {row.delta !== undefined && row.delta !== null && Math.abs(row.delta) >= 0.001 && (
+                <span
+                  className="text-[10px] font-bold tabular-nums"
+                  style={{ color: row.delta > 0 ? "var(--good)" : "var(--critical)" }}
+                >
+                  {row.delta > 0 ? "▲" : "▼"}
+                  {Math.abs(row.delta * 100).toFixed(1)}
+                </span>
+              )}
+              <span
+                className="tabular-nums font-bold text-sm"
+                style={{ fontFamily: "var(--font-mono)", color: "var(--ink)" }}
+              >
+                {row.value}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="text-xs pt-2 mt-2" style={{ borderTop: "1px solid var(--border)", color: "var(--ink-muted)" }}>
+        {footer}
+      </div>
+    </Link>
   );
 }
 
-function HeroStatsRow({ hero, topTeamDelta }: { hero: HeroStats; topTeamDelta: number | null }) {
+function HeroStatsRow({ hero }: { hero: HeroStats }) {
   const cards: React.ReactNode[] = [];
 
-  if (hero.topTeam) {
+  if (hero.champCentral || hero.champPacific) {
     cards.push(
-      <DashboardCard
+      <SplitLeagueCard
         key="champ"
         badgeLabel="優勝確率 首位"
         badgeColor="var(--accent)"
         badgeBg="var(--accent-track)"
-        corner={<DeltaBadge delta={topTeamDelta} />}
-        teamLine={hero.topTeam.team.name}
-        value={`${(hero.topTeam.probability * 100).toFixed(1)}`}
-        valueUnit="%"
-        ratio={hero.topTeam.probability}
+        central={
+          hero.champCentral
+            ? { name: hero.champCentral.team.name, value: `${(hero.champCentral.probability * 100).toFixed(1)}%`, delta: hero.champCentralDelta }
+            : null
+        }
+        pacific={
+          hero.champPacific
+            ? { name: hero.champPacific.team.name, value: `${(hero.champPacific.probability * 100).toFixed(1)}%`, delta: hero.champPacificDelta }
+            : null
+        }
         footer={
           <div className="flex justify-between">
             <span>順位表を見る</span>
-            <span className="font-bold" style={{ color: TEAM_THEME[hero.topTeam.team.slug]?.accent ?? "var(--accent)" }}>
+            <span className="font-bold" style={{ color: "var(--accent)" }}>
               →
             </span>
           </div>
@@ -198,26 +337,29 @@ function HeroStatsRow({ hero, topTeamDelta }: { hero: HeroStats; topTeamDelta: n
     );
   }
 
-  if (hero.topTitle) {
+  if (hero.titleCentral || hero.titlePacific) {
     cards.push(
-      <DashboardCard
+      <SplitLeagueCard
         key="title"
         badgeLabel="タイトルレース"
         badgeColor="var(--category-amber)"
         badgeBg="var(--category-amber-soft)"
-        corner={
-          <span className="text-xs" style={{ color: "var(--ink-muted)" }}>
-            本塁打王
-          </span>
+        cornerNote="本塁打王"
+        central={
+          hero.titleCentral
+            ? { name: `${hero.titleCentral.playerName}（${teamAbbr(hero.titleCentral.team.slug)}）`, value: `${hero.titleCentral.currentValue}本` }
+            : null
         }
-        teamLine={`${hero.topTitle.playerName}（${teamAbbr(hero.topTitle.team.slug)}）`}
-        value={`${hero.topTitle.currentValue}`}
-        valueUnit="本"
+        pacific={
+          hero.titlePacific
+            ? { name: `${hero.titlePacific.playerName}（${teamAbbr(hero.titlePacific.team.slug)}）`, value: `${hero.titlePacific.currentValue}本` }
+            : null
+        }
         footer={
           <div className="flex justify-between">
-            <span>獲得確率</span>
-            <span className="font-bold tabular-nums" style={{ color: "var(--ink)" }}>
-              {(hero.topTitle.probability * 100).toFixed(1)}%
+            <span>タイトルレース全項目を見る</span>
+            <span className="font-bold" style={{ color: "var(--category-amber)" }}>
+              →
             </span>
           </div>
         }
@@ -226,21 +368,49 @@ function HeroStatsRow({ hero, topTeamDelta }: { hero: HeroStats; topTeamDelta: n
     );
   }
 
-  if (hero.topValue) {
+  if (hero.valueCentral || hero.valuePacific) {
     cards.push(
-      <DashboardCard
+      <SplitLeagueCard
         key="value"
         badgeLabel="独自指標 MVP"
         badgeColor="var(--category-purple)"
         badgeBg="var(--category-purple-soft)"
-        corner={
-          <span className="text-xs" style={{ color: "var(--ink-muted)" }}>
-            LABバリュー
-          </span>
+        cornerNote="LABバリュー"
+        central={
+          hero.valueCentral
+            ? { name: `${hero.valueCentral.playerName}（${teamAbbr(hero.valueCentral.team.slug)}）`, value: hero.valueCentral.value.toFixed(2) }
+            : null
         }
-        teamLine={`${hero.topValue.playerName}（${teamAbbr(hero.topValue.team.slug)}）`}
-        value={hero.topValue.value.toFixed(2)}
-        footer="総合貢献度の独自試算トップ"
+        pacific={
+          hero.valuePacific
+            ? { name: `${hero.valuePacific.playerName}（${teamAbbr(hero.valuePacific.team.slug)}）`, value: hero.valuePacific.value.toFixed(2) }
+            : null
+        }
+        footer="総合貢献度の独自試算トップ（セ・パ別）"
+        href="/analysis"
+      />,
+    );
+  }
+
+  if (hero.rookieCentral || hero.rookiePacific) {
+    cards.push(
+      <SplitLeagueCard
+        key="rookie"
+        badgeLabel="新人王候補"
+        badgeColor="var(--category-cyan)"
+        badgeBg="var(--category-cyan-soft)"
+        cornerNote="LABバリュー"
+        central={
+          hero.rookieCentral
+            ? { name: `${hero.rookieCentral.playerName}（${teamAbbr(hero.rookieCentral.team.slug)}）`, value: hero.rookieCentral.value.toFixed(2) }
+            : null
+        }
+        pacific={
+          hero.rookiePacific
+            ? { name: `${hero.rookiePacific.playerName}（${teamAbbr(hero.rookiePacific.team.slug)}）`, value: hero.rookiePacific.value.toFixed(2) }
+            : null
+        }
+        footer="直近3年のドラフト指名選手から独自指標トップを算出（当サイト独自の簡易試算）"
         href="/analysis"
       />,
     );
@@ -287,7 +457,7 @@ function HeroStatsRow({ hero, topTeamDelta }: { hero: HeroStats; topTeamDelta: n
           毎日更新
         </span>
       </div>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">{cards}</div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">{cards}</div>
     </section>
   );
 }
@@ -481,7 +651,7 @@ export default async function Home() {
           </Link>
         )}
 
-        <HeroStatsRow hero={heroStats} topTeamDelta={teamHighlights[0]?.probabilityDelta ?? null} />
+        <HeroStatsRow hero={heroStats} />
 
         {teamHighlights.length > 0 && <FavoriteTeamHighlight teams={teamHighlights} />}
 

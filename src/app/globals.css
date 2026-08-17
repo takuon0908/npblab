@@ -33,6 +33,8 @@
   --category-purple-soft: #faf5ff;
   --category-emerald: #059669;
   --category-emerald-soft: #ecfdf5;
+  --category-cyan: #0891b2;
+  --category-cyan-soft: #ecfeff;
 
   --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
