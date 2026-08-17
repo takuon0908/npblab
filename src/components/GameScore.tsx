@@ -285,10 +285,11 @@ function ScoreboardGameScore({
 
   return (
     <div
-      className="hover-lift relative rounded-none py-3 pl-5 pr-4 tabular-nums overflow-hidden"
+      className="hover-lift relative rounded-2xl py-3 pl-5 pr-4 tabular-nums overflow-hidden h-full"
       style={{
-        border: isClose ? "1.5px solid color-mix(in srgb, var(--accent) 55%, var(--border-strong))" : "1px solid var(--border-strong)",
+        border: isClose ? "1.5px solid color-mix(in srgb, var(--accent) 55%, var(--border))" : "1px solid var(--border)",
         background: "var(--surface)",
+        boxShadow: "var(--shadow-sm)",
       }}
     >
       <div

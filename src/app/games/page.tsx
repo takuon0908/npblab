@@ -76,8 +76,8 @@ export default async function GamesPage() {
             {probableStarters.map((g) => (
               <div
                 key={g.id}
-                className="flex items-center justify-between gap-2 rounded px-3 py-2 text-sm"
-                style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
+                className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm"
+                style={{ border: "1px solid var(--border)", background: "var(--surface)", boxShadow: "var(--shadow-sm)" }}
               >
                 <span style={{ color: "var(--ink-muted)" }} className="text-xs whitespace-nowrap">
                   {formatDateJa(g.date).replace(/^\d+年/, "")}
@@ -100,20 +100,14 @@ export default async function GamesPage() {
           データがありません。<code>npm run scrape</code> を実行してください。
         </p>
       ) : (
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-8">
           {gamesByDate.map(([dateKey, games]) => (
-            <section key={dateKey} className="flex items-baseline gap-4">
-              <h2
-                className="text-xs whitespace-nowrap w-16 shrink-0 pt-2"
-                style={{ color: "var(--ink-muted)" }}
-              >
-                {formatDateJa(new Date(dateKey)).replace(/^\d+年/, "")}
+            <section key={dateKey}>
+              <h2 className="flex items-center gap-2 text-base font-bold mb-3" style={{ color: "var(--ink)" }}>
+                <span aria-hidden className="w-2 h-5 rounded-full inline-block" style={{ background: "var(--accent)" }} />
+                {formatDateJa(new Date(dateKey))}
               </h2>
-              <FavoriteAwareGameGrid
-                games={games}
-                className="flex flex-col gap-2 flex-1 min-w-0"
-                variant="scoreboard"
-              />
+              <FavoriteAwareGameGrid games={games} variant="scoreboard" className="grid grid-cols-1 sm:grid-cols-2 gap-3" />
             </section>
           ))}
         </div>
