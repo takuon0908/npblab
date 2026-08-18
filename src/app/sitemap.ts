@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAllColumns, CATEGORIES } from "@/lib/microcms";
 import { categoryToSlug } from "@/lib/categorySlug";
 import { siteUrl } from "@/lib/siteUrl";
+import { hasSufficientSeasonSample } from "@/lib/playerContentQuality";
 
 // revalidate未指定だとビルド時(=コードデプロイ時)にしか再生成されない。
 // 日次パイプラインはコードを触らずSupabaseにデータを書き込むだけなので、それだと
@@ -13,11 +14,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const teams = await prisma.team.findMany({ select: { slug: true } });
 
   const season = new Date().getFullYear();
-  const [battingPlayers, pitchingPlayers] = await Promise.all([
-    prisma.playerBattingStat.findMany({ where: { season }, distinct: ["playerId"], select: { playerId: true } }),
-    prisma.playerPitchingStat.findMany({ where: { season }, distinct: ["playerId"], select: { playerId: true } }),
+  const [battingRows, pitchingRows] = await Promise.all([
+    prisma.playerBattingStat.findMany({ where: { season }, select: { playerId: true, level: true, atBats: true, games: true } }),
+    prisma.playerPitchingStat.findMany({ where: { season }, select: { playerId: true, level: true, inningsPitched: true } }),
   ]);
-  const playerIds = [...new Set([...battingPlayers, ...pitchingPlayers].map((p) => p.playerId))];
+  const allPlayerIds = [...new Set([...battingRows.map((p) => p.playerId), ...pitchingRows.map((p) => p.playerId)])];
+  // 今季ほぼ出場のない選手はページの情報量が乏しく、AdSenseの品質審査で
+  // 「有用性の低いコンテンツ」の一因になりうるため、検索エンジンに送るURLから除外する
+  // (ページ自体はnoindexで残るのみ。詳細はplayerContentQuality.ts、players/[playerId]/page.tsx)
+  const playerIds = allPlayerIds.filter((playerId) =>
+    hasSufficientSeasonSample(
+      battingRows.filter((b) => b.playerId === playerId),
+      pitchingRows.filter((p) => p.playerId === playerId),
+    ),
+  );
 
   let columns: { slug: string; updatedAt: string }[] = [];
   try {

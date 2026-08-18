@@ -20,6 +20,7 @@ import { formatAvg } from "@/lib/format";
 import { calcPercentile } from "@/lib/percentile";
 import { PercentileBar } from "@/components/PercentileBar";
 import { StatTooltip } from "@/components/StatTooltip";
+import { hasSufficientSeasonSample } from "@/lib/playerContentQuality";
 
 // データは1日1回(日次パイプライン)しか更新されないため24時間に緩めている(Supabase egress/Vercel ISR Writes対策)
 export const revalidate = 86400;
@@ -200,15 +201,25 @@ export async function generateMetadata({
   const player = await getPlayer(playerId);
   if (!player) return {};
 
-  // 今シーズンの現役データが無い(引退・故障者等)選手は解説文が生成できず内容が薄いため、評価対象から外す
-  const hasCurrentSeasonData =
-    player.currentBatting || player.currentPitching || player.currentNigunBatting || player.currentNigunPitching;
+  // 今季ほぼ出場のない選手(引退・故障者・数打席のみの選手等)はページの実質的な情報量が
+  // 乏しく、大量にインデックスされると「有用性の低いコンテンツ」と判断されうるため、
+  // 一定以上の出場実績がある選手だけを検索エンジンに開放する(詳細はplayerContentQuality.ts)
+  const sufficientSample = hasSufficientSeasonSample(
+    [
+      ...(player.currentBatting ? [{ level: Level.ICHIGUN, atBats: player.currentBatting.atBats, games: player.currentBatting.games }] : []),
+      ...(player.currentNigunBatting ? [{ level: Level.NIGUN, atBats: player.currentNigunBatting.atBats, games: player.currentNigunBatting.games }] : []),
+    ],
+    [
+      ...(player.currentPitching ? [{ level: Level.ICHIGUN, inningsPitched: player.currentPitching.inningsPitched }] : []),
+      ...(player.currentNigunPitching ? [{ level: Level.NIGUN, inningsPitched: player.currentNigunPitching.inningsPitched }] : []),
+    ],
+  );
 
   return {
     title: `${player.playerName} 成績・データ`,
     description: `${player.playerName}(${player.team.name})の最新成績、LABバリュー、セイバーメトリクス指標をシーズン推移で掲載。`,
     alternates: { canonical: `/players/${playerId}` },
-    ...(hasCurrentSeasonData ? {} : { robots: { index: false, follow: true } }),
+    ...(sufficientSample ? {} : { robots: { index: false, follow: true } }),
   };
 }
 
