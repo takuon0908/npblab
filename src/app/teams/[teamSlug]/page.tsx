@@ -15,7 +15,7 @@ import { calcMagicNumber } from "@/lib/baseball";
 import { latestPerPlayer } from "@/lib/latestPerPlayer";
 import { getAllColumns } from "@/lib/microcms";
 import { formatDateJa } from "@/lib/date";
-import { detectColumnTeamSlug, TEAM_THEME } from "@/lib/teamTheme";
+import { detectColumnTeamSlug, TEAM_THEME, TEAM_ALIASES } from "@/lib/teamTheme";
 import { siteUrl } from "@/lib/siteUrl";
 import { getTeamSocialLinks } from "@/lib/teamSocialLinks";
 import { TeamSocialLinksRow } from "@/components/TeamSocialLinks";
@@ -101,9 +101,16 @@ export async function generateMetadata({
   const team = await prisma.team.findUnique({ where: { slug: teamSlug } });
   if (!team) return {};
 
+  // seo-strategist分析(2026-09-05)で「愛称がtitleに入っていない」と指摘されたが、検証すると
+  // 12球団中11球団は正式名称(team.name)が既に愛称・スポンサー名を含んでいた(例:「中日ドラゴンズ」に
+  // 「中日」を含む)。唯一「読売ジャイアンツ」だけ「巨人」という最も一般的な呼び方を含んでいないため、
+  // そのケースのみTEAM_ALIASESから補って括弧書きで追加する(他11球団は変更なし)
+  const missingAlias = (TEAM_ALIASES[teamSlug] ?? []).find((alias) => !team.name.includes(alias));
+  const displayName = missingAlias ? `${team.name}(${missingAlias})` : team.name;
+
   return {
-    title: `${team.name} 順位・優勝確率・戦力分析`,
-    description: `${team.name}の最新順位、貯金借金、優勝確率、パワーランキング、補強シミュレーションを毎日更新。データに基づく戦力分析でチームの現在地がわかります。`,
+    title: `${displayName} 順位・優勝確率・戦力分析`,
+    description: `${displayName}の最新順位、貯金借金、優勝確率、パワーランキング、補強シミュレーションを毎日更新。データに基づく戦力分析でチームの現在地がわかります。`,
     alternates: { canonical: `/teams/${teamSlug}` },
   };
 }
