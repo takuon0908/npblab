@@ -86,10 +86,32 @@ export default async function ColumnPage({
   const bodySections = diagrams.length > 0 || hasMidArticleAffiliate ? splitBodyIntoSections(bodyWithAnchors) : null;
   const midArticleAffiliateAfterSection = 1;
 
+  // 「ルール・基礎知識」カテゴリだけで48記事あり、通常の関連記事アルゴリズム(カテゴリ一致で
+  // 新しい順に6件取得)だと2026年7月下旬公開の本記事群は8月公開の新しい記事群に埋もれて
+  // 一切表示されない。看板記事(月6000表示超)から「圏外ギリギリ」の伸びしろ記事へ内部リンクを
+  // 意図的に流すため、対象記事のみ手動オーバーライドする
+  // (seo-strategist分析 2026-09-05: 通常のアルゴリズムでは構造的にリンクされないと判明)
+  const MANUAL_RELATED_OVERRIDES: Record<string, string[]> = {
+    "rules-basics-cs-new-rule-2026": [
+      "rules-basics-video-review",
+      "rules-basics-tiebreaker",
+      "rules-basics-dh",
+      "rules-basics-save-vs-hold",
+    ],
+  };
+
   const relatedCategory = column.category?.[0];
   const relatedTag = parseTags(column.tags)[0];
   const seenSlugs = new Set([column.slug]);
-  const relatedColumns = relatedCategory
+  const overrideSlugs = MANUAL_RELATED_OVERRIDES[column.slug] ?? [];
+  const overrideResults = await Promise.all(overrideSlugs.map((slug) => getColumnBySlug(slug)));
+  const overrideColumns: NonNullable<(typeof overrideResults)[number]>[] = [];
+  for (const c of overrideResults) {
+    if (!c || seenSlugs.has(c.slug)) continue;
+    seenSlugs.add(c.slug);
+    overrideColumns.push(c);
+  }
+  const relatedColumns = overrideColumns.length > 0 ? overrideColumns : relatedCategory
     ? (await getColumns(6, relatedCategory)).contents.filter((c) => {
         if (seenSlugs.has(c.slug)) return false;
         seenSlugs.add(c.slug);
