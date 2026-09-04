@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "算出方法について",
-  description: "優勝確率・タイトル獲得確率・パワーランキングなど、当サイトの各種指標の算出方法を解説します。",
+  title: "優勝確率・ピタゴラス勝率・Eloレーティングの算出方法",
+  description:
+    "優勝確率シミュレーション、タイトルレース獲得確率、ピタゴラス勝率・Eloパワーランキング、LABバリュー、FIP・wOBAなど、当サイトの独自指標の算出方法をすべて解説します。",
   alternates: { canonical: "/about/methodology" },
 };
 

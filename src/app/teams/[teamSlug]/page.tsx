@@ -331,6 +331,15 @@ export default async function TeamPage({
             )}
           </dl>
 
+          {teamGoods && (
+            // 平均滞在時間が短く(GA4実測11〜40秒)、順位・優勝確率だけ見て離脱するユーザーが
+            // 多いと推測されるため、ここまでの主要スタッツ表示の直後にも導線を用意する
+            // (末尾の設置はそのまま残し、最後まで読むユーザー向けの導線として維持)
+            <div className="mb-8 flex justify-center">
+              <RakutenProductCard product={teamGoods} articleSlug={`team-${team.slug}-mid`} />
+            </div>
+          )}
+
           <div className="grid gap-6 sm:grid-cols-2 mb-8">
             <div>
               <h2 className="text-sm font-semibold mb-3" style={{ color: "var(--ink-muted)" }}>

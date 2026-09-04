@@ -4,13 +4,14 @@ import { prisma } from "@/lib/prisma";
 import { formatDateJa } from "@/lib/date";
 import { FavoriteAwareGameGrid } from "@/components/FavoriteAwareGameGrid";
 import { teamAbbr } from "@/lib/teamAbbr";
+import { A8Banner } from "@/components/A8Banner";
 
 // データは1日1回(日次パイプライン)しか更新されないため24時間に緩めている(Supabase egress/Vercel ISR Writes対策)
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: "試合結果",
-  description: "NPB(プロ野球)の直近の試合結果を日別に一覧表示します。",
+  title: "試合結果一覧 ― 12球団の直近スコア・勝敗投手・予告先発",
+  description: "NPB(プロ野球)セ・パ12球団の直近の試合結果を日別に一覧表示。勝敗投手・セーブ投手・予告先発投手も毎日更新します。",
   alternates: { canonical: "/games" },
 };
 
@@ -94,6 +95,13 @@ export default async function GamesPage() {
           </div>
         </section>
       )}
+
+      {/* GA4実測で平均滞在574秒・直帰率0%と極めて高いエンゲージメントがあるにもかかわらず
+          収益化要素が皆無だったため設置(growth-strategist分析 2026-09-05)。
+          「試合結果を見に来る=毎試合追いたい」層と相性の良いスカパー導線をページ上部に配置 */}
+      <div className="mb-8 flex justify-center">
+        <A8Banner placement="games:top" />
+      </div>
 
       {gamesByDate.length === 0 ? (
         <p className="text-sm" style={{ color: "var(--ink-secondary)" }}>

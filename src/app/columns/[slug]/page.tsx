@@ -75,12 +75,16 @@ export default async function ColumnPage({
   const bodyWithAnchors = wrapTables(bodyWithAnchorsRaw);
   const pointSummary = excerptForMeta(column.body);
   const diagrams = getArticleDiagrams(column.slug);
-  const bodySections = diagrams.length > 0 ? splitBodyIntoSections(bodyWithAnchors) : null;
-
   // 関連記事は「同じカテゴリ」を優先し、枠が余ればタグが一致する記事で埋める。
   // カテゴリだけだと同カテゴリ内に記事が少ない場合に関連記事自体が出なくなるため
   const affiliateProduct = getAffiliateProduct(column.slug, column.category?.[0]);
   const rakutenProduct = getRakutenProduct(column.slug, column.category?.[0]);
+  // アフィリエイト導線が記事末尾(読了後)にしか無く、月間クリックがほぼゼロだった問題への対処。
+  // 見出し1個目のセクション直後にも同じ商品カードを挿入し、離脱前に一度見せる機会を作る
+  // (growth-strategist分析 2026-09-05: 最大流入記事で導線が本文末尾のみだった点を指摘)
+  const hasMidArticleAffiliate = (affiliateProduct || rakutenProduct) && headings.length >= 3;
+  const bodySections = diagrams.length > 0 || hasMidArticleAffiliate ? splitBodyIntoSections(bodyWithAnchors) : null;
+  const midArticleAffiliateAfterSection = 1;
 
   const relatedCategory = column.category?.[0];
   const relatedTag = parseTags(column.tags)[0];
@@ -306,6 +310,12 @@ export default async function ColumnPage({
                         </figure>
                       )
                     )}
+                  {hasMidArticleAffiliate && i === midArticleAffiliateAfterSection && (
+                    <div className="not-prose my-8 flex justify-center gap-4 flex-wrap">
+                      {affiliateProduct && <AmazonProductCard product={affiliateProduct} articleSlug={`${column.slug}-mid`} />}
+                      {rakutenProduct && <RakutenProductCard product={rakutenProduct} articleSlug={`${column.slug}-mid`} />}
+                    </div>
+                  )}
                 </div>
               ))
             : // eslint-disable-next-line react/no-danger

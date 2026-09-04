@@ -25,9 +25,13 @@ export async function generateMetadata({
   // ページネーションは自身を正規URLとして宣言する(常にpage1へ丸め込むとGoogleが2ページ目以降を
   // 正規ページと認識できず、そこにしか出てこない記事一覧がインデックスされなくなるため)
   const canonical = page > 1 ? `/columns?page=${page}` : "/columns";
+  // Semrush実測(2026-09-05, seo-strategist): 「プロ野球 コラム」320回/月、「コラム 一覧」320回/月の
+  // 検索需要があり、旧title「コラム」単体にはこの2語のどちらも入っていなかった(順位62.1の主因と推測)
+  const baseTitle = "プロ野球コラム一覧 ― NPBのデータ分析・ルール解説記事まとめ";
   return {
-    title: page > 1 ? `コラム(${page}ページ目)` : "コラム",
-    description: "NPBのデータ分析コラム。独自指標や優勝確率・タイトルレースの考察記事一覧。",
+    title: page > 1 ? `${baseTitle}(${page}ページ目)` : baseTitle,
+    description:
+      "NPB(プロ野球)のデータ分析コラムを一覧掲載。優勝確率・タイトルレースの考察、野球のルール解説、投球・打撃の科学、セイバーメトリクス指標の読み方まで、当サイトのライター陣が解説します。",
     alternates: { canonical },
   };
 }

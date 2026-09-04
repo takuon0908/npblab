@@ -25,6 +25,11 @@ const TITLE_UPDATES: Record<string, string> = {
   "rules-basics-video-review": "ビデオ判定（リクエスト）は1試合何回まで？仕組みと回数のルール ― 野球のルール入門",
   "rules-basics-save-vs-hold": "セーブとホールドの違いとは？ 今季の争いで見る「条件」の差 ― 野球のルール入門",
   "rules-basics-danger-pitch-ejection": "危険球退場は日本プロ野球独自のルール ― 野球のルール入門",
+  // seo-strategist分析(2026-09-05): 上記と同じ「シリーズ接頭辞が実キーワードより前に来て
+  // 表示上不利」パターンが、この2本にはまだ適用されていなかった(適用漏れ)。
+  // 「タイブレーク とは」はSemrush実測で月間14,800回・難易度28と伸びしろが大きい
+  "rules-basics-tiebreaker": "タイブレークとは何か？いつ・どんな条件で導入されるのか【野球のルール入門】",
+  "rules-basics-dh": "DH制度とは何か、セ・リーグとパ・リーグでなぜ違うのか【野球のルール入門】",
 };
 
 async function main() {
